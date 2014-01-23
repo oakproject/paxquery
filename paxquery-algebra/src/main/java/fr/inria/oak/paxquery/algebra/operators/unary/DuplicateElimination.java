@@ -23,7 +23,7 @@ import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
  * Duplicate elimination logical operator.
  *
  */
-public class DuplicateElimination extends BaseUnaryOperator implements Cloneable{
+public class DuplicateElimination extends BaseUnaryOperator {
 
 	public int[] columns;
 	
@@ -45,16 +45,6 @@ public class DuplicateElimination extends BaseUnaryOperator implements Cloneable
 		this.columns = columns;
 		this.visible = true;
 		this.nestedMetadata = child.getNRSMD();
-	}
-	
-	@Override
-	public Object clone() throws  CloneNotSupportedException{
-		try {
-			return new DuplicateElimination((BaseLogicalOperator)this.getChild().clone(), this.columns);
-		} catch (PAXQueryExecutionException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 }

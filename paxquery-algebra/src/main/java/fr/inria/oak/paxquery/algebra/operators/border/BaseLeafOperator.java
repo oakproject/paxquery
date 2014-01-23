@@ -22,7 +22,7 @@ import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
  * Generic class that a leaf operator extends.
  *
  */
-public abstract class BaseLeafOperator extends BaseLogicalOperator implements Cloneable{
+public abstract class BaseLeafOperator extends BaseLogicalOperator {
 	
 	@Override
 	public int recursiveDotString(StringBuffer sb, int parentNo, int firstAvailableNo) {
@@ -49,11 +49,4 @@ public abstract class BaseLeafOperator extends BaseLogicalOperator implements Cl
 		}
 		return firstAvailableNo;
 	}
-	
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		throw new CloneNotSupportedException();
-	}
-
-	
 }

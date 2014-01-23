@@ -29,7 +29,7 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
  * Generic class that a logical operator extends.
  *
  */
-public abstract class BaseLogicalOperator implements Cloneable {
+public abstract class BaseLogicalOperator {
 	
 	private static final Log logger = LogFactory.getLog(BaseLogicalOperator.class);
 	
@@ -96,12 +96,6 @@ public abstract class BaseLogicalOperator implements Cloneable {
 		} catch (Exception e) {
 			logger.error("Exception: ",e);
 		}
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		logger.debug("Tryingo to clone a "+this.getClass());
-		throw new CloneNotSupportedException();
 	}
 
 	public NestedMetadata getNRSMD() {
