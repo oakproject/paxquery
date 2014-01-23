@@ -95,9 +95,7 @@ import fr.inria.oak.paxquery.pact.operators.unary.ProjectionOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.SelectionOperator;
 
 /**
- * 
- * 
- * @author Jesus CAMACHO RODRIGUEZ
+ * Translation of a logical expression into a PACT plan.
  * 
  */
 public class Logical2Pact {
