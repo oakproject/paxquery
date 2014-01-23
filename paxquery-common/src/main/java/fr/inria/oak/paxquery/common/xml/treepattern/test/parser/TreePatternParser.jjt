@@ -1,0 +1,158 @@
+options {
+  MULTI=true;
+  VISITOR=true;
+  NODE_DEFAULT_VOID=true;
+  BUILD_NODE_FILES=true;
+  STATIC=false;
+}
+
+PARSER_BEGIN(TreePatternParser)
+package fr.inria.oak.paxquery.common.xml.treepattern.test.parser;
+
+import java.io.*;
+import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
+
+public class TreePatternParser {
+
+}
+PARSER_END(TreePatternParser)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: ["1"-"9"] (["0"-"9"])* >
+}
+
+TOKEN : /* STRING */
+{
+	< STRING: "\"" (~["\""])* "\"" >
+}
+
+TOKEN : /* STRING */
+{
+    <ATTRDOCID: "docID" >
+	| <ATTRID: "ID" >
+	| <ATTRVAL: "Val" >
+	| <ATTRCONT: "Cont" >
+   	| <PREDCODE: "=" | "!=" | ">=" | ">" | "<=" | "<">
+}
+
+ASTStart Start(String TreePatternName) #Start : {}
+{
+  
+  TreePatternSpec() <EOF>
+  { return jjtThis; }
+}
+
+void TreePatternSpec() : {}
+{
+	( ( IsOrdered() IsRoot() DefaultNamespace() NSpec() ";" ESpec() ) #TreePatternSpec )
+}
+
+void IsRoot() : {} 
+{
+	(("/") #ROOT)?
+}
+
+void IsOrdered() : {} 
+{
+	(("o"|"O") #TreePatternOrdered)?
+}
+
+void DefaultNamespace() : {} 
+{
+	(("[Namespace=" Content()"]") #DefaultNamespace)?
+}
+
+void NSpec() : {}
+{
+	((NE()|NA()))* #NSPEC
+}
+
+void NE() : {}
+{
+	("E:" MyID() (IDSpec())? (TSpec())? (VSpec())? (CSpec())? ) #NE
+}
+
+void NA() : {}
+{
+	("A:" MyID()  (IDSpec())?  (TSpec()) ? (VSpec())? (CSpec())? ) #NA
+}
+
+void IDSpec()  : {}
+{
+	(("ID" (
+			"s" #Structural |
+			"o" #Ordered |
+			"i" #Integer |
+			"n" #Navigating |
+			"u" #Updating 
+			)
+	)  (("R") #Required)? ) #IDSpec 
+}
+
+void TSpec() : {}
+{
+	(	
+		((("[Tag=" Content()"]") #TagRestriction) (("Tag" (("R") #Required)?) #TagFull)? )| (("Tag") ((("R") #Required)?) #Tag)
+	) 
+}
+
+void VSpec() : {}
+{
+	(	
+		((("[Val" PredCode()  (Content() | MyID())"]") #ValRestriction) (("Val" (("R") #Required)?) #ValFull)? )| (("Val") ((("R") #Required)?) #Val)
+	) 
+}
+
+void CSpec() #CSpec : {}
+{
+	"Cont" 
+}
+
+void PredCode() #PredCode :
+{
+  Token t;
+}
+{
+  t=<PREDCODE>
+  {
+    jjtThis.setName(t.image);
+  }
+}
+
+void Content() #Content :
+{
+  Token t;
+}
+{
+  t=<STRING>
+  {
+    jjtThis.setName(t.image);
+  }
+}
+
+void MyID() #MyID :
+{
+  Token t;
+}
+{
+  t=<INTEGER_LITERAL>
+  {
+    jjtThis.setName(t.image);
+  }
+}
+
+void ESpec()   :{}
+{
+	( (MyID() "," MyID() ( "//" #Descendant |"/" #Child ) ("n" #Nested)? ("o" #Outer |"j" #Join |"s" #Semi )  ) #EdgeSpec ) *
+}
+
