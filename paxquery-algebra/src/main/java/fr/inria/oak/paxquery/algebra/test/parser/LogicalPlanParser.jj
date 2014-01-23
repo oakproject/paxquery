@@ -1,0 +1,565 @@
+options {
+	STATIC = false ;
+	LOOKAHEAD = 10;
+}
+
+PARSER_BEGIN(LogicalPlanParser)
+
+package fr.inria.oak.paxquery.algebra.test.parser;
+
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
+import fr.inria.oak.paxquery.algebra.operators.binary.Join;
+import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterJoin;
+import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoin;
+import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoinWithAggregation;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.unary.Aggregation;
+import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
+import fr.inria.oak.paxquery.algebra.operators.unary.Flatten;
+import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
+import fr.inria.oak.paxquery.algebra.operators.unary.GroupByWithAggregation;
+import fr.inria.oak.paxquery.algebra.operators.unary.Navigation;
+import fr.inria.oak.paxquery.algebra.operators.unary.Projection;
+import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
+import fr.inria.oak.paxquery.common.aggregation.AggregationType;
+import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation;
+import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation.Operation;
+import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
+import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
+import fr.inria.oak.paxquery.common.predicates.Predicate;
+import fr.inria.oak.paxquery.common.predicates.Predicate.PredicateType;
+import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
+import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
+import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
+import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+
+
+
+/**
+ * A parser for logical plan files (.logp)
+ *
+ */
+public class LogicalPlanParser {
+
+	private static final Log logger = LogFactory.getLog(LogicalPlanParser.class);
+
+
+	private BaseLogicalOperator logOp;
+
+	private LogicalPlanParser(String fileName) throws Exception {
+		this(new FileInputStream(fileName));
+	}
+
+	public static BaseLogicalOperator parseFile(java.io.InputStream stream) throws Exception {	  
+		LogicalPlanParser parser = new LogicalPlanParser(stream);
+		parser.Start();
+		return parser.logOp;
+	}
+
+	public static BaseLogicalOperator parseFile(String pathToFile) throws Exception {	  
+		LogicalPlanParser parser = new LogicalPlanParser(pathToFile);
+		parser.Start();
+		return parser.logOp;
+	}
+	
+    private LogicalPlanParser(String strPlan, boolean fromString) throws Exception {
+        this(new ByteArrayInputStream(strPlan.getBytes()));
+    }
+
+    public static BaseLogicalOperator parseString(String strPlan) throws Exception {
+        LogicalPlanParser parser = new LogicalPlanParser(strPlan, true);
+        parser.Start();
+        return parser.logOp;
+    } 
+
+
+	public static void main(String args[]) throws Exception {
+		LogicalPlanParser parser = new LogicalPlanParser(args[0]);
+		parser.Start();
+		System.out.println(parser.logOp.getName());
+	}
+
+
+}
+
+PARSER_END(LogicalPlanParser)
+
+SKIP :
+{
+	  " "
+	| "\t"
+	| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+	| "\n"
+	| "\r"
+	| "\r\n"
+}
+
+TOKEN: /* RESERVED TOKENS */
+{
+      <COMMA: ",">
+   |  <LPAREN: "(">
+   |  <RPAREN: ")">
+   |  <LSBRACKET: "[">
+   |  <RSBRACKET: "]">
+   |  <PREDCODE: "=" | "!=" | ">=" | ">" | "<=" | "<">
+   |  <ARITHCODE: "ADD" | "MUL" | "SUB" | "DIV">
+   |  <AGGREGATIONTYPE: "COUNT" | "MAX" | "MIN" | "SUM">
+   |  <AND: "&&">
+   |  <OR: "||">
+   |  <DOLLAR: "$">
+}
+
+TOKEN :
+{
+	< TREEPATTERNSTRING: "|" (~["|"])* "|" > 
+}
+
+TOKEN: /* BINARYOPERATORS */
+{
+      <CARTESIANPRODUCT: "CartesianProduct">
+   |  <JOIN: "Join">
+   |  <LEFTOUTERJOIN: "LeftOuterJoin">
+   |  <LEFTOUTERNESTEDJOIN: "LeftOuterNestedJoin">
+   |  <LEFTOUTERNESTEDJOINWITHAGGREGATION: "LeftOuterNestedJoinWithAggregation">
+}
+
+TOKEN: /* UNARYOPERATORS */
+{
+	  <XMLCONSTRUCT: "XMLConstruct">
+   |  <NAVIGATION: "Navigation">
+   |  <PROJECTION: "Projection">
+   |  <SELECTION: "Selection">
+   |  <FLATTEN: "Flatten">
+   |  <GROUPBY: "GroupBy">
+   |  <GROUPBYWITHAGGREGATION: "GroupByWithAggregation">
+   |  <DUPLICATEELIMINATION: "DuplicateElimination">
+   |  <AGGREGATION: "Aggregation">
+}
+
+TOKEN: /* LEAFOPERATORS */
+{
+      <XMLPARSE: "XMLScan">
+}
+
+TOKEN :
+{
+	  < NUMBER: (["0"-"9"])+ >
+   |  < NAME: (["a"-"z","A"-"Z","-","_",".","0"-"9"])+ >
+   |  < STR: "\"" (~["\""])* "\"" >
+}
+
+void Start() :
+{}
+{
+	LogicalPlan()
+	<EOF>
+}
+
+void LogicalPlan() :
+{}
+{
+	logOp = OperatorDEF()
+}
+
+BaseLogicalOperator OperatorDEF() :
+{
+	BaseLogicalOperator returnLogOp = null;
+}
+{
+	(returnLogOp = BinaryOpDEF() | returnLogOp = UnaryOpDEF() | returnLogOp = LeafOpDEF())
+	{
+		return returnLogOp;
+	}
+}
+
+BaseLogicalOperator BinaryOpDEF() :
+{
+	BaseLogicalOperator returnLogOp = null;
+  
+  	Token binaryOp;
+	BaseLogicalOperator tempLeftLogOp;
+	BaseLogicalOperator tempRightLogOp;
+	Predicate pred;
+	int documentIDColumn = -1;
+	int nodeIDColumn = -1;
+	int aggregationColumn = -1;
+	Token tempAggregationType = null;
+	Token tempExcludeNestedField = null;
+}
+{
+	(
+		(		  (binaryOp = <CARTESIANPRODUCT>)
+		  <LPAREN> tempLeftLogOp = OperatorDEF()
+		  <COMMA> tempRightLogOp = OperatorDEF()
+		  <RPAREN>
+		)
+		{
+			try {
+			 	if (binaryOp.toString().equals("CartesianProduct"))
+					returnLogOp = new CartesianProduct(tempLeftLogOp, tempRightLogOp);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		|(
+		  (binaryOp = <JOIN> | binaryOp = <LEFTOUTERJOIN>
+		  |	binaryOp = <LEFTOUTERNESTEDJOIN>
+		  |	binaryOp = <LEFTOUTERNESTEDJOINWITHAGGREGATION>)
+		  <LPAREN> tempLeftLogOp = OperatorDEF()
+		  <COMMA> tempRightLogOp = OperatorDEF()
+		  <COMMA> pred = PredicateDEF()
+		  (<COMMA> documentIDColumn = ColumnDEF()
+		  <COMMA> nodeIDColumn = ColumnDEF())?
+		  (<COMMA> tempAggregationType = <AGGREGATIONTYPE>
+		  <COMMA> aggregationColumn = ColumnDEF()
+		  <COMMA> tempExcludeNestedField = <NAME>)?
+		  <RPAREN>
+		)
+		{
+			try {	
+			  	if (binaryOp.toString().equals("Join"))
+					returnLogOp = new Join(tempLeftLogOp, tempRightLogOp, pred);
+			   	else if (binaryOp.toString().equals("LeftOuterJoin"))
+					returnLogOp = new LeftOuterJoin(tempLeftLogOp, tempRightLogOp, pred,
+							documentIDColumn, nodeIDColumn);
+			   	else if (binaryOp.toString().equals("LeftOuterNestedJoin"))
+					returnLogOp = new LeftOuterNestedJoin(tempLeftLogOp, tempRightLogOp, pred,
+							documentIDColumn, nodeIDColumn);
+				else if (binaryOp.toString().equals("LeftOuterNestedJoinWithAggregation")) {
+					AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
+					boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
+					returnLogOp = new LeftOuterNestedJoinWithAggregation(tempLeftLogOp, tempRightLogOp, pred,
+							documentIDColumn, nodeIDColumn, aggregationColumn, aggregationType,
+							excludeNestedField);
+				}
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+    )
+    {
+		return returnLogOp;
+    }
+}
+
+BaseLogicalOperator UnaryOpDEF() :
+{
+	BaseLogicalOperator returnLogOp = null;
+  
+	Token unaryOp;
+	BaseLogicalOperator tempChildLogOp;
+	ApplyConstruct apply;
+	int[] columns1 = null;
+	int[] columns2;
+	Predicate pred;
+	int column = -1;
+	Token string;
+	Token tempAggregationType = null;
+	Token tempExcludeNestedField = null;
+}
+{
+	(
+		(<XMLCONSTRUCT> <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> apply = ApplyConstructDEF() <COMMA> string = <STR> <RPAREN>)
+		{
+			try {
+				returnLogOp = new XMLConstruct(
+						tempChildLogOp,
+						apply,
+						string.image.substring(1, string.image.length()-1));
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		|(
+		  (unaryOp = <PROJECTION> | unaryOp = <DUPLICATEELIMINATION>)
+		  <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> columns1 = ColumnsDEF() <RPAREN>
+		)
+		{
+			try {				if (unaryOp.toString().equals("Projection"))
+					returnLogOp = new Projection(tempChildLogOp, columns1);
+				else if (unaryOp.toString().equals("DuplicateElimination"))
+					returnLogOp = new DuplicateElimination(tempChildLogOp, columns1);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		|(<SELECTION> <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> pred = PredicateDEF() <RPAREN>)
+		{			returnLogOp = new Selection(tempChildLogOp, pred);
+		}
+		|(<NAVIGATION> <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> column = ColumnDEF() <COMMA> string = <TREEPATTERNSTRING> <RPAREN>)
+		{
+			try {
+				TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+                		string.toString().replace("|","").replace("|",""),
+                    	"ntp");
+				returnLogOp = new Navigation(tempChildLogOp, column, pat);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		|(
+		  (unaryOp = <GROUPBY> | unaryOp = <GROUPBYWITHAGGREGATION>)
+		  <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> columns1 = ColumnsDEF() <COMMA> columns2 = ColumnsDEF()
+		  (<COMMA> tempAggregationType = <AGGREGATIONTYPE> <COMMA> column = ColumnDEF() <COMMA> tempExcludeNestedField = <NAME>)?
+		  <RPAREN>
+		)
+		{
+			try {
+				if (unaryOp.toString().equals("GroupByWithAggregation"))				{
+					AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
+					boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
+					returnLogOp = new GroupByWithAggregation(tempChildLogOp, columns1, columns2,
+							column, aggregationType, excludeNestedField);
+				}
+				else
+					returnLogOp = new GroupBy(tempChildLogOp, columns1, columns2);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		| (<FLATTEN> <LPAREN> tempChildLogOp = OperatorDEF() (<COMMA> columns1 = ColumnsDEF())? <RPAREN>)
+		{
+			try {
+				if(columns1 != null)
+					returnLogOp = new Flatten(tempChildLogOp, columns1);
+				else
+					returnLogOp = new Flatten(tempChildLogOp);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+		| (<AGGREGATION> <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> tempAggregationType = <AGGREGATIONTYPE> columns1 = ColumnsDEF() (<COMMA> column = ColumnDEF() <COMMA> tempExcludeNestedField = <NAME>)? <RPAREN>)
+		{			
+			try {
+				AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
+				if(column != -1) {
+					boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);					returnLogOp = new Aggregation(tempChildLogOp, columns1, aggregationType, column, excludeNestedField);
+				}
+				else
+					returnLogOp = new Aggregation(tempChildLogOp, columns1, aggregationType);
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}
+		}
+	)
+	{
+		return returnLogOp;
+	}
+}
+
+BaseLogicalOperator LeafOpDEF() :
+{
+	BaseLogicalOperator returnLogOp = null;
+
+	Token name = null;
+	Token string = null;
+	Token path;
+	String[] listDocs = null;
+	Token attachDocumentID;
+}
+{
+	(
+		(<XMLPARSE> <LPAREN> path = <STR> (<COMMA> listDocs = ListDocsDEF())?
+			<COMMA> attachDocumentID = <NAME>
+			(<COMMA> name = <NAME> <COMMA> string = <TREEPATTERNSTRING>)?
+			<RPAREN>)
+		{
+			try {
+				if(string != null && listDocs != null) {
+					TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+	                		string.toString().replace("|","").replace("|",""),
+	                    	name.toString());
+					returnLogOp = new XMLScan(
+							Boolean.parseBoolean(attachDocumentID.image),
+							pat,
+							path.image.substring(1, path.image.length()-1),
+							listDocs);
+				}
+				else if(string != null) {
+					TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+	                		string.toString().replace("|","").replace("|",""),
+	                    	name.toString());
+					returnLogOp = new XMLScan(
+							Boolean.parseBoolean(attachDocumentID.image),
+							pat,
+							path.image.substring(1, path.image.length()-1));
+				}
+				else if(listDocs != null) {
+					returnLogOp = new XMLScan(
+							Boolean.parseBoolean(attachDocumentID.image),
+							path.image.substring(1, path.image.length()-1),
+							listDocs);
+				}
+				else {
+					returnLogOp = new XMLScan(
+							Boolean.parseBoolean(attachDocumentID.image),
+							path.image.substring(1, path.image.length()-1));
+				}
+			} catch (Exception e) {
+				logger.error("Exception: ",e);
+			}		}
+	)
+	{
+		return returnLogOp;
+	}
+}
+
+DisjunctivePredicate PredicateDEF() :
+{
+  	ArrayList<ConjunctivePredicate> list = new ArrayList<ConjunctivePredicate>();
+	ConjunctivePredicate tempCPred = null;
+}
+{
+  	(<LSBRACKET> (tempCPred = ConjunctivePredicateDEF()) { list.add(tempCPred); }
+  	((<OR> tempCPred = ConjunctivePredicateDEF()) { list.add(tempCPred);} )* <RSBRACKET>)
+  	{
+  		return new DisjunctivePredicate(list);
+  	}
+}
+
+ConjunctivePredicate ConjunctivePredicateDEF() :
+{
+  	ArrayList<SimplePredicate> list = new ArrayList<SimplePredicate>();
+	SimplePredicate tempSPred = null;
+}{  	(<LPAREN> (tempSPred = SimplePredicateDEF()) { list.add(tempSPred); }
+  	((<AND> tempSPred = SimplePredicateDEF()) { list.add(tempSPred);} )* <RPAREN>)
+  	{
+		return new ConjunctivePredicate(list);
+  	}
+}
+
+
+SimplePredicate SimplePredicateDEF() :
+{
+  	Token tempPredCode;
+  	ArithmeticOperation arithOperation1 = null;
+  	ArithmeticOperation arithOperation2 = null;
+	int column1 = -1;
+	int column2 = -1;
+  	Token stringConstant = null;
+  	Token intConstant = null;
+}
+{
+   
+  	column1 = ColumnDEF() (arithOperation1 = ArithmeticOperationDEF())? tempPredCode = <PREDCODE> (column2 = ColumnDEF() (arithOperation2 = ArithmeticOperationDEF())? | stringConstant = <STR> | intConstant = <NUMBER>)
+  	{
+  	  	PredicateType predCode = null;
+  	  	if(tempPredCode.toString().equals("="))
+			predCode = PredicateType.PREDICATE_EQUAL;
+		else if(tempPredCode.toString().equals("!="))
+			predCode = PredicateType.PREDICATE_NOTEQUAL;
+		else if(tempPredCode.toString().equals(">="))
+			predCode = PredicateType.PREDICATE_GREATEROREQUALTHAN;
+		else if(tempPredCode.toString().equals(">"))
+			predCode = PredicateType.PREDICATE_GREATERTHAN;
+		else if(tempPredCode.toString().equals("<="))
+			predCode = PredicateType.PREDICATE_SMALLEROREQUALTHAN;
+		else if(tempPredCode.toString().equals("<"))
+			predCode = PredicateType.PREDICATE_SMALLERTHAN;
+
+		if(arithOperation1 != null || arithOperation2 != null)
+			return new SimplePredicate(column1, arithOperation1, column2, arithOperation2, predCode);
+		else if(stringConstant != null) {
+			String constantColumn2 = StringEscapeUtils.unescapeJava(stringConstant.image.substring(1, stringConstant.image.length()-1));
+			return new SimplePredicate(column1, constantColumn2, predCode);
+		}
+		else if(intConstant != null) {			Double constantColumn2 = Double.parseDouble(intConstant.image);
+			return new SimplePredicate(column1, constantColumn2, predCode);
+		} else {
+  			return new SimplePredicate(column1, column2, predCode);		}
+  	}
+}
+
+ArithmeticOperation ArithmeticOperationDEF() :
+{
+  	Token tempArithCode;
+	Token constant;
+}
+{
+	tempArithCode = <ARITHCODE> constant = <NUMBER>
+	{
+		return new ArithmeticOperation(Operation.valueOf(tempArithCode.image), Double.parseDouble(constant.image));
+	}}
+
+
+int[] ColumnsDEF() :
+{
+  	int column;
+    ArrayList<Integer> list = new ArrayList<Integer>();
+}
+{
+  	(<LSBRACKET> (column = ColumnDEF() {list.add(column);})?
+  	(<COMMA> column = ColumnDEF() {list.add(column);})*
+  	<RSBRACKET>)
+  	{
+	  	int[] result = new int[list.size()];
+	    for (int i=0; i < result.length; i++) {
+	        result[i] = list.get(i).intValue();
+	    }
+	    return result;
+  	}
+}
+
+int ColumnDEF() :
+{
+  	Token t;}
+{
+		<DOLLAR> t = <NUMBER>		{
+				return Integer.parseInt(t.image);		}}
+
+String[] ListDocsDEF() :
+{
+  	Token t;
+    ArrayList<String> list = new ArrayList<String>();
+}
+{
+  	(<LPAREN> (t = <NAME>) {list.add(t.toString());}
+  	((<COMMA> t = <NAME>) {list.add(t.toString());})+ <RPAREN>)
+  	{
+	  	String[] result = new String[list.size()];
+	    for (int i=0; i < result.length; i++) {
+	        result[i] = list.get(i);
+	    }
+	    return result;
+  	}
+}
+
+ApplyConstruct ApplyConstructDEF() :
+{
+  	ApplyConstruct apply;
+  	Token before;
+  	Token after;
+
+  	Token tempEach;
+  	int column;
+  	ApplyConstruct tempApply;
+  	List<String> each = new ArrayList<String>();
+  	List<Integer> fields = new ArrayList<Integer>();
+  	List<ApplyConstruct> nested = new ArrayList<ApplyConstruct>();
+}
+{
+  	(<LSBRACKET> before = <STR> <COMMA> after = <STR> <COMMA>
+  	(tempEach = <STR> {each.add(StringEscapeUtils.unescapeJava(tempEach.image.substring(1, tempEach.image.length()-1)));})?
+	(<LPAREN> column = ColumnDEF() {fields.add(column);} <RPAREN>
+	  (tempApply = ApplyConstructDEF() {nested.add(tempApply);})?
+      tempEach = <STR> {each.add(StringEscapeUtils.unescapeJava(tempEach.image.substring(1, tempEach.image.length()-1)));})* <RSBRACKET>)
+  	{
+		return new ApplyConstruct(StringEscapeUtils.unescapeJava(before.image.substring(1, before.image.length()-1)),
+			each.toArray(new String[each.size()]),
+			StringEscapeUtils.unescapeJava(after.image.substring(1, after.image.length()-1)),
+			ArrayUtils.toPrimitive(fields.toArray(new Integer[fields.size()])),
+			nested.toArray(new ApplyConstruct[nested.size()]));
+  	}
+}
