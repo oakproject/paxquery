@@ -107,10 +107,5 @@ public class Flatten extends BaseUnaryOperator {
 
 		return Arrays.copyOf(unnestPath, j);
 	}
-		
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		return new Flatten((BaseLogicalOperator)getChild().clone(),this.unnestPath);
-	}
 	
 }

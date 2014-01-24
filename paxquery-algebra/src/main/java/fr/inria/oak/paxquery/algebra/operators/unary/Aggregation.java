@@ -150,10 +150,5 @@ public class Aggregation extends BaseUnaryOperator {
 	public int getDocumentIDColumn() {
 		return this.documentIDColumn;
 	}
-		
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		return new Aggregation((BaseLogicalOperator)getChild().clone(), this.aggregationPath, this.aggregationType, this.documentIDColumn, this.excludeNestedField);
-	}
 	
 }
