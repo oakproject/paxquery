@@ -59,8 +59,8 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
-import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
+import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.metadata.MetadataTypesMapping;
@@ -191,13 +191,13 @@ public class Logical2Pact {
 			.input(childPlan)
 			.name("Select")
 			.build();
-		
+				
 		// selection configuration
 		final String encodedNRSMD = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(sel.getNRSMD()));
 		selection.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD);
 		final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(sel.getPred()));
 		selection.setParameter(PACTOperatorsConfiguration.PRED_BINARY.toString(), encodedPredicate);
-		
+				
 		return new Operator[]{selection};
 	}
 	

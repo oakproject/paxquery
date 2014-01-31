@@ -38,8 +38,8 @@ import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation;
 import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation.Operation;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
-import fr.inria.oak.paxquery.common.predicates.Predicate;
-import fr.inria.oak.paxquery.common.predicates.Predicate.PredicateType;
+import fr.inria.oak.paxquery.common.predicates.BasePredicate;
+import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
@@ -73,16 +73,6 @@ public class LogicalPlanParser {
 		parser.Start();
 		return parser.logOp;
 	}
-	
-    private LogicalPlanParser(String strPlan, boolean fromString) throws Exception {
-        this(new ByteArrayInputStream(strPlan.getBytes()));
-    }
-
-    public static BaseLogicalOperator parseString(String strPlan) throws Exception {
-        LogicalPlanParser parser = new LogicalPlanParser(strPlan, true);
-        parser.Start();
-        return parser.logOp;
-    } 
 
 
 	public static void main(String args[]) throws Exception {
@@ -150,7 +140,7 @@ TOKEN: /* UNARYOPERATORS */
 
 TOKEN: /* LEAFOPERATORS */
 {
-      <XMLPARSE: "XMLScan">
+      <XMLSCAN: "XMLScan">
 }
 
 TOKEN :
@@ -191,7 +181,7 @@ BaseLogicalOperator BinaryOpDEF() :
   	Token binaryOp;
 	BaseLogicalOperator tempLeftLogOp;
 	BaseLogicalOperator tempRightLogOp;
-	Predicate pred;
+	BasePredicate pred;
 	int documentIDColumn = -1;
 	int nodeIDColumn = -1;
 	int aggregationColumn = -1;
@@ -263,7 +253,7 @@ BaseLogicalOperator UnaryOpDEF() :
 	ApplyConstruct apply;
 	int[] columns1 = null;
 	int[] columns2;
-	Predicate pred;
+	BasePredicate pred;
 	int column = -1;
 	Token string;
 	Token tempAggregationType = null;
@@ -371,7 +361,7 @@ BaseLogicalOperator LeafOpDEF() :
 }
 {
 	(
-		(<XMLPARSE> <LPAREN> path = <STR> (<COMMA> listDocs = ListDocsDEF())?
+		(<XMLSCAN> <LPAREN> path = <STR> (<COMMA> listDocs = ListDocsDEF())?
 			<COMMA> attachDocumentID = <NAME>
 			(<COMMA> name = <NAME> <COMMA> string = <TREEPATTERNSTRING>)?
 			<RPAREN>)

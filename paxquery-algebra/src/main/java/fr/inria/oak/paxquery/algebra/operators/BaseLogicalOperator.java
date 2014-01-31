@@ -43,6 +43,8 @@ public abstract class BaseLogicalOperator {
 	protected boolean visible;
 
 	protected ArrayList<BaseLogicalOperator> children;
+	
+	protected int[] modifiedFields;
 
 
 	/*

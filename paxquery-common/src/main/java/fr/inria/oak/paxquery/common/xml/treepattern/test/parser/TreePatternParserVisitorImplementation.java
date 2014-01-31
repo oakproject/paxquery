@@ -100,24 +100,24 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 				Class c = child.getClass();
 				
 				if (c.getName().equals(
-						"fr.inria.oak.stratosphere.xml.ntp.parser.ASTNSPEC")) {
+						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNSPEC")) {
 					//add all xam nodes to the in-memory tree structure x
 					nodes = (LinkedList<PatternNode>) visit(((ASTNSPEC) child), data, nodes);
 				} else if (c.getName().equals(
-						"fr.inria.oak.stratosphere.xml.ntp.parser.ASTROOT")) {
+						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTROOT")) {
 					// the first node is the root
 					fromRoot=true;
 				} else if (c.getName().equals(
-						"fr.inria.oak.stratosphere.xml.ntp.parser.ASTDefaultNamespace")) {
+						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTDefaultNamespace")) {
 					ASTDefaultNamespace defaultNamespaceNode = (ASTDefaultNamespace) child;
 					ASTContent defaultNamespace = (ASTContent) defaultNamespaceNode.jjtGetChild(0);
 					this.defaultNamespace = removeQuotes(defaultNamespace.getInfo());
 				} else if (c.getName().equals(
-						"fr.inria.oak.stratosphere.xml.ntp.parser.ASTXamOrdered")) {
+						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTXamOrdered")) {
 					// the first node is the root
 					p.setOrdered(true);
 				} else if (c.getName().equals(
-						"fr.inria.oak.stratosphere.xml.ntp.parser.ASTEdgeSpec")) {
+						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTEdgeSpec")) {
 					//add all xam edges to the in-memory tree structure x
 					nodes = (LinkedList<PatternNode>) visit(((ASTEdgeSpec) child), data, nodes);
 				} else
@@ -217,11 +217,11 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 			predCode = PredicateType.PREDICATE_SMALLERTHAN;		
 		SimpleNode child = (SimpleNode) astNode.jjtGetChild(1);
 		if (child.getClass().getName().equals(
-				"fr.inria.oak.stratosphere.xml.ntp.parser.ASTContent")) {
+				"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTContent")) {
 			ASTContent restrValue = (ASTContent) child;
 			patternNode.setSelectOnValue(true,predCode,StringEscapeUtils.unescapeJava(removeQuotes(restrValue.getInfo())));
 		} else if (child.getClass().getName().equals(
-				"fr.inria.oak.stratosphere.xml.ntp.parser.ASTMyID")) {
+				"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTMyID")) {
 			ASTMyID restrValue = (ASTMyID) child;
 			double constant = restrValue.getID();
 			patternNode.setSelectOnValue(true,predCode,constant);
@@ -280,7 +280,7 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 
 				//if NA set "attribute" attribute to true
 				if ((child1.getClass()).equals(Class
-						.forName("fr.inria.oak.stratosphere.xml.ntp.parser.ASTNE")))
+						.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNE")))
 					ne.setAttribute(false);
 				else
 					ne.setAttribute(true);
@@ -295,25 +295,25 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 					//child2 is an IDSpec TagRestriction Val ValRestriction....
 					SimpleNode child2 = (SimpleNode) child1.jjtGetChild(j);
 					if (child2.getClass().getName().equals(
-							"fr.inria.oak.stratosphere.xml.ntp.parser.ASTIDSpec")) {
+							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTIDSpec")) {
 						getIDSpec((ASTIDSpec) child2, ne);
 					} else if (child2
 							.getClass()
 							.getName()
 							.equals(
-									"fr.inria.oak.stratosphere.xml.ntp.parser.ASTTagRestriction")) {
+									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTagRestriction")) {
 						getTagRestrictionSpec((ASTTagRestriction) child2, ne);
 					} else if (child2
 							.getClass()
 							.getName()
 							.equals(
-									"fr.inria.oak.stratosphere.xml.ntp.parser.ASTValRestriction")) {
+									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTValRestriction")) {
 						getValRestrictionSpec((ASTValRestriction) child2, ne);
 					}else if (child2
 							.getClass()
 							.getName()
 							.equals(
-									"fr.inria.oak.stratosphere.xml.ntp.parser.ASTTagFull")) {						
+									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTagFull")) {						
 						ne.setStoresTag(true); //Update, although actually we are not entering here
 						if(((SimpleNode)child2).jjtGetNumChildren()>0)
 							ne.setRequiresTag(true);
@@ -321,15 +321,15 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 							.getClass()
 							.getName()
 							.equals(
-									"fr.inria.oak.stratosphere.xml.ntp.parser.ASTValFull")) {
+									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTValFull")) {
 						ne.setStoresValue(true);
 						if(((SimpleNode)child2).jjtGetNumChildren()>0)
 							ne.setRequiresVal(true);
 					}else if (child2.getClass().getName().equals(
-							"fr.inria.oak.stratosphere.xml.ntp.parser.ASTTag")) {
+							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTag")) {
 						getTagSpec((ASTTag) child2, ne);
 					} else if (child2.getClass().getName().equals(
-							"fr.inria.oak.stratosphere.xml.ntp.parser.ASTCSpec")) {
+							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTCSpec")) {
 						//getSerializedContentSpec((ASTCSpec)child2,ne);
 						ne.setStoresContent(true);
 					} else {//ASTVal
@@ -460,13 +460,13 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 		
 		try {
 			if ((descendantTypeNode.getClass()).equals(Class
-					.forName("fr.inria.oak.stratosphere.xml.ntp.parser.ASTChild")))
+					.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTChild")))
 				parent=true;				//xe.setParent(true);
 			
 			SimpleNode nestingTypeNode = (SimpleNode) node.jjtGetChild(3);
 			SimpleNode joinTypeNode = null;
 			if ((nestingTypeNode.getClass()).equals(Class
-					.forName("fr.inria.oak.stratosphere.xml.ntp.parser.ASTNested"))) {
+					.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNested"))) {
 				//xe.setNested(true);
 				nested=true;
 				joinTypeNode = (SimpleNode) node.jjtGetChild(4);
