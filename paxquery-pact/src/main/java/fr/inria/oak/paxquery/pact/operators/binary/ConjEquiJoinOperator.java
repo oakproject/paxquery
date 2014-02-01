@@ -18,6 +18,7 @@ package fr.inria.oak.paxquery.pact.operators.binary;
 import eu.stratosphere.configuration.Configuration;
 import eu.stratosphere.types.Record;
 import eu.stratosphere.util.Collector;
+import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operators.BaseMatchOperator;
 
 
@@ -35,7 +36,7 @@ public class ConjEquiJoinOperator extends BaseMatchOperator {
 	
 	@Override
 	public void join(Record record1, Record record2, Collector<Record> collector) {
-		record1.concatenate(record2);
+		RecordOperations.concatenate(record1,record2);
 		collector.collect(record1);
 	}
 

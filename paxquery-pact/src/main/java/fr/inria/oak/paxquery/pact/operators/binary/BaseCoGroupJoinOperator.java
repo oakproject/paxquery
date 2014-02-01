@@ -82,7 +82,7 @@ public abstract class BaseCoGroupJoinOperator extends BaseCoGroupOperator {
 					//duplicates for the next operation
 					if(!evaluation) {
 						Record newRecord = record1.createCopy();
-						newRecord.concatenate(record2);
+						RecordOperations.concatenate(newRecord,record2);
 						if(addMark)
 							newRecord.addField(new IntValue(1));
 						collector.collect(newRecord);
@@ -106,7 +106,7 @@ public abstract class BaseCoGroupJoinOperator extends BaseCoGroupOperator {
 						//duplicates for the next operation
 						if(!evaluation) {
 							Record newRecord = record1.createCopy();
-							newRecord.concatenate(record2);
+							RecordOperations.concatenate(newRecord,record2);
 							if(addMark)
 								newRecord.addField(new IntValue(1));
 							collector.collect(newRecord);
@@ -121,7 +121,7 @@ public abstract class BaseCoGroupJoinOperator extends BaseCoGroupOperator {
 					do {
 						Record record1 = records1.next();
 						if(nullRecord != null)
-							record1.concatenate(nullRecord);
+							RecordOperations.concatenate(record1,nullRecord);
 						else
 							RecordOperations.addNullRecord(record1, inputRecordsSignature2);
 						if(addMark)

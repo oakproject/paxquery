@@ -27,6 +27,7 @@ import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
+import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operations.RecordPredicateEvaluation;
 import fr.inria.oak.paxquery.pact.operators.BaseMatchOperator;
 
@@ -93,7 +94,7 @@ public class DisjEquiJoinOperator extends BaseMatchOperator {
 				collector.collect(record1);
 			}
 			else {
-				record1.concatenate(record2);
+				RecordOperations.concatenate(record1,record2);
 				collector.collect(record1);
 			}
 		}

@@ -34,6 +34,7 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
+import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtractor;
 import fr.inria.oak.paxquery.pact.operators.BaseMapOperator;
 
@@ -103,7 +104,7 @@ public class NavigationOperator extends BaseMapOperator {
 		    		Iterator<Record> pactRecordsIterator = extractor.getRecords().iterator();
 		    		while(pactRecordsIterator.hasNext()) {
 						Record originalRecord = record.createCopy();
-						originalRecord.concatenate(pactRecordsIterator.next());
+						RecordOperations.concatenate(originalRecord,pactRecordsIterator.next());
 		    			collector.collect(originalRecord);
 		    		}
 

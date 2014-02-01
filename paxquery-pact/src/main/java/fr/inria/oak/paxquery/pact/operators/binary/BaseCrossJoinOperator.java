@@ -87,7 +87,7 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 				}
 			}
 			else {
-				record1.concatenate(record2);
+				RecordOperations.concatenate(record1,record2);
 				if(addMark)
 					record1.addField(new IntValue(1));
 			}
@@ -115,9 +115,9 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 				}
 				else {
 					if(nullRecord != null)
-						record1.concatenate(nullRecord);
+						RecordOperations.concatenate(record1,nullRecord);
 					else
-						record1.concatenate(RecordOperations.createNullRecord(inputRecordSignature2));
+						RecordOperations.concatenate(record1,RecordOperations.createNullRecord(inputRecordSignature2));
 					if(addMark)
 						record1.addField(new IntValue(0));
 				}

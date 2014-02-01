@@ -29,6 +29,16 @@ import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
  */
 public class RecordOperations {
 	
+	public static void concatenate(Record record1, Record record2) {
+		int[] copyFrom = new int[record2.getNumFields()];
+		int[] copyTo = new int[record2.getNumFields()];
+		for(int i=0;i<record2.getNumFields();i++) {
+			copyFrom[i] = i;
+			copyTo[i] = record1.getNumFields() + i;
+		}
+		record1.copyFrom(record2, copyFrom, copyTo);
+	}
+	
 	public static void project(Record record, int[] keepColumns) {
 		int j=0, k=0;
 		// For each column that we need to project...

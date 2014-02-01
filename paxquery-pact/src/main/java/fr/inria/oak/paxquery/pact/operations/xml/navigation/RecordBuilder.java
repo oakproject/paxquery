@@ -318,7 +318,7 @@ public class RecordBuilder {
 						
 						if(tPrevious.getNumFields() > 0) {
 							Record appendedTuple = tPrevious.createCopy();
-							appendedTuple.concatenate(nt2);
+							RecordOperations.concatenate(appendedTuple,nt2);
 							v.add(appendedTuple);
 						}
 						else

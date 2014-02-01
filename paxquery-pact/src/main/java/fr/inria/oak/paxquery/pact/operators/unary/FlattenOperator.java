@@ -28,6 +28,7 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.metadata.MetadataTypesMapping;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
+import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operators.BaseMapOperator;
 
 
@@ -109,7 +110,7 @@ public class FlattenOperator extends BaseMapOperator {
 						
 						while(iterator.hasNext()) {
 							Record copy = output.createCopy();
-							copy.concatenate(iterator.next());
+							RecordOperations.concatenate(copy,iterator.next());
 							newOutputRecords.add(copy);
 						}
 					}

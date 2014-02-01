@@ -36,6 +36,7 @@ import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
+import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtractor;
 
 
@@ -124,7 +125,7 @@ public class XmlNavInputFormat extends FileInputFormat {
     		if(this.pactRecordsIterator.hasNext()) {
     			if(this.attachDocumentID) {
     				record.addField(new StringValue(this.documentID));
-    				record.concatenate(this.pactRecordsIterator.next());
+    				RecordOperations.concatenate(record,this.pactRecordsIterator.next());
     			}
     			else
     				this.pactRecordsIterator.next().copyTo(record);
@@ -156,7 +157,7 @@ public class XmlNavInputFormat extends FileInputFormat {
 		    		this.pactRecordsIterator = this.extractor.getRecords().iterator();
 	    			if(this.attachDocumentID) {
 	    				record.addField(new StringValue(this.documentID));
-	    				record.concatenate(this.pactRecordsIterator.next());
+	    				RecordOperations.concatenate(record,this.pactRecordsIterator.next());
 	    			}
 	    			else
 	    				this.pactRecordsIterator.next().copyTo(record);

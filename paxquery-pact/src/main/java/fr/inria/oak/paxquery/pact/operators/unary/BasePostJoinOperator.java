@@ -129,7 +129,7 @@ public abstract class BasePostJoinOperator extends BaseReduceOperator {
 			else { //OUTER JOIN - WE UNNEST AT THE SAME TIME THAT WE EMIT THE RECORDS
 				for(Record rightRecord: newListNestedRecords) {
 					Record recordCopy = record.createCopy();
-					recordCopy.concatenate(rightRecord);
+					RecordOperations.concatenate(recordCopy,rightRecord);
 					collector.collect(recordCopy);
 				}
 			}
