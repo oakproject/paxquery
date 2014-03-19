@@ -256,5 +256,6 @@
 		<module>paxquery-pact</module>
 		<module>paxquery-translation</module>
 		<module>paxquery-client</module>
+		<module>paxquery-xparser</module>
 	</modules>
 </project>
