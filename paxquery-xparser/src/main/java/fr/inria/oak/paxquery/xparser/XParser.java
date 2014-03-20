@@ -9,7 +9,7 @@ public class XParser implements XParserConstants {
         while(true)
         {
                 success = false;
-                System.out.println("Enter an XPath (subset) expresion and hit ENTER: ");
+                System.out.println("Enter an XPath (subset) expresion followed by \u005c";\u005c" : ");
                 try
                 {
 

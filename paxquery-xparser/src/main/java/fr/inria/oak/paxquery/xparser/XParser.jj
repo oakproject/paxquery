@@ -22,7 +22,7 @@ public class XParser
 	while(true)
 	{
 	  	success = false;
-	  	System.out.println("Enter an XPath (subset) expresion and hit ENTER: ");
+	  	System.out.println("Enter an XPath (subset) expresion followed by \";\" : ");
 		try
 		{
 		  
