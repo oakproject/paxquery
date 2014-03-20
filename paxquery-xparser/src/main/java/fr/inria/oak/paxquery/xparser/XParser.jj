@@ -6,7 +6,7 @@ options
         STATIC = false;
         LOOKAHEAD=5;
         FORCE_LA_CHECK=true;
-        DEBUG_PARSER=true;
+        DEBUG_PARSER=false;
 }
  
 

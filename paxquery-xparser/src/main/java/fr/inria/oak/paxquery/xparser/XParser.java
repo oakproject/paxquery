@@ -59,577 +59,392 @@ public class XParser implements XParserConstants {
   }
 
   final public void Start() throws ParseException {
-    trace_call("Start");
-    try {
-      Expr();
-      jj_consume_token(3);
-    } finally {
-      trace_return("Start");
-    }
+    Expr();
+    jj_consume_token(3);
   }
 
   final public void Expr() throws ParseException {
-    trace_call("Expr");
-    try {
-      OrExpr();
-    } finally {
-      trace_return("Expr");
-    }
+    OrExpr();
   }
 
   final public void OrExpr() throws ParseException {
-    trace_call("OrExpr");
-    try {
-      AndExpr();
-      OrExpr2();
-    } finally {
-      trace_return("OrExpr");
-    }
+    AndExpr();
+    OrExpr2();
   }
 
   final public void OrExpr2() throws ParseException {
-    trace_call("OrExpr2");
-    try {
-      if (jj_2_1(5)) {
-        jj_consume_token(4);
-        AndExpr();
-        OrExpr2();
-      } else {
+    if (jj_2_1(5)) {
+      jj_consume_token(4);
+      AndExpr();
+      OrExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("OrExpr2");
     }
   }
 
   final public void AndExpr() throws ParseException {
-    trace_call("AndExpr");
-    try {
-      EqualityExpr();
-      AndExpr2();
-    } finally {
-      trace_return("AndExpr");
-    }
+    EqualityExpr();
+    AndExpr2();
   }
 
   final public void AndExpr2() throws ParseException {
-    trace_call("AndExpr2");
-    try {
-      if (jj_2_2(5)) {
-        jj_consume_token(5);
-        EqualityExpr();
-        AndExpr2();
-      } else {
+    if (jj_2_2(5)) {
+      jj_consume_token(5);
+      EqualityExpr();
+      AndExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("AndExpr2");
     }
   }
 
   final public void EqualityExpr() throws ParseException {
-    trace_call("EqualityExpr");
-    try {
-      RelationalExpr();
-      EqualityExpr2();
-    } finally {
-      trace_return("EqualityExpr");
-    }
+    RelationalExpr();
+    EqualityExpr2();
   }
 
   final public void EqualityExpr2() throws ParseException {
-    trace_call("EqualityExpr2");
-    try {
-      if (jj_2_3(5)) {
-        jj_consume_token(6);
-        RelationalExpr();
-        EqualityExpr2();
-      } else if (jj_2_4(5)) {
-        jj_consume_token(7);
-        RelationalExpr();
-        EqualityExpr2();
-      } else {
+    if (jj_2_3(5)) {
+      jj_consume_token(6);
+      RelationalExpr();
+      EqualityExpr2();
+    } else if (jj_2_4(5)) {
+      jj_consume_token(7);
+      RelationalExpr();
+      EqualityExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("EqualityExpr2");
     }
   }
 
   final public void RelationalExpr() throws ParseException {
-    trace_call("RelationalExpr");
-    try {
-      AdditiveExpr();
-      RelationalExpr2();
-    } finally {
-      trace_return("RelationalExpr");
-    }
+    AdditiveExpr();
+    RelationalExpr2();
   }
 
   final public void RelationalExpr2() throws ParseException {
-    trace_call("RelationalExpr2");
-    try {
-      if (jj_2_5(5)) {
-        jj_consume_token(8);
-        AdditiveExpr();
-        RelationalExpr2();
-      } else if (jj_2_6(5)) {
-        jj_consume_token(9);
-        AdditiveExpr();
-        RelationalExpr2();
-      } else if (jj_2_7(5)) {
-        jj_consume_token(10);
-        AdditiveExpr();
-        RelationalExpr2();
-      } else if (jj_2_8(5)) {
-        jj_consume_token(11);
-        AdditiveExpr();
-        RelationalExpr2();
-      } else {
+    if (jj_2_5(5)) {
+      jj_consume_token(8);
+      AdditiveExpr();
+      RelationalExpr2();
+    } else if (jj_2_6(5)) {
+      jj_consume_token(9);
+      AdditiveExpr();
+      RelationalExpr2();
+    } else if (jj_2_7(5)) {
+      jj_consume_token(10);
+      AdditiveExpr();
+      RelationalExpr2();
+    } else if (jj_2_8(5)) {
+      jj_consume_token(11);
+      AdditiveExpr();
+      RelationalExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("RelationalExpr2");
     }
   }
 
   final public void AdditiveExpr() throws ParseException {
-    trace_call("AdditiveExpr");
-    try {
-      MultiplicativeExpr();
-      AdditiveExpr2();
-    } finally {
-      trace_return("AdditiveExpr");
-    }
+    MultiplicativeExpr();
+    AdditiveExpr2();
   }
 
   final public void AdditiveExpr2() throws ParseException {
-    trace_call("AdditiveExpr2");
-    try {
-      if (jj_2_9(5)) {
-        jj_consume_token(12);
-        MultiplicativeExpr();
-        AdditiveExpr2();
-      } else if (jj_2_10(5)) {
-        jj_consume_token(13);
-        MultiplicativeExpr();
-        AdditiveExpr2();
-      } else {
+    if (jj_2_9(5)) {
+      jj_consume_token(12);
+      MultiplicativeExpr();
+      AdditiveExpr2();
+    } else if (jj_2_10(5)) {
+      jj_consume_token(13);
+      MultiplicativeExpr();
+      AdditiveExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("AdditiveExpr2");
     }
   }
 
   final public void MultiplicativeExpr() throws ParseException {
-    trace_call("MultiplicativeExpr");
-    try {
-      UnaryExpr();
-      MultiplicativeExpr2();
-    } finally {
-      trace_return("MultiplicativeExpr");
-    }
+    UnaryExpr();
+    MultiplicativeExpr2();
   }
 
   final public void MultiplicativeExpr2() throws ParseException {
-    trace_call("MultiplicativeExpr2");
-    try {
-      if (jj_2_11(5)) {
-        jj_consume_token(14);
-        UnaryExpr();
-        MultiplicativeExpr2();
-      } else if (jj_2_12(5)) {
-        jj_consume_token(15);
-        UnaryExpr();
-        MultiplicativeExpr2();
-      } else if (jj_2_13(5)) {
-        jj_consume_token(16);
-        UnaryExpr();
-        MultiplicativeExpr2();
-      } else {
+    if (jj_2_11(5)) {
+      jj_consume_token(14);
+      UnaryExpr();
+      MultiplicativeExpr2();
+    } else if (jj_2_12(5)) {
+      jj_consume_token(15);
+      UnaryExpr();
+      MultiplicativeExpr2();
+    } else if (jj_2_13(5)) {
+      jj_consume_token(16);
+      UnaryExpr();
+      MultiplicativeExpr2();
+    } else {
 
-      }
-    } finally {
-      trace_return("MultiplicativeExpr2");
     }
   }
 
   final public void UnaryExpr() throws ParseException {
-    trace_call("UnaryExpr");
-    try {
-      if (jj_2_14(5)) {
-        UnionExpr();
-      } else if (jj_2_15(5)) {
-        jj_consume_token(13);
-        UnaryExpr();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("UnaryExpr");
+    if (jj_2_14(5)) {
+      UnionExpr();
+    } else if (jj_2_15(5)) {
+      jj_consume_token(13);
+      UnaryExpr();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void UnionExpr() throws ParseException {
-    trace_call("UnionExpr");
-    try {
-      ValueExpr();
-      label_1:
-      while (true) {
-        if (jj_2_16(5)) {
-          ;
-        } else {
-          break label_1;
-        }
-        jj_consume_token(17);
-        ValueExpr();
+    ValueExpr();
+    label_1:
+    while (true) {
+      if (jj_2_16(5)) {
+        ;
+      } else {
+        break label_1;
       }
-    } finally {
-      trace_return("UnionExpr");
+      jj_consume_token(17);
+      ValueExpr();
     }
   }
 
   final public void ValueExpr() throws ParseException {
-    trace_call("ValueExpr");
-    try {
-      if (jj_2_20(5)) {
-        FilterExpr();
-        if (jj_2_19(5)) {
-          if (jj_2_17(5)) {
-            jj_consume_token(18);
-          } else if (jj_2_18(5)) {
-            jj_consume_token(19);
-          } else {
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-          RelativePathExpr();
-        } else {
-          ;
-        }
-      } else if (jj_2_21(5)) {
-        PathExpr();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("ValueExpr");
-    }
-  }
-
-  final public void PathExpr() throws ParseException {
-    trace_call("PathExpr");
-    try {
-      if (jj_2_23(5)) {
-        jj_consume_token(18);
-        if (jj_2_22(5)) {
-          RelativePathExpr();
-        } else {
-          ;
-        }
-      } else if (jj_2_24(5)) {
-        jj_consume_token(19);
-        RelativePathExpr();
-      } else if (jj_2_25(5)) {
-        RelativePathExpr();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("PathExpr");
-    }
-  }
-
-  final public void RelativePathExpr() throws ParseException {
-    trace_call("RelativePathExpr");
-    try {
-      StepExpr();
-      label_2:
-      while (true) {
-        if (jj_2_26(5)) {
-          ;
-        } else {
-          break label_2;
-        }
-        if (jj_2_27(5)) {
+    if (jj_2_20(5)) {
+      FilterExpr();
+      if (jj_2_19(5)) {
+        if (jj_2_17(5)) {
           jj_consume_token(18);
-        } else if (jj_2_28(5)) {
+        } else if (jj_2_18(5)) {
           jj_consume_token(19);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
         }
-        StepExpr();
+        RelativePathExpr();
+      } else {
+        ;
       }
-    } finally {
-      trace_return("RelativePathExpr");
+    } else if (jj_2_21(5)) {
+      PathExpr();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void PathExpr() throws ParseException {
+    if (jj_2_23(5)) {
+      jj_consume_token(18);
+      if (jj_2_22(5)) {
+        RelativePathExpr();
+      } else {
+        ;
+      }
+    } else if (jj_2_24(5)) {
+      jj_consume_token(19);
+      RelativePathExpr();
+    } else if (jj_2_25(5)) {
+      RelativePathExpr();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void RelativePathExpr() throws ParseException {
+    StepExpr();
+    label_2:
+    while (true) {
+      if (jj_2_26(5)) {
+        ;
+      } else {
+        break label_2;
+      }
+      if (jj_2_27(5)) {
+        jj_consume_token(18);
+      } else if (jj_2_28(5)) {
+        jj_consume_token(19);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      StepExpr();
     }
   }
 
   final public void StepExpr() throws ParseException {
-    trace_call("StepExpr");
-    try {
-      AxisStep();
-    } finally {
-      trace_return("StepExpr");
-    }
+    AxisStep();
   }
 
   final public void AxisStep() throws ParseException {
-    trace_call("AxisStep");
-    try {
-      ForwardStep();
-      PredicateList();
-    } finally {
-      trace_return("AxisStep");
-    }
+    ForwardStep();
+    PredicateList();
   }
 
   final public void ForwardStep() throws ParseException {
-    trace_call("ForwardStep");
-    try {
-      AbbrevForwardStep();
-    } finally {
-      trace_return("ForwardStep");
-    }
+    AbbrevForwardStep();
   }
 
   final public void AbbrevForwardStep() throws ParseException {
-    trace_call("AbbrevForwardStep");
-    try {
-      if (jj_2_29(5)) {
-        jj_consume_token(20);
-      } else {
-        ;
-      }
-      NodeTest();
-    } finally {
-      trace_return("AbbrevForwardStep");
+    if (jj_2_29(5)) {
+      jj_consume_token(20);
+    } else {
+      ;
     }
+    NodeTest();
   }
 
   final public void NodeTest() throws ParseException {
-    trace_call("NodeTest");
-    try {
-      if (jj_2_30(5)) {
-        KindTest();
-      } else if (jj_2_31(5)) {
-        NameTest();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("NodeTest");
+    if (jj_2_30(5)) {
+      KindTest();
+    } else if (jj_2_31(5)) {
+      NameTest();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void KindTest() throws ParseException {
-    trace_call("KindTest");
-    try {
-      TextTest();
-    } finally {
-      trace_return("KindTest");
-    }
+    TextTest();
   }
 
   final public void NameTest() throws ParseException {
-    trace_call("NameTest");
-    try {
-      if (jj_2_32(5)) {
-        jj_consume_token(15);
-      } else if (jj_2_33(5)) {
-        jj_consume_token(16);
-      } else if (jj_2_34(5)) {
-        QName();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("NameTest");
+    if (jj_2_32(5)) {
+      jj_consume_token(15);
+    } else if (jj_2_33(5)) {
+      jj_consume_token(16);
+    } else if (jj_2_34(5)) {
+      QName();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void FilterExpr() throws ParseException {
-    trace_call("FilterExpr");
-    try {
-      PrimaryExpr();
-      PredicateList();
-    } finally {
-      trace_return("FilterExpr");
-    }
+    PrimaryExpr();
+    PredicateList();
   }
 
   final public void PredicateList() throws ParseException {
-    trace_call("PredicateList");
-    try {
-      label_3:
-      while (true) {
-        if (jj_2_35(5)) {
-          ;
-        } else {
-          break label_3;
-        }
-        Predicate();
+    label_3:
+    while (true) {
+      if (jj_2_35(5)) {
+        ;
+      } else {
+        break label_3;
       }
-    } finally {
-      trace_return("PredicateList");
+      Predicate();
     }
   }
 
   final public void Predicate() throws ParseException {
-    trace_call("Predicate");
-    try {
-      jj_consume_token(21);
-      Expr();
-      jj_consume_token(22);
-    } finally {
-      trace_return("Predicate");
-    }
+    jj_consume_token(21);
+    Expr();
+    jj_consume_token(22);
   }
 
   final public void PrimaryExpr() throws ParseException {
-    trace_call("PrimaryExpr");
-    try {
-      if (jj_2_36(5)) {
-        Literal();
-      } else if (jj_2_37(5)) {
-        ParenthesizedExpr();
-      } else if (jj_2_38(5)) {
-        FunctionCall();
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("PrimaryExpr");
+    if (jj_2_36(5)) {
+      Literal();
+    } else if (jj_2_37(5)) {
+      ParenthesizedExpr();
+    } else if (jj_2_38(5)) {
+      FunctionCall();
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void Literal() throws ParseException {
-    trace_call("Literal");
-    try {
-      if (jj_2_39(5)) {
-        NumericLiteral();
-      } else if (jj_2_40(5)) {
-        jj_consume_token(StringLiteral);
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("Literal");
+    if (jj_2_39(5)) {
+      NumericLiteral();
+    } else if (jj_2_40(5)) {
+      jj_consume_token(StringLiteral);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void NumericLiteral() throws ParseException {
-    trace_call("NumericLiteral");
-    try {
-      if (jj_2_41(5)) {
-        jj_consume_token(IntegerLiteral);
-      } else if (jj_2_42(5)) {
-        jj_consume_token(DecimalLiteral);
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("NumericLiteral");
+    if (jj_2_41(5)) {
+      jj_consume_token(IntegerLiteral);
+    } else if (jj_2_42(5)) {
+      jj_consume_token(DecimalLiteral);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void ParenthesizedExpr() throws ParseException {
-    trace_call("ParenthesizedExpr");
-    try {
-      jj_consume_token(23);
-      Expr();
-      jj_consume_token(24);
-    } finally {
-      trace_return("ParenthesizedExpr");
-    }
+    jj_consume_token(23);
+    Expr();
+    jj_consume_token(24);
   }
 
   final public void FunctionCall() throws ParseException {
-    trace_call("FunctionCall");
-    try {
-      FunctionName();
-      jj_consume_token(23);
-      if (jj_2_44(5)) {
-        Expr();
-        label_4:
-        while (true) {
-          if (jj_2_43(5)) {
-            ;
-          } else {
-            break label_4;
-          }
-          jj_consume_token(25);
-          Expr();
+    FunctionName();
+    jj_consume_token(23);
+    if (jj_2_44(5)) {
+      Expr();
+      label_4:
+      while (true) {
+        if (jj_2_43(5)) {
+          ;
+        } else {
+          break label_4;
         }
-      } else {
-        ;
+        jj_consume_token(25);
+        Expr();
       }
-      jj_consume_token(24);
-    } finally {
-      trace_return("FunctionCall");
+    } else {
+      ;
     }
+    jj_consume_token(24);
   }
 
   final public void FunctionName() throws ParseException {
-    trace_call("FunctionName");
-    try {
-      if (jj_2_45(5)) {
-        jj_consume_token(26);
-      } else if (jj_2_46(5)) {
-        jj_consume_token(27);
-      } else if (jj_2_47(5)) {
-        jj_consume_token(28);
-      } else if (jj_2_48(5)) {
-        jj_consume_token(29);
-      } else if (jj_2_49(5)) {
-        jj_consume_token(30);
-      } else if (jj_2_50(5)) {
-        jj_consume_token(31);
-      } else if (jj_2_51(5)) {
-        jj_consume_token(32);
-      } else if (jj_2_52(5)) {
-        jj_consume_token(33);
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    } finally {
-      trace_return("FunctionName");
+    if (jj_2_45(5)) {
+      jj_consume_token(26);
+    } else if (jj_2_46(5)) {
+      jj_consume_token(27);
+    } else if (jj_2_47(5)) {
+      jj_consume_token(28);
+    } else if (jj_2_48(5)) {
+      jj_consume_token(29);
+    } else if (jj_2_49(5)) {
+      jj_consume_token(30);
+    } else if (jj_2_50(5)) {
+      jj_consume_token(31);
+    } else if (jj_2_51(5)) {
+      jj_consume_token(32);
+    } else if (jj_2_52(5)) {
+      jj_consume_token(33);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   final public void TextTest() throws ParseException {
-    trace_call("TextTest");
-    try {
-      jj_consume_token(26);
-      if (jj_2_53(5)) {
-        jj_consume_token(23);
-        jj_consume_token(24);
-      } else {
-        ;
-      }
-    } finally {
-      trace_return("TextTest");
+    jj_consume_token(26);
+    if (jj_2_53(5)) {
+      jj_consume_token(23);
+      jj_consume_token(24);
+    } else {
+      ;
     }
   }
 
   final public void QName() throws ParseException {
-    trace_call("QName");
-    try {
-      jj_consume_token(QNameToken);
-    } finally {
-      trace_return("QName");
-    }
+    jj_consume_token(QNameToken);
   }
 
   private boolean jj_2_1(int xla) {
@@ -1798,7 +1613,6 @@ public class XParser implements XParserConstants {
           }
         }
       }
-      trace_token(token, "");
       return token;
     }
     token = oldToken;
@@ -1836,7 +1650,6 @@ public class XParser implements XParserConstants {
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
     jj_gen++;
-      trace_token(token, " (in getNextToken)");
     return token;
   }
 
@@ -1925,55 +1738,12 @@ public class XParser implements XParserConstants {
     return new ParseException(token, exptokseq, tokenImage);
   }
 
-  private int trace_indent = 0;
-  private boolean trace_enabled = true;
-
-/** Enable tracing. */
+  /** Enable tracing. */
   final public void enable_tracing() {
-    trace_enabled = true;
   }
 
-/** Disable tracing. */
+  /** Disable tracing. */
   final public void disable_tracing() {
-    trace_enabled = false;
-  }
-
-  private void trace_call(String s) {
-    if (trace_enabled) {
-      for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-      System.out.println("Call:   " + s);
-    }
-    trace_indent = trace_indent + 2;
-  }
-
-  private void trace_return(String s) {
-    trace_indent = trace_indent - 2;
-    if (trace_enabled) {
-      for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-      System.out.println("Return: " + s);
-    }
-  }
-
-  private void trace_token(Token t, String where) {
-    if (trace_enabled) {
-      for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-      System.out.print("Consumed token: <" + tokenImage[t.kind]);
-      if (t.kind != 0 && !tokenImage[t.kind].equals("\"" + t.image + "\"")) {
-        System.out.print(": \"" + t.image + "\"");
-      }
-      System.out.println(" at line " + t.beginLine + " column " + t.beginColumn + ">" + where);
-    }
-  }
-
-  private void trace_scan(Token t1, int t2) {
-    if (trace_enabled) {
-      for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-      System.out.print("Visited token: <" + tokenImage[t1.kind]);
-      if (t1.kind != 0 && !tokenImage[t1.kind].equals("\"" + t1.image + "\"")) {
-        System.out.print(": \"" + t1.image + "\"");
-      }
-      System.out.println(" at line " + t1.beginLine + " column " + t1.beginColumn + ">; Expected token: <" + tokenImage[t2] + ">");
-    }
   }
 
   private void jj_rescan_token() {
