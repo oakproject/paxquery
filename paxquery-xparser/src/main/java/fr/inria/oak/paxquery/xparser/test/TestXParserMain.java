@@ -27,11 +27,11 @@ import org.xml.sax.SAXException;
 import fr.inria.oak.paxquery.xparser.*;
 
 @RunWith(Parameterized.class)
-public class TestXParser 
+public class TestXParserMain 
 {
 	public String query;
 	
-	public TestXParser(String query)
+	public TestXParserMain(String query)
 	{
 		this.query = query;
 	}
@@ -55,14 +55,7 @@ public class TestXParser
         System.out.println("Number of tests: " + nodeList.getLength());
 
         for(int i=0; i<nodeList.getLength(); i++)
-        {
-        	/*Node node = nodeList.item(i);
-            if(node.getNodeType() == Node.ELEMENT_NODE)
-            {
-            	
-            }*/
-        	testCases.add(new String[] {nodeList.item(i).getAttributes().getNamedItem("value").getNodeValue()+";"});
-        }
+        	testCases.add(new String[] {nodeList.item(i).getAttributes().getNamedItem("value").getNodeValue()});
                 
         return testCases;        
 	}
@@ -70,8 +63,7 @@ public class TestXParser
 	@Test
 	public void test() 
 	{
-		//fail("Not yet implemented");
-		assertEquals(true, XParser.test_main(query));
+		assertEquals(true, XParserMain.test_main(query));
 	}
 
 }
