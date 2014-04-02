@@ -3,7 +3,6 @@ package fr.inria.oak.paxquery.xparser.test;
 
 import static org.junit.Assert.*;
 
-
 //import javax.xml.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,14 +23,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import fr.inria.oak.paxquery.xparser.*;
+//import fr.inria.oak.paxquery.xparser.*;
+import fr.inria.oak.paxquery.xparser.XPathMain;
 
 @RunWith(Parameterized.class)
-public class TestXParserMain 
+public class TestXPathMain 
 {
 	public String query;
 	
-	public TestXParserMain(String query)
+	public TestXPathMain(String query)
 	{
 		this.query = query;
 	}
@@ -63,7 +63,7 @@ public class TestXParserMain
 	@Test
 	public void test() 
 	{
-		assertEquals(true, XParserMain.test_main(query));
+		assertEquals(true, XPathMain.test_main(query));
 	}
 
 }

@@ -1,4 +1,4 @@
-// Generated from XParser.g4 by ANTLR 4.2
+// Generated from XPath.g4 by ANTLR 4.2
 package fr.inria.oak.paxquery.xparser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class XParserParser extends Parser {
+public class XPathParser extends Parser {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
@@ -19,20 +19,20 @@ public class XParserParser extends Parser {
 		T__21=9, T__20=10, T__19=11, T__18=12, T__17=13, T__16=14, T__15=15, T__14=16, 
 		T__13=17, T__12=18, T__11=19, T__10=20, T__9=21, T__8=22, T__7=23, T__6=24, 
 		T__5=25, T__4=26, T__3=27, T__2=28, T__1=29, T__0=30, QNAME_TOKEN=31, 
-		STRING_LITERAL=32, INTEGER_LITERAL=33, DECIMAL_LITERAL=34, DIGITS=35, 
-		NCNAME_TOK=36, LOCAL_PART=37, NMSTART=38, NMCHAR=39, LETTER=40, BASE_CHAR=41, 
-		IDEOGRAPHIC=42, COMBINING_CHAR=43, DIGIT=44, EXTENDER=45, WS=46;
+		VCMP=32, NCMP=33, STRING_LITERAL=34, AVAL=35, REFERENCE=36, ENTITY_REF=37, 
+		CHAR_REF=38, VAR=39, ENAME=40, ANAME=41, INTEGER_LITERAL=42, DECIMAL_LITERAL=43, 
+		DIGITS=44, WS=45;
 	public static final String[] tokenNames = {
 		"<INVALID>", "'/'", "'substring'", "'true'", "'!='", "'concat'", "'='", 
 		"'<='", "'('", "'*'", "','", "'false'", "'ceiling'", "'mod'", "'['", "'>='", 
 		"'//'", "'|'", "'<'", "']'", "'>'", "'@'", "'or'", "'text'", "'div'", 
-		"'floor'", "')'", "'and'", "'+'", "'not'", "'-'", "QNAME_TOKEN", "STRING_LITERAL", 
-		"INTEGER_LITERAL", "DECIMAL_LITERAL", "DIGITS", "NCNAME_TOK", "LOCAL_PART", 
-		"NMSTART", "NMCHAR", "LETTER", "BASE_CHAR", "IDEOGRAPHIC", "COMBINING_CHAR", 
-		"DIGIT", "EXTENDER", "WS"
+		"'floor'", "')'", "'and'", "'+'", "'not'", "'-'", "QNAME_TOKEN", "VCMP", 
+		"NCMP", "STRING_LITERAL", "AVAL", "REFERENCE", "ENTITY_REF", "CHAR_REF", 
+		"VAR", "ENAME", "ANAME", "INTEGER_LITERAL", "DECIMAL_LITERAL", "DIGITS", 
+		"WS"
 	};
 	public static final int
-		RULE_start = 0, RULE_expr = 1, RULE_orExpr = 2, RULE_orExpr2 = 3, RULE_andExpr = 4, 
+		RULE_xpath = 0, RULE_expr = 1, RULE_orExpr = 2, RULE_orExpr2 = 3, RULE_andExpr = 4, 
 		RULE_andExpr2 = 5, RULE_equalityExpr = 6, RULE_equalityExpr2 = 7, RULE_relationalExpr = 8, 
 		RULE_relationalExpr2 = 9, RULE_additiveExpr = 10, RULE_additiveExpr2 = 11, 
 		RULE_multiplicativeExpr = 12, RULE_multiplicativeExpr2 = 13, RULE_unaryExpr = 14, 
@@ -43,7 +43,7 @@ public class XParserParser extends Parser {
 		RULE_numericLiteral = 31, RULE_parenthesizedExpr = 32, RULE_functionCall = 33, 
 		RULE_functionName = 34, RULE_textTest = 35, RULE_qName = 36;
 	public static final String[] ruleNames = {
-		"start", "expr", "orExpr", "orExpr2", "andExpr", "andExpr2", "equalityExpr", 
+		"xpath", "expr", "orExpr", "orExpr2", "andExpr", "andExpr2", "equalityExpr", 
 		"equalityExpr2", "relationalExpr", "relationalExpr2", "additiveExpr", 
 		"additiveExpr2", "multiplicativeExpr", "multiplicativeExpr2", "unaryExpr", 
 		"unionExpr", "valueExpr", "pathExpr", "relativePathExpr", "stepExpr", 
@@ -54,7 +54,7 @@ public class XParserParser extends Parser {
 	};
 
 	@Override
-	public String getGrammarFileName() { return "XParser.g4"; }
+	public String getGrammarFileName() { return "XPath.g4"; }
 
 	@Override
 	public String[] getTokenNames() { return tokenNames; }
@@ -68,31 +68,31 @@ public class XParserParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	public XParserParser(TokenStream input) {
+	public XPathParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
-	public static class StartContext extends ParserRuleContext {
+	public static class XpathContext extends ParserRuleContext {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public StartContext(ParserRuleContext parent, int invokingState) {
+		public XpathContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_start; }
+		@Override public int getRuleIndex() { return RULE_xpath; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterStart(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterXpath(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitStart(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitXpath(this);
 		}
 	}
 
-	public final StartContext start() throws RecognitionException {
-		StartContext _localctx = new StartContext(_ctx, getState());
-		enterRule(_localctx, 0, RULE_start);
+	public final XpathContext xpath() throws RecognitionException {
+		XpathContext _localctx = new XpathContext(_ctx, getState());
+		enterRule(_localctx, 0, RULE_xpath);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -120,11 +120,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_expr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitExpr(this);
 		}
 	}
 
@@ -161,11 +161,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_orExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterOrExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterOrExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitOrExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitOrExpr(this);
 		}
 	}
 
@@ -203,11 +203,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_orExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterOrExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterOrExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitOrExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitOrExpr2(this);
 		}
 	}
 
@@ -261,11 +261,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_andExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAndExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAndExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAndExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAndExpr(this);
 		}
 	}
 
@@ -303,11 +303,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_andExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAndExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAndExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAndExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAndExpr2(this);
 		}
 	}
 
@@ -362,11 +362,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_equalityExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterEqualityExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterEqualityExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitEqualityExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitEqualityExpr(this);
 		}
 	}
 
@@ -404,11 +404,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_equalityExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterEqualityExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterEqualityExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitEqualityExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitEqualityExpr2(this);
 		}
 	}
 
@@ -472,11 +472,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_relationalExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterRelationalExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterRelationalExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitRelationalExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitRelationalExpr(this);
 		}
 	}
 
@@ -514,11 +514,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_relationalExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterRelationalExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterRelationalExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitRelationalExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitRelationalExpr2(this);
 		}
 	}
 
@@ -600,11 +600,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_additiveExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAdditiveExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAdditiveExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAdditiveExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAdditiveExpr(this);
 		}
 	}
 
@@ -642,11 +642,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_additiveExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAdditiveExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAdditiveExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAdditiveExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAdditiveExpr2(this);
 		}
 	}
 
@@ -716,11 +716,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterMultiplicativeExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterMultiplicativeExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitMultiplicativeExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitMultiplicativeExpr(this);
 		}
 	}
 
@@ -758,11 +758,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpr2; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterMultiplicativeExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterMultiplicativeExpr2(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitMultiplicativeExpr2(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitMultiplicativeExpr2(this);
 		}
 	}
 
@@ -842,11 +842,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_unaryExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterUnaryExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterUnaryExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitUnaryExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitUnaryExpr(this);
 		}
 	}
 
@@ -914,11 +914,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_unionExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterUnionExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterUnionExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitUnionExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitUnionExpr(this);
 		}
 	}
 
@@ -973,11 +973,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_valueExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterValueExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterValueExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitValueExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitValueExpr(this);
 		}
 	}
 
@@ -1040,11 +1040,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_pathExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterPathExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPathExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitPathExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPathExpr(this);
 		}
 	}
 
@@ -1115,11 +1115,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_relativePathExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterRelativePathExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterRelativePathExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitRelativePathExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitRelativePathExpr(this);
 		}
 	}
 
@@ -1173,11 +1173,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_stepExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterStepExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterStepExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitStepExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitStepExpr(this);
 		}
 	}
 
@@ -1214,11 +1214,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_axisStep; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAxisStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAxisStep(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAxisStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAxisStep(this);
 		}
 	}
 
@@ -1253,11 +1253,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_forwardStep; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterForwardStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterForwardStep(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitForwardStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitForwardStep(this);
 		}
 	}
 
@@ -1291,11 +1291,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_abbrevForwardStep; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterAbbrevForwardStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAbbrevForwardStep(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitAbbrevForwardStep(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAbbrevForwardStep(this);
 		}
 	}
 
@@ -1341,11 +1341,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_nodeTest; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterNodeTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNodeTest(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitNodeTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNodeTest(this);
 		}
 	}
 
@@ -1394,11 +1394,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_kindTest; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterKindTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterKindTest(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitKindTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitKindTest(this);
 		}
 	}
 
@@ -1432,11 +1432,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_nameTest; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterNameTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNameTest(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitNameTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNameTest(this);
 		}
 	}
 
@@ -1492,11 +1492,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_filterExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterFilterExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterFilterExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitFilterExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitFilterExpr(this);
 		}
 	}
 
@@ -1534,11 +1534,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_predicateList; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterPredicateList(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicateList(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitPredicateList(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicateList(this);
 		}
 	}
 
@@ -1585,11 +1585,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_predicate; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterPredicate(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicate(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitPredicate(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicate(this);
 		}
 	}
 
@@ -1631,11 +1631,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primaryExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterPrimaryExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPrimaryExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitPrimaryExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPrimaryExpr(this);
 		}
 	}
 
@@ -1691,18 +1691,18 @@ public class XParserParser extends Parser {
 		public NumericLiteralContext numericLiteral() {
 			return getRuleContext(NumericLiteralContext.class,0);
 		}
-		public TerminalNode STRING_LITERAL() { return getToken(XParserParser.STRING_LITERAL, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(XPathParser.STRING_LITERAL, 0); }
 		public LiteralContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_literal; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterLiteral(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitLiteral(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitLiteral(this);
 		}
 	}
 
@@ -1741,19 +1741,19 @@ public class XParserParser extends Parser {
 	}
 
 	public static class NumericLiteralContext extends ParserRuleContext {
-		public TerminalNode INTEGER_LITERAL() { return getToken(XParserParser.INTEGER_LITERAL, 0); }
-		public TerminalNode DECIMAL_LITERAL() { return getToken(XParserParser.DECIMAL_LITERAL, 0); }
+		public TerminalNode INTEGER_LITERAL() { return getToken(XPathParser.INTEGER_LITERAL, 0); }
+		public TerminalNode DECIMAL_LITERAL() { return getToken(XPathParser.DECIMAL_LITERAL, 0); }
 		public NumericLiteralContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_numericLiteral; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterNumericLiteral(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNumericLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitNumericLiteral(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNumericLiteral(this);
 		}
 	}
 
@@ -1793,11 +1793,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_parenthesizedExpr; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterParenthesizedExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterParenthesizedExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitParenthesizedExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitParenthesizedExpr(this);
 		}
 	}
 
@@ -1839,11 +1839,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_functionCall; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterFunctionCall(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterFunctionCall(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitFunctionCall(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitFunctionCall(this);
 		}
 	}
 
@@ -1899,11 +1899,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_functionName; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterFunctionName(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterFunctionName(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitFunctionName(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitFunctionName(this);
 		}
 	}
 
@@ -1940,11 +1940,11 @@ public class XParserParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_textTest; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterTextTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterTextTest(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitTextTest(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitTextTest(this);
 		}
 	}
 
@@ -1979,18 +1979,18 @@ public class XParserParser extends Parser {
 	}
 
 	public static class QNameContext extends ParserRuleContext {
-		public TerminalNode QNAME_TOKEN() { return getToken(XParserParser.QNAME_TOKEN, 0); }
+		public TerminalNode QNAME_TOKEN() { return getToken(XPathParser.QNAME_TOKEN, 0); }
 		public QNameContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_qName; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).enterQName(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterQName(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XParserListener ) ((XParserListener)listener).exitQName(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitQName(this);
 		}
 	}
 
@@ -2015,9 +2015,9 @@ public class XParserParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\60\u0119\4\2\t\2"+
-		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
-		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3/\u0119\4\2\t\2\4"+
+		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
 		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\5\3"+
@@ -2036,8 +2036,8 @@ public class XParserParser extends Parser {
 		"\3\36\3\36\3\37\3\37\3\37\5\37\u00f6\n\37\3 \3 \5 \u00fa\n \3!\3!\3\""+
 		"\3\"\3\"\3\"\3#\3#\3#\3#\3#\7#\u0107\n#\f#\16#\u010a\13#\5#\u010c\n#\3"+
 		"#\3#\3$\3$\3%\3%\3%\5%\u0115\n%\3&\3&\3&\2\2\'\2\4\6\b\n\f\16\20\22\24"+
-		"\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJ\2\5\4\2\3\3\22\22\3\2#"+
-		"$\b\2\4\5\7\7\r\16\31\31\33\33\37\37\u0113\2L\3\2\2\2\4N\3\2\2\2\6P\3"+
+		"\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJ\2\5\4\2\3\3\22\22\3\2,"+
+		"-\b\2\4\5\7\7\r\16\31\31\33\33\37\37\u0113\2L\3\2\2\2\4N\3\2\2\2\6P\3"+
 		"\2\2\2\bX\3\2\2\2\nZ\3\2\2\2\fb\3\2\2\2\16d\3\2\2\2\20p\3\2\2\2\22r\3"+
 		"\2\2\2\24\u0086\3\2\2\2\26\u0088\3\2\2\2\30\u0094\3\2\2\2\32\u0096\3\2"+
 		"\2\2\34\u00a6\3\2\2\2\36\u00ab\3\2\2\2 \u00ad\3\2\2\2\"\u00bb\3\2\2\2"+
@@ -2094,7 +2094,7 @@ public class XParserParser extends Parser {
 		"\u00ee\u00ef\7\20\2\2\u00ef\u00f0\5\4\3\2\u00f0\u00f1\7\25\2\2\u00f1;"+
 		"\3\2\2\2\u00f2\u00f6\5> \2\u00f3\u00f6\5B\"\2\u00f4\u00f6\5D#\2\u00f5"+
 		"\u00f2\3\2\2\2\u00f5\u00f3\3\2\2\2\u00f5\u00f4\3\2\2\2\u00f6=\3\2\2\2"+
-		"\u00f7\u00fa\5@!\2\u00f8\u00fa\7\"\2\2\u00f9\u00f7\3\2\2\2\u00f9\u00f8"+
+		"\u00f7\u00fa\5@!\2\u00f8\u00fa\7$\2\2\u00f9\u00f7\3\2\2\2\u00f9\u00f8"+
 		"\3\2\2\2\u00fa?\3\2\2\2\u00fb\u00fc\t\3\2\2\u00fcA\3\2\2\2\u00fd\u00fe"+
 		"\7\n\2\2\u00fe\u00ff\5\4\3\2\u00ff\u0100\7\34\2\2\u0100C\3\2\2\2\u0101"+
 		"\u0102\5F$\2\u0102\u010b\7\n\2\2\u0103\u0108\5\4\3\2\u0104\u0105\7\f\2"+

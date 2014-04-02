@@ -1,0 +1,12 @@
+/XQueryParser.java
+/XQueryListener.java
+/XQueryLexer.tokens
+/XQueryLexer.java
+/XQueryBaseListener.java
+/XQuery.tokens
+/XPathParser.java
+/XPathListener.java
+/XPathLexer.tokens
+/XPathLexer.java
+/XPathBaseListener.java
+/XPath.tokens

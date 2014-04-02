@@ -3,19 +3,19 @@ package fr.inria.oak.paxquery.xparser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-public class XParserMain {
+public class XPathMain {
 	public static void main(String args[]) throws Exception {
-		System.out.println("Enter a valid expression followed by Enter and Ctrl+D: ");
+		System.out.println("Enter a valid XPath expression followed by Enter and Ctrl+D: ");
 		//create a CharStream that reads from standard input
 		ANTLRInputStream input = new ANTLRInputStream(System.in);
 		//create a lexer that feeds off of input CharStream
-		XParserLexer lexer = new XParserLexer(input);
+		XPathLexer lexer = new XPathLexer(input);
 		//create a buffer of tokens pulled from the lexer
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		//create a parser that feeds off the tokens buffer
-		XParserParser parser = new XParserParser(tokens);
+		XPathParser parser = new XPathParser(tokens);
 		
-		ParseTree tree = parser.start();	//begin parsing at start rule
+		ParseTree tree = parser.xpath();	//begin parsing at start rule
 		System.out.println(tree.toStringTree(parser));
 	}
 	
@@ -26,13 +26,13 @@ public class XParserMain {
 			//create a CharStream that reads from standard input
 			ANTLRInputStream input = new ANTLRInputStream(new java.io.ByteArrayInputStream(test_query.getBytes()));
 			//create a lexer that feeds off of input CharStream
-			XParserLexer lexer = new XParserLexer(input);
+			XPathLexer lexer = new XPathLexer(input);
 			//create a buffer of tokens pulled from the lexer
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			//create a parser that feeds off the tokens buffer
-			XParserParser parser = new XParserParser(tokens);
+			XPathParser parser = new XPathParser(tokens);
 			
-			ParseTree tree = parser.start();	//begin parsing at start rule
+			ParseTree tree = parser.xpath();	//begin parsing at start rule
 			System.out.println(tree.toStringTree(parser));
 
 			return true;

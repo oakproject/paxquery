@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests>
+		<test value="let $pc := collection('XMarkDocs/XMarkPeople/file0.xml')
+for $p in $pc/site/people/person[@id=&#34;person0&#34;]
+let $n := $p/name/text()
+return $n"/>
+		<test value="let $ic := collection('XMarkDocs/XMarkItems/file0.xml')
+for $i in $ic/site/regions/australia/item
+let $n := $i/name/text(), $d := $i/description 
+return &#60;item name=&#34;{$n}&#34;>{$d}&#60;/item>"/>
+		<test value="let $ic := collection(&#34;XMarkDocs/XMarkItems/file0.xml&#34;)
+for $i in $ic//item, $d in $i/description/text/text()
+let $n := $i/name/text()
+where contains($d, &#34;gold&#34;)
+return $n"/>
+		<test value="let $cc := collection(&#34;XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)
+for $a in $cc/site/closed_auctions/closed_auction/annotation/description/parlist/listitem/text/emph/keyword/text()
+return &#60;text>{$a}&#60;/text>"/>
+		<test value="let $cc := collection(&#34;XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)
+for $ca in $cc/site/closed_auctions/closed_auction
+for $k in $ca/annotation/description/parlist/listitem/text/emph/keyword/text()
+let $id := $ca/seller/@person
+where not(empty($k))
+return &#60;person id=&#34;{$id}&#34;/>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;)
+for $p in $pc/site/people/person
+let $h := $p/homepage, $n := $p/name/text()
+where not(empty($h))
+return &#60;person name=&#34;{$n}&#34;/>"/>
+		<test value="let $cc := collection(&#34;XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)
+let $p :=
+  for $i in $cc/site/closed_auctions/closed_auction/price/text()
+  where $i > 40
+  return $i
+let $c := count($p)
+return $c"/>
+		<test value="let $ic := collection(&#34;XMarkDocs/XMarkItems/file0.xml&#34;)
+let $i := $ic/site/regions//item
+let $c := count($i)
+return $c"/>
+		<test value="let $pc := collection('XMarkDocs/XMarkPeople/file0.xml'), $cc := collection('XMarkDocs/XMarkPeople/file0.xml')
+for $p in $pc/site/people/person[address/country/text()='France']
+  let $a := $p/address/city/text()
+for $c in $cc/site/closed_auctions/closed_auction, $i in $p/@id, $b in $c/buyer/@person
+where $i = $b
+group by $a
+return &#60;res>&#60;city>{$a}&#60;/city>&#60;num>{count($p)}&#60;/num>&#60;/res>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;),
+$cc := collection('XMarkDocs/XMarkClosedAuctions/file0.xml'), $ic := collection('XMarkDocs/XMarkItems/file0.xml')
+let $ca := $cc/site/closed_auctions/closed_auction, $ei := $ic/site/regions/europe/item
+for $p in $pc/site/people/person let $pn := $p/name/text()
+  let $a :=
+    for $t in $ca, $i in $p/@id, $b in $t/buyer/@person 
+    where $i = $b
+    return
+      let $n :=
+      for $t2 in $ei, $ti2 in $t2/@id, $ti in $t/itemref/@item 
+      where $ti = $ti2
+      return $t2
+      let $in := $n/name/text()
+      return &#60;item>{$in}&#60;/item>
+return &#60;person name=&#34;{$pn}&#34;>{$a}&#60;/person>"/>
+		<test value="let $pc := collection('XMarkDocs/XMarkPeople/file0.xml')
+for $i in distinct-values($pc/site/people/person/
+                     profile/interest/@category)
+let $p :=
+for $t in $pc/site/people/person,
+$c in $t/profile/interest/@category let $r1 := $t/profile/gender/text(),
+$r2 := $t/profile/age/text(),
+$r3 := $t/profile/education/text(), $r4 := $t/profile/@income,
+$r5 := $t/name/text(),
+$r6 := $t/address/street/text(), $r7 := $t/address/city/text(),
+$r8 := $t/address/country/text(), $r9 := $t/emailaddress/text(),
+$r10 := $t/homepage/text(),
+$r11 := $t/creditcard/text()
+where $c = $i return &#60;personne>
+   &#60;statistiques>
+    &#60;sexe>{$r1}&#60;/sexe>
+    &#60;age>{$r2}&#60;/age>
+    &#60;education>{$r3}&#60;/education>
+    &#60;revenu>{$r4}&#60;/revenu>
+   &#60;/statistiques>
+   &#60;coordonnees>
+    &#60;nom>{$r5}&#60;/nom>
+    &#60;rue>{$r6}&#60;/rue>
+    &#60;ville>{$r7}&#60;/ville>
+    &#60;pays>{$r8}&#60;/pays>
+    &#60;reseau>
+      &#60;courrier>{$r9}&#60;/courrier>
+      &#60;pagePerso>{$r10}&#60;/pagePerso>
+    &#60;/reseau>
+   &#60;/coordonnees>
+   &#60;cartePaiement>{$r11}&#60;/cartePaiement>
+ &#60;/personne>
+return &#60;categorie>&#60;id>{$i}&#60;/id>{$p}&#60;/categorie>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;),
+$cc := collection(&#34;XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)
+for $p in $pc/site/people/person let $n := $p/name/text()
+let $a :=
+for $t in $cc/site/closed_auctions/closed_auction, $b in $t/buyer/@person, $i in $p/@id
+where $b = $i
+return $t
+let $c := count($a)
+return &#60;item person=&#34;{$n}&#34;>{$c}&#60;/item>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;), $cc := collection(&#34;XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)
+for $p in $pc/site/people/person, $i in $p/@id, $ad in $p/address/country/text()
+  let $a :=
+    for $c in $cc//closed_auction, $b in $c/buyer/@person, $s in $c/seller/@person
+    let $ir := $c/itemref 
+    where $i = $b or $i = $s 
+    return $ir
+  let $n := $p/name
+  where $ad = 'France'
+return &#60;res>{$n,$a}&#60;/res>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;), $oc := collection(&#34;XMarkDocs/XMarkOpenAuctions/file0.xml&#34;)
+for $p in $pc/site/people/person 
+let $l :=
+for $o in $oc/site/open_auctions/open_auction, 
+  $i in $o/initial/text(),
+  $si in $p/profile/@income,
+  $a in $o/annotation//text/text()
+let $x := 5000*$i
+where $si > $x and contains($a,&#34;car&#34;) 
+return $i
+for $li in $p/profile/@income
+let $n := count($l)
+where $li > 200000
+return &#60;items person=&#34;{$li}&#34;>{$n}&#60;/items>"/>
+</tests>
