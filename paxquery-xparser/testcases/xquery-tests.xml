@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tests>
+		<test value="let $ic := collection('items')
+let $i := $ic/site/regions//item
+let $c := count($i)
+return $c"/>
+		<test value="let $ic := collection('items')
+for $i in $ic/site/regions//item
+let $l := $i/location/text()
+group by $l
+return &#60;res>&#60;name>{$l}&#60;/name>&#60;num>{count($i)}&#60;/num>&#60;/res>"/>
+		<test value="let $pc := collection('people'),
+$cc := collection('closed_auctions')
+for $p in $pc/site/people/person
+let $n := $p/name/text()
+let $a :=
+for $t in $cc/site/closed_auctions/closed_auction, $b in $t/buyer/@person, $i in $p/@id
+where $b = $i
+return $t
+let $c := count($a)
+return &#60;item person=&#34;{$n}&#34;>{$c}&#60;/item>"/>
 		<test value="let $pc := collection('XMarkDocs/XMarkPeople/file0.xml')
 for $p in $pc/site/people/person[@id=&#34;person0&#34;]
 let $n := $p/name/text()

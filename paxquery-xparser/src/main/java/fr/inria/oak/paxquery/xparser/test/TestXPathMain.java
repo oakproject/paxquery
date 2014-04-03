@@ -41,7 +41,7 @@ public class TestXPathMain
 	{
 		ArrayList<String[]> testCases = new ArrayList<String[]>();
 		
-		String testCaseFilePath = "./testcases/pathx1-tests.xml";
+		String testCaseFilePath = "./testcases/xpath-tests.xml";
 		
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();

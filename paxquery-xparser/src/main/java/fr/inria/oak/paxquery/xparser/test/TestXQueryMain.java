@@ -40,7 +40,7 @@ public class TestXQueryMain
 	{
 		ArrayList<String[]> testCases = new ArrayList<String[]>();
 		
-		String testCaseFilePath = "./testcases/queryx1-tests.xml";
+		String testCaseFilePath = "./testcases/xquery-tests.xml";
 		
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
