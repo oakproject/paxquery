@@ -17,6 +17,7 @@ package fr.inria.oak.paxquery.common.xml.treepattern.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +59,13 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	 * Otherwise, this node represents an element, and though, only elements match.
 	 */
 	private boolean isAttribute;
+	
+	/**
+	 * If not null, this node (either an attribute or an element) is assigned to one or more variables in the query. 
+	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
+	 * For example, variable $i would be stored in matchingVariables of “name” for the sentence $i := <whatever>/name 
+	 */
+	private HashSet<String> matchingVariables;	
 	
 	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node
@@ -872,6 +880,55 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	}
 	
 	/**
+	 * If not null, this node (either an attribute or an element) is assigned to one or more variables in the query. 
+	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
+	 * A String array is provided rather than an iterator to prevent deletion.
+	 */
+	public String[] getMatchingVariables() {
+		return this.matchingVariables.toArray(new String[0]);	//new String[0] indicates the type of the returned array
+	}
+	
+	/**
+	 * Returns the number of matching variables.
+     */
+	public int getMatchingVariablesSize() {
+		return matchingVariables.size();
+	}
+
+	/**
+	 * Marks this node as assigned to those variables indicated by {@link #variables}.
+	 */
+	public void addMatchingVariables(String... variables) {
+		if(matchingVariables == null)
+			matchingVariables = new HashSet<String>();
+		for(String variable : variables)
+			matchingVariables.add(variable);
+	}
+
+	/**
+	 * Removes all matching variables from this node.
+     */
+	public void clearMatchingVariables() {
+		if(matchingVariables == null)
+			matchingVariables = new HashSet<String>();
+		else
+			matchingVariables.clear();
+	}
+
+	/**
+	 * Removes the matching variable indicated by {@link #variables} (if present).
+	 */
+	public void removeMatchingVariables(String... variables) {
+		if(matchingVariables == null)
+			matchingVariables = new HashSet<String>();
+		else {
+			for(String variable : variables)
+				matchingVariables.remove(variable);
+		}
+	}
+	
+	
+	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node
 	 * from which it originated.
 	 * 
@@ -1542,6 +1599,7 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 			edges.get(i).n2.recursiveDrawTree(sb, -this.hashCode(), backgroundColor, foregroundColor);
 	}
 	
+	//TODO: draw matching variables
 	private void recursiveDrawTree(StringBuffer sb, int parentNodeCode, String backgroundColor, String foregroundColor)
 	{		
 		sb.append(nodeCode + " [");
