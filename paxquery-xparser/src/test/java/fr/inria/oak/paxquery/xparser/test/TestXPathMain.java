@@ -1,4 +1,4 @@
-/*package fr.inria.oak.paxquery.xparser.test;
+package fr.inria.oak.paxquery.xparser.test;
 
 
 import static org.junit.Assert.*;
@@ -38,7 +38,7 @@ public class TestXPathMain
 	{
 		ArrayList<String[]> testCases = new ArrayList<String[]>();
 		
-		String testCaseFilePath = "./testcases/xpath-tests.xml";
+		String testCaseFilePath = "src/test/resources/xpath-tests.xml";
 		
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -64,4 +64,3 @@ public class TestXPathMain
 	}
 
 }
-*/
