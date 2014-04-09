@@ -42,17 +42,6 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitForBinding(@NotNull XQueryParser.ForBindingContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XQueryParser#nameTest}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameTest(@NotNull XQueryParser.NameTestContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XQueryParser#nameTest}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameTest(@NotNull XQueryParser.NameTestContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XQueryParser#additiveExpr}.
 	 * @param ctx the parse tree
 	 */
@@ -196,6 +185,17 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitNumericLiteral(@NotNull XQueryParser.NumericLiteralContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#nameTEst_mod}.
+	 * @param ctx the parse tree
+	 */
+	void enterNameTEst_mod(@NotNull XQueryParser.NameTEst_modContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#nameTEst_mod}.
+	 * @param ctx the parse tree
+	 */
+	void exitNameTEst_mod(@NotNull XQueryParser.NameTEst_modContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#att}.
 	 * @param ctx the parse tree
 	 */
@@ -216,17 +216,6 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLetBinding(@NotNull XQueryParser.LetBindingContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link XQueryParser#pathExprInner_xq}.
-	 * @param ctx the parse tree
-	 */
-	void enterPathExprInner_xq(@NotNull XQueryParser.PathExprInner_xqContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XQueryParser#pathExprInner_xq}.
-	 * @param ctx the parse tree
-	 */
-	void exitPathExprInner_xq(@NotNull XQueryParser.PathExprInner_xqContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#vcmp}.
@@ -328,6 +317,17 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitContains(@NotNull XQueryParser.ContainsContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExprInner_xq_doc}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExprInner_xq_doc(@NotNull XQueryParser.PathExprInner_xq_docContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExprInner_xq_doc}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExprInner_xq_doc(@NotNull XQueryParser.PathExprInner_xq_docContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#pathExpr}.
 	 * @param ctx the parse tree
 	 */
@@ -394,6 +394,17 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitQName(@NotNull XQueryParser.QNameContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExprInner_xq_VAR}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExprInner_xq_VAR(@NotNull XQueryParser.PathExprInner_xq_VARContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExprInner_xq_VAR}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExprInner_xq_VAR(@NotNull XQueryParser.PathExprInner_xq_VARContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#nodeTest}.
 	 * @param ctx the parse tree
 	 */
@@ -403,6 +414,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNodeTest(@NotNull XQueryParser.NodeTestContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#nameTest_qName}.
+	 * @param ctx the parse tree
+	 */
+	void enterNameTest_qName(@NotNull XQueryParser.NameTest_qNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#nameTest_qName}.
+	 * @param ctx the parse tree
+	 */
+	void exitNameTest_qName(@NotNull XQueryParser.NameTest_qNameContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#andExpr_xq}.
@@ -425,6 +447,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFlwrexpr(@NotNull XQueryParser.FlwrexprContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#nameTest_div}.
+	 * @param ctx the parse tree
+	 */
+	void enterNameTest_div(@NotNull XQueryParser.NameTest_divContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#nameTest_div}.
+	 * @param ctx the parse tree
+	 */
+	void exitNameTest_div(@NotNull XQueryParser.NameTest_divContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#groupBy}.
@@ -700,6 +733,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAttInner(@NotNull XQueryParser.AttInnerContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExprInner_xq_collection}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExprInner_xq_collection(@NotNull XQueryParser.PathExprInner_xq_collectionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExprInner_xq_collection}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExprInner_xq_collection(@NotNull XQueryParser.PathExprInner_xq_collectionContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#boolExpr_xq}.

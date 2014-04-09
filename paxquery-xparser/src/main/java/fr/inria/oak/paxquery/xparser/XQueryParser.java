@@ -659,19 +659,50 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class PathExprInner_xqContext extends ParserRuleContext {
-		public TerminalNode VAR() { return getToken(XQueryParser.VAR, 0); }
-		public TerminalNode STRING_LITERAL() { return getToken(XQueryParser.STRING_LITERAL, 0); }
 		public PathExprInner_xqContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_pathExprInner_xq; }
+	 
+		public PathExprInner_xqContext() { }
+		public void copyFrom(PathExprInner_xqContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class PathExprInner_xq_docContext extends PathExprInner_xqContext {
+		public TerminalNode STRING_LITERAL() { return getToken(XQueryParser.STRING_LITERAL, 0); }
+		public PathExprInner_xq_docContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq(this);
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_doc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq(this);
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_doc(this);
+		}
+	}
+	public static class PathExprInner_xq_VARContext extends PathExprInner_xqContext {
+		public TerminalNode VAR() { return getToken(XQueryParser.VAR, 0); }
+		public PathExprInner_xq_VARContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_VAR(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_VAR(this);
+		}
+	}
+	public static class PathExprInner_xq_collectionContext extends PathExprInner_xqContext {
+		public TerminalNode STRING_LITERAL() { return getToken(XQueryParser.STRING_LITERAL, 0); }
+		public PathExprInner_xq_collectionContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_collection(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_collection(this);
 		}
 	}
 
@@ -682,6 +713,7 @@ public class XQueryParser extends Parser {
 			setState(210);
 			switch (_input.LA(1)) {
 			case 26:
+				_localctx = new PathExprInner_xq_collectionContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(201); match(26);
@@ -691,6 +723,7 @@ public class XQueryParser extends Parser {
 				}
 				break;
 			case 40:
+				_localctx = new PathExprInner_xq_docContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(205); match(40);
@@ -700,6 +733,7 @@ public class XQueryParser extends Parser {
 				}
 				break;
 			case VAR:
+				_localctx = new PathExprInner_xq_VARContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(209); match(VAR);
@@ -3448,20 +3482,50 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class NameTestContext extends ParserRuleContext {
-		public QNameContext qName() {
-			return getRuleContext(QNameContext.class,0);
-		}
 		public NameTestContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_nameTest; }
+	 
+		public NameTestContext() { }
+		public void copyFrom(NameTestContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class NameTest_qNameContext extends NameTestContext {
+		public QNameContext qName() {
+			return getRuleContext(QNameContext.class,0);
+		}
+		public NameTest_qNameContext(NameTestContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTest(this);
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTest_qName(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTest(this);
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTest_qName(this);
+		}
+	}
+	public static class NameTest_divContext extends NameTestContext {
+		public NameTest_divContext(NameTestContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTest_div(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTest_div(this);
+		}
+	}
+	public static class NameTEst_modContext extends NameTestContext {
+		public NameTEst_modContext(NameTestContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTEst_mod(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTEst_mod(this);
 		}
 	}
 
@@ -3472,18 +3536,21 @@ public class XQueryParser extends Parser {
 			setState(534);
 			switch (_input.LA(1)) {
 			case 34:
+				_localctx = new NameTest_divContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(531); match(34);
 				}
 				break;
 			case 21:
+				_localctx = new NameTEst_modContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(532); match(21);
 				}
 				break;
 			case QNAME_TOKEN:
+				_localctx = new NameTest_qNameContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(533); qName();

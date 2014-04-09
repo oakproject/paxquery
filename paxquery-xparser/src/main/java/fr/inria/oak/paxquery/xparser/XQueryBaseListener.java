@@ -56,19 +56,6 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNameTest(@NotNull XQueryParser.NameTestContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNameTest(@NotNull XQueryParser.NameTestContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterAdditiveExpr(@NotNull XQueryParser.AdditiveExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -238,6 +225,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNameTEst_mod(@NotNull XQueryParser.NameTEst_modContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameTEst_mod(@NotNull XQueryParser.NameTEst_modContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAtt(@NotNull XQueryParser.AttContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -258,19 +258,6 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLetBinding(@NotNull XQueryParser.LetBindingContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPathExprInner_xq(@NotNull XQueryParser.PathExprInner_xqContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPathExprInner_xq(@NotNull XQueryParser.PathExprInner_xqContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -394,6 +381,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathExprInner_xq_doc(@NotNull XQueryParser.PathExprInner_xq_docContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExprInner_xq_doc(@NotNull XQueryParser.PathExprInner_xq_docContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPathExpr(@NotNull XQueryParser.PathExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -472,6 +472,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathExprInner_xq_VAR(@NotNull XQueryParser.PathExprInner_xq_VARContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExprInner_xq_VAR(@NotNull XQueryParser.PathExprInner_xq_VARContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNodeTest(@NotNull XQueryParser.NodeTestContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -479,6 +492,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNodeTest(@NotNull XQueryParser.NodeTestContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNameTest_qName(@NotNull XQueryParser.NameTest_qNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameTest_qName(@NotNull XQueryParser.NameTest_qNameContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -505,6 +531,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFlwrexpr(@NotNull XQueryParser.FlwrexprContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNameTest_div(@NotNull XQueryParser.NameTest_divContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameTest_div(@NotNull XQueryParser.NameTest_divContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -830,6 +869,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAttInner(@NotNull XQueryParser.AttInnerContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPathExprInner_xq_collection(@NotNull XQueryParser.PathExprInner_xq_collectionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExprInner_xq_collection(@NotNull XQueryParser.PathExprInner_xq_collectionContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

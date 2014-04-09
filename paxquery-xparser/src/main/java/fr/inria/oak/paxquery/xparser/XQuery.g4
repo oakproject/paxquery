@@ -33,7 +33,10 @@ let : 'let' letBinding (',' letBinding)* ;
 letBinding : VAR ':=' ( pathExpr_xq | flwrexpr | aggrExpr | arithmeticExpr_xq | literal) ;
 arithExpr : ;
 pathExpr_xq : 'distinct-values' '(' pathExprInner_xq (xpath)? ')' | pathExprInner_xq (xpath)? ;
-pathExprInner_xq : 'collection' '(' STRING_LITERAL ')' | 'doc' '(' STRING_LITERAL ')' | VAR ;
+pathExprInner_xq : 'collection' '(' STRING_LITERAL ')'  #pathExprInner_xq_collection 
+				   | 'doc' '(' STRING_LITERAL ')' 		#pathExprInner_xq_doc
+				   | VAR 								#pathExprInner_xq_VAR
+				   ;								
 aggrExpr : ('count' | 'avg' | 'max' | 'min' | 'sum' ) '(' VAR ')' ;
 where : 'where' orExpr_xq ;
 orExpr_xq : andExpr_xq (OR andExpr_xq)* ;

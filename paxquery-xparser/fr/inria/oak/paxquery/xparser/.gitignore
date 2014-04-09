@@ -10,3 +10,5 @@
 /XPathLexer.java
 /XPathBaseListener.java
 /XPath.tokens
+/XQueryVisitor.java
+/XQueryBaseVisitor.java

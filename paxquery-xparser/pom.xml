@@ -16,6 +16,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
+ 	 <dependency>
+			<groupId>fr.inria.oak</groupId>
+			<artifactId>paxquery-common</artifactId>
+			<version>${project.version}</version>
+	</dependency>
   	<dependency>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-runtime</artifactId>

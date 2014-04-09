@@ -16,7 +16,13 @@ public class XQueryMain {
 			XQueryParser parser = new XQueryParser(tokens);
 			
 			ParseTree tree = parser.xquery();	//begin parsing at start rule
+			ParseTreeWalker walker = new ParseTreeWalker();	//create a standard walker
+			XQueryProcessor processor = new XQueryProcessor();
+			walker.walk(processor,  tree);
+	
 			System.out.println(tree.toStringTree(parser));
+			System.out.println("XPath nodes: ");
+			System.out.println(processor.patternNodeMap.toString());
 	}
 	
 	public static boolean test_main(String test_query) {
