@@ -21,8 +21,6 @@ public class XQueryMain {
 			walker.walk(processor,  tree);
 	
 			System.out.println(tree.toStringTree(parser));
-			System.out.println("XPath nodes: ");
-			System.out.println(processor.patternNodeMap.toString());
 	}
 	
 	public static boolean test_main(String test_query) {

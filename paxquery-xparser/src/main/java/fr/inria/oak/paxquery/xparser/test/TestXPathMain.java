@@ -1,4 +1,4 @@
-package fr.inria.oak.paxquery.xparser.test;
+/*package fr.inria.oak.paxquery.xparser.test;
 
 
 import static org.junit.Assert.*;
@@ -17,13 +17,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-//import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
-//import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-//import fr.inria.oak.paxquery.xparser.*;
 import fr.inria.oak.paxquery.xparser.XPathMain;
 
 @RunWith(Parameterized.class)
@@ -67,3 +64,4 @@ public class TestXPathMain
 	}
 
 }
+*/

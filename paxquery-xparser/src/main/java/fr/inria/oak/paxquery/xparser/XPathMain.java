@@ -1,4 +1,4 @@
-package fr.inria.oak.paxquery.xparser;
+/*package fr.inria.oak.paxquery.xparser;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -46,3 +46,4 @@ public class XPathMain {
 	}
 
 }
+*/

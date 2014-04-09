@@ -56,13 +56,26 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNameTest(@NotNull XPathParser.NameTestContext ctx) { }
+	@Override public void enterNameTest_qName(@NotNull XPathParser.NameTest_qNameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNameTest(@NotNull XPathParser.NameTestContext ctx) { }
+	@Override public void exitNameTest_qName(@NotNull XPathParser.NameTest_qNameContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNameTest_div(@NotNull XPathParser.NameTest_divContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameTest_div(@NotNull XPathParser.NameTest_divContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -232,6 +245,19 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNumericLiteral(@NotNull XPathParser.NumericLiteralContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNameTEst_mod(@NotNull XPathParser.NameTEst_modContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameTEst_mod(@NotNull XPathParser.NameTEst_modContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
