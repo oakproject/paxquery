@@ -174,6 +174,17 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitLet(@NotNull XQueryParser.LetContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExpr_slash}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_slash(@NotNull XQueryParser.PathExpr_slashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExpr_slash}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_slash(@NotNull XQueryParser.PathExpr_slashContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#numericLiteral}.
 	 * @param ctx the parse tree
 	 */
@@ -328,17 +339,6 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitPathExprInner_xq_doc(@NotNull XQueryParser.PathExprInner_xq_docContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XQueryParser#pathExpr}.
-	 * @param ctx the parse tree
-	 */
-	void enterPathExpr(@NotNull XQueryParser.PathExprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XQueryParser#pathExpr}.
-	 * @param ctx the parse tree
-	 */
-	void exitPathExpr(@NotNull XQueryParser.PathExprContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XQueryParser#functionCall}.
 	 * @param ctx the parse tree
 	 */
@@ -436,6 +436,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAndExpr_xq(@NotNull XQueryParser.AndExpr_xqContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExpr_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_slashslash(@NotNull XQueryParser.PathExpr_slashslashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExpr_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_slashslash(@NotNull XQueryParser.PathExpr_slashslashContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#flwrexpr}.
@@ -546,6 +557,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimaryExpr(@NotNull XQueryParser.PrimaryExprContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#relativePathExpr2_slash}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativePathExpr2_slash(@NotNull XQueryParser.RelativePathExpr2_slashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#relativePathExpr2_slash}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativePathExpr2_slash(@NotNull XQueryParser.RelativePathExpr2_slashContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#where}.
@@ -735,6 +757,17 @@ public interface XQueryListener extends ParseTreeListener {
 	void exitAttInner(@NotNull XQueryParser.AttInnerContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#pathExpr_relativePathExpr}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_relativePathExpr(@NotNull XQueryParser.PathExpr_relativePathExprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#pathExpr_relativePathExpr}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_relativePathExpr(@NotNull XQueryParser.PathExpr_relativePathExprContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#pathExprInner_xq_collection}.
 	 * @param ctx the parse tree
 	 */
@@ -777,6 +810,17 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAndExpr(@NotNull XQueryParser.AndExprContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#relativePathExpr2_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativePathExpr2_slashslash(@NotNull XQueryParser.RelativePathExpr2_slashslashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#relativePathExpr2_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativePathExpr2_slashslash(@NotNull XQueryParser.RelativePathExpr2_slashslashContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#stepExpr}.

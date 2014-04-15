@@ -53,6 +53,17 @@ public interface XPathListener extends ParseTreeListener {
 	void exitNameTest_qName(@NotNull XPathParser.NameTest_qNameContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XPathParser#pathExpr_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_slashslash(@NotNull XPathParser.PathExpr_slashslashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#pathExpr_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_slashslash(@NotNull XPathParser.PathExpr_slashslashContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XPathParser#nameTest_div}.
 	 * @param ctx the parse tree
 	 */
@@ -174,6 +185,17 @@ public interface XPathListener extends ParseTreeListener {
 	void exitParenthesizedExpr(@NotNull XPathParser.ParenthesizedExprContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link XPathParser#relativePathExpr2_slash}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativePathExpr2_slash(@NotNull XPathParser.RelativePathExpr2_slashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#relativePathExpr2_slash}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativePathExpr2_slash(@NotNull XPathParser.RelativePathExpr2_slashContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XPathParser#expr}.
 	 * @param ctx the parse tree
 	 */
@@ -194,6 +216,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitOrExpr2(@NotNull XPathParser.OrExpr2Context ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#pathExpr_slash}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_slash(@NotNull XPathParser.PathExpr_slashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#pathExpr_slash}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_slash(@NotNull XPathParser.PathExpr_slashContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#numericLiteral}.
@@ -361,17 +394,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitTextTest(@NotNull XPathParser.TextTestContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#pathExpr}.
-	 * @param ctx the parse tree
-	 */
-	void enterPathExpr(@NotNull XPathParser.PathExprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#pathExpr}.
-	 * @param ctx the parse tree
-	 */
-	void exitPathExpr(@NotNull XPathParser.PathExprContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#functionCall}.
 	 * @param ctx the parse tree
 	 */
@@ -381,6 +403,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunctionCall(@NotNull XPathParser.FunctionCallContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#pathExpr_relativePathExpr}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathExpr_relativePathExpr(@NotNull XPathParser.PathExpr_relativePathExprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#pathExpr_relativePathExpr}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathExpr_relativePathExpr(@NotNull XPathParser.PathExpr_relativePathExprContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#forwardStep}.
@@ -425,6 +458,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAndExpr(@NotNull XPathParser.AndExprContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#relativePathExpr2_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativePathExpr2_slashslash(@NotNull XPathParser.RelativePathExpr2_slashslashContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#relativePathExpr2_slashslash}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativePathExpr2_slashslash(@NotNull XPathParser.RelativePathExpr2_slashslashContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#stepExpr}.

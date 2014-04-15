@@ -212,6 +212,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathExpr_slash(@NotNull XQueryParser.PathExpr_slashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_slash(@NotNull XQueryParser.PathExpr_slashContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNumericLiteral(@NotNull XQueryParser.NumericLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -394,19 +407,6 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPathExpr(@NotNull XQueryParser.PathExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPathExpr(@NotNull XQueryParser.PathExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFunctionCall(@NotNull XQueryParser.FunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -518,6 +518,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAndExpr_xq(@NotNull XQueryParser.AndExpr_xqContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPathExpr_slashslash(@NotNull XQueryParser.PathExpr_slashslashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_slashslash(@NotNull XQueryParser.PathExpr_slashslashContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -648,6 +661,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrimaryExpr(@NotNull XQueryParser.PrimaryExprContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativePathExpr2_slash(@NotNull XQueryParser.RelativePathExpr2_slashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativePathExpr2_slash(@NotNull XQueryParser.RelativePathExpr2_slashContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -875,6 +901,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathExpr_relativePathExpr(@NotNull XQueryParser.PathExpr_relativePathExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_relativePathExpr(@NotNull XQueryParser.PathExpr_relativePathExprContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPathExprInner_xq_collection(@NotNull XQueryParser.PathExprInner_xq_collectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -921,6 +960,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAndExpr(@NotNull XQueryParser.AndExprContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativePathExpr2_slashslash(@NotNull XQueryParser.RelativePathExpr2_slashslashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativePathExpr2_slashslash(@NotNull XQueryParser.RelativePathExpr2_slashslashContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

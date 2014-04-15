@@ -69,6 +69,19 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathExpr_slashslash(@NotNull XPathParser.PathExpr_slashslashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_slashslash(@NotNull XPathParser.PathExpr_slashslashContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNameTest_div(@NotNull XPathParser.NameTest_divContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -212,6 +225,19 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRelativePathExpr2_slash(@NotNull XPathParser.RelativePathExpr2_slashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativePathExpr2_slash(@NotNull XPathParser.RelativePathExpr2_slashContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpr(@NotNull XPathParser.ExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -232,6 +258,19 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitOrExpr2(@NotNull XPathParser.OrExpr2Context ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPathExpr_slash(@NotNull XPathParser.PathExpr_slashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_slash(@NotNull XPathParser.PathExpr_slashContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -433,19 +472,6 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPathExpr(@NotNull XPathParser.PathExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPathExpr(@NotNull XPathParser.PathExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFunctionCall(@NotNull XPathParser.FunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -453,6 +479,19 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFunctionCall(@NotNull XPathParser.FunctionCallContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPathExpr_relativePathExpr(@NotNull XPathParser.PathExpr_relativePathExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathExpr_relativePathExpr(@NotNull XPathParser.PathExpr_relativePathExprContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -505,6 +544,19 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAndExpr(@NotNull XPathParser.AndExprContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativePathExpr2_slashslash(@NotNull XPathParser.RelativePathExpr2_slashslashContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativePathExpr2_slashslash(@NotNull XPathParser.RelativePathExpr2_slashslashContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

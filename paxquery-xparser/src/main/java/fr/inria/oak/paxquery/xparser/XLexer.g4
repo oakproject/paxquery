@@ -1,6 +1,9 @@
 lexer grammar XLexer;
 
 /* Terminals */
+TEXTFUNCTION : 'text()' ;
+SLASH : '/' ;
+SLASHSLASH : '//' ;
 OR : 'or' ;
 AND : 'and' ;
 NOT : 'not' ;

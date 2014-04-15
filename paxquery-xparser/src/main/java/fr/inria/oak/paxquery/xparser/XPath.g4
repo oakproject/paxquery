@@ -81,11 +81,20 @@ multiplicativeExpr2 : '*' unaryExpr multiplicativeExpr2
 unaryExpr : unionExpr
 			| '-' unaryExpr ;
 unionExpr : valueExpr ( '|' valueExpr )* ;
-valueExpr :  ( filterExpr ( ( '/' | '//' ) relativePathExpr )? ) | pathExpr  ;
-pathExpr : '/' ( relativePathExpr )? 
-			| ( '//' relativePathExpr )
-			| relativePathExpr ;
-relativePathExpr : stepExpr ( ( '/' | '//' ) stepExpr )* ;
+valueExpr : filterExpr (pathExpr)? | pathExpr ;
+
+//Actually SLASH (relativePathExpr)? is the correct expression (so '/' is accepted as valid XPath), but we are using
+//SLASH (relativePathExpr) since expressions such as '$a/' and '$a/item/' are not valid in XQuery.
+//pathExpr : SLASH (relativePathExpr)?		#pathExpr_slash
+pathExpr : SLASH relativePathExpr			#pathExpr_slash
+			| SLASHSLASH relativePathExpr 	#pathExpr_slashslash
+			| relativePathExpr				#pathExpr_relativePathExpr
+			;
+relativePathExpr : stepExpr (relativePathExpr2)* ;
+relativePathExpr2 :  SLASH stepExpr			#relativePathExpr2_slash
+					| SLASHSLASH stepExpr	#relativePathExpr2_slashslash
+					;
+
 stepExpr : axisStep ;
 axisStep : forwardStep predicateList ;
 forwardStep : abbrevForwardStep ;
@@ -104,6 +113,9 @@ literal : numericLiteral | STRING_LITERAL ;
 numericLiteral : INTEGER_LITERAL | DECIMAL_LITERAL ;
 parenthesizedExpr : '(' expr ')' ;
 functionCall : functionName '(' ( expr ( ',' expr )* )? ')' ;
-functionName : 'text' | 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
-textTest : 'text' ( '(' ')' )? ;
+//functionName : 'text' | 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
+functionName : 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
+//textTest : 'text' ( '(' ')' )? ;
+//textTest : TEXTFUNCTION ;
+textTest : 'text()' ;
 qName : QNAME_TOKEN ;
