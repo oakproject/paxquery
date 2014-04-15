@@ -1538,6 +1538,9 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		if (this.storesContent){
 			sb.append("C");
 		}
+		if(this.storesValue){
+			sb.append("V");
+		}
 		if (this.selectOnValue) {
 			sb.append(" {=" + this.stringValue + "} ");
 		}
