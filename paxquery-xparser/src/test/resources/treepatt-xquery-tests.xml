@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests>
+		<test>
+			<value>let $i := collection('items') return $i</value>
+			<output>PT:root---HM:{$i=root}</output>
+		</test>
+		<test>
+			<value>let $i := collection(&quot;items&quot;)/a return $i</value>
+			<output>PT:root/aC---HM:{$i=aC}</output>
+		</test>
+		<test>
+			<value>let $i := collection('items')//a return $i</value>
+			<output>PT:root//aC---HM:{$i=aC}</output>
+		</test>
+		<test>
+			<value>let $i := collection(&quot;items&quot;)/@a return $i</value>
+			<output>PT:root/@a---HM:{$i=@a}</output>
+		</test>
+		<test>
+			<value>let $i := doc(&quot;items&quot;) return $i</value>
+			<output>PT:root---HM:{$i=root}</output>
+		</test>
+		<test>
+			<value>let $i := doc('items')/a return $i</value>
+			<output>PT:root/aC---HM:{$i=aC}</output>
+		</test>
+		<test>
+			<value>let $i := doc(&quot;items&quot;)//a return $i</value>
+			<output>PT:root//aC---HM:{$i=aC}</output>
+		</test>
+		<test>
+			<value>let $i := doc('items')/@a return $i</value>
+			<output>PT:root/@a---HM:{$i=@a}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items') let $i := $ic/site/regions//item return $i</value>
+			<output>PT:root/site/regions//itemC---HM:{$i=itemC,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items') let $i := $ic//site//regions//item return $i</value>
+			<output>PT:root//site//regions//itemC---HM:{$i=itemC,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items') let $i := $ic/site/text() return $i</value>
+			<output>PT:root/siteV---HM:{$i=siteV,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items') let $i := $ic/site//text() return $i</value>
+			<output>PT:root/siteV---HM:{$i=siteV,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items') let $i := $ic//site//text() return $i</value>
+			<output>PT:root//siteV---HM:{$i=siteV,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := collection('items')/site let $i := $ic//regions/text() return $i</value>
+			<output>PT:root/site//regionsV---HM:{$i=regionsV,$ic=site}</output>
+		</test>
+		<test>
+			<value>let $ic := doc('items') let $i := $ic/regions/@name/text() return $i</value>
+			<output>PT:root/regions/@nameV---HM:{$i=@nameV,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := doc('items') let $i := $ic/regions/@name return $i</value>
+			<output>PT:root/regions/@name---HM:{$i=@name,$ic=root}</output>
+		</test>
+		<test>
+			<value>let $ic := doc('items')//@a return $ic</value>
+			<output>PT:root//@a---HM:{$ic=@a}</output>
+		</test>
+		<test>
+			<value>let $ic := doc('items')//@a let $i := $ic/b//c return $ic</value>
+			<output>PT:root//@a/b//cC---HM:{$i=cC,$ic=@a}</output>
+		</test>
+</tests>

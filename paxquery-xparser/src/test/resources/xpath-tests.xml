@@ -34,7 +34,6 @@
 		<test value=".0000000000000000000000000000000000000000123456789"/>
 		<test value=".01"/>
 		<test value=".123456789"/>
-		<test value="/"/>
 		<test value="//ACT"/>
 		<test value="//child1[element1]"/>
 		<test value="//child1|//child2"/>
