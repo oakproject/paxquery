@@ -24,12 +24,12 @@ import java.io.Serializable;
  */
 public class ApplyConstruct implements Serializable {
 	
-	private final String before;
-	private final String[] each;
-	private final String after;
+	private final String before; // Tag to apply before each group of tuples/records
+	private final String[] each; // Holds constant XML tags 
+	private final String after; // Tag to apply after each group of tuples/records
 	
-	private final int[] fields;
-	private final ApplyConstruct[] nested;
+	private final int[] fields; // Positions in the tuples/records
+	private final ApplyConstruct[] nested; // Construct for nested collections
 	
 	
 	public ApplyConstruct(String before, String[] each, String after, int[] fields, ApplyConstruct[] nested) {
