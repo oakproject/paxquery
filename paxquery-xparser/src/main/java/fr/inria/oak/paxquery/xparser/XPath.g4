@@ -52,18 +52,10 @@ andExpr : equalityExpr andExpr2 ;
 andExpr2 : AND equalityExpr andExpr2 
 			|  ;
 equalityExpr : relationalExpr equalityExpr2 ;
-/*equalityExpr2 : '=' relationalExpr equalityExpr2 
-				| '!=' relationalExpr equalityExpr2
-				|  ;*/
 equalityExpr2 : EQ_S relationalExpr equalityExpr2 
 				| NE_S relationalExpr equalityExpr2
 				|  ;
 relationalExpr : additiveExpr relationalExpr2 ;
-/*relationalExpr2 : '<' additiveExpr relationalExpr2
-					| '>' additiveExpr relationalExpr2
-					| '<=' additiveExpr relationalExpr2
-					| '>=' additiveExpr relationalExpr2
-					|  ; */
 relationalExpr2 : LT_S additiveExpr relationalExpr2
 					| GT_S additiveExpr relationalExpr2
 					| LE_S additiveExpr relationalExpr2
@@ -112,10 +104,7 @@ primaryExpr : literal | parenthesizedExpr | functionCall ;
 literal : numericLiteral | STRING_LITERAL ;
 numericLiteral : INTEGER_LITERAL | DECIMAL_LITERAL ;
 parenthesizedExpr : '(' expr ')' ;
-functionCall : functionName '(' ( expr ( ',' expr )* )? ')' ;
-//functionName : 'text' | 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
+functionCall : functionName '(' ( expr ( COMMA expr )* )? ')' ;
 functionName : 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
-//textTest : 'text' ( '(' ')' )? ;
-//textTest : TEXTFUNCTION ;
 textTest : 'text()' ;
 qName : QNAME_TOKEN ;

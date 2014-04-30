@@ -17,6 +17,19 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAttInner2(@NotNull XQueryParser.AttInner2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAttInner2(@NotNull XQueryParser.AttInner2Context ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterEqualityExpr2(@NotNull XQueryParser.EqualityExpr2Context ctx) { }
 	/**
 	 * {@inheritDoc}

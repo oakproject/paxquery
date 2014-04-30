@@ -15,20 +15,25 @@ public class XPathParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__17=1, T__16=2, T__15=3, T__14=4, T__13=5, T__12=6, T__11=7, T__10=8, 
-		T__9=9, T__8=10, T__7=11, T__6=12, T__5=13, T__4=14, T__3=15, T__2=16, 
-		T__1=17, T__0=18, TEXTFUNCTION=19, SLASH=20, SLASHSLASH=21, OR=22, AND=23, 
-		NOT=24, EQ=25, EQ_S=26, NE=27, NE_S=28, LT=29, LT_S=30, LE=31, LE_S=32, 
-		GT=33, GT_S=34, GE=35, GE_S=36, VAR=37, LEFTCURL=38, RIGHTCURL=39, OPEN_TAG=40, 
-		CLOSE_TAG=41, QNAME_TOKEN=42, STRING_LITERAL=43, REFERENCE=44, ENTITY_REF=45, 
-		CHAR_REF=46, INTEGER_LITERAL=47, DECIMAL_LITERAL=48, DIGITS=49, WS=50;
+		T__16=1, T__15=2, T__14=3, T__13=4, T__12=5, T__11=6, T__10=7, T__9=8, 
+		T__8=9, T__7=10, T__6=11, T__5=12, T__4=13, T__3=14, T__2=15, T__1=16, 
+		T__0=17, AGGR_FUNCT=18, TEXTFUNCTION=19, SLASH=20, SLASHSLASH=21, OR=22, 
+		AND=23, NOT=24, EQ=25, EQ_S=26, NE=27, NE_S=28, LT=29, LT_S=30, LE=31, 
+		LE_S=32, GT=33, GT_S=34, GE=35, GE_S=36, VAR=37, LEFTCURL=38, RIGHTCURL=39, 
+		OPEN_ATTR_VAR_DOUBLE=40, OPEN_ATTR_VAR_SINGLE=41, CLOSE_ATTR_VAR_DOUBLE=42, 
+		CLOSE_ATTR_VAR_SINGLE=43, OPEN_CLOSING_TAG=44, CLOSE_OPENING_TAG=45, QNAME_TOKEN=46, 
+		SINGLE_QUOTE=47, DOUBLE_QUOTE=48, COMMA=49, STRING_LITERAL=50, REFERENCE=51, 
+		ENTITY_REF=52, CHAR_REF=53, INTEGER_LITERAL=54, DECIMAL_LITERAL=55, DIGITS=56, 
+		WS=57;
 	public static final String[] tokenNames = {
 		"<INVALID>", "'substring'", "'true'", "'ceiling'", "'mod'", "'['", "'|'", 
 		"'concat'", "']'", "'@'", "'div'", "'('", "'floor'", "')'", "'*'", "'+'", 
-		"','", "'-'", "'false'", "'text()'", "'/'", "'//'", "'or'", "'and'", "'not'", 
-		"'eq'", "'='", "'ne'", "'!='", "'lt'", "'<'", "'le'", "'<='", "'gt'", 
-		"'>'", "'ge'", "'>='", "VAR", "'{'", "'}'", "OPEN_TAG", "CLOSE_TAG", "QNAME_TOKEN", 
-		"STRING_LITERAL", "REFERENCE", "ENTITY_REF", "CHAR_REF", "INTEGER_LITERAL", 
+		"'-'", "'false'", "AGGR_FUNCT", "'text()'", "'/'", "'//'", "'or'", "'and'", 
+		"'not'", "'eq'", "'='", "'ne'", "'!='", "'lt'", "'<'", "'le'", "'<='", 
+		"'gt'", "'>'", "'ge'", "'>='", "VAR", "'{'", "'}'", "OPEN_ATTR_VAR_DOUBLE", 
+		"OPEN_ATTR_VAR_SINGLE", "CLOSE_ATTR_VAR_DOUBLE", "CLOSE_ATTR_VAR_SINGLE", 
+		"OPEN_CLOSING_TAG", "CLOSE_OPENING_TAG", "QNAME_TOKEN", "'''", "'\"'", 
+		"','", "STRING_LITERAL", "REFERENCE", "ENTITY_REF", "CHAR_REF", "INTEGER_LITERAL", 
 		"DECIMAL_LITERAL", "DIGITS", "WS"
 	};
 	public static final int
@@ -229,7 +234,7 @@ public class XPathParser extends Parser {
 			case EOF:
 			case 8:
 			case 13:
-			case 16:
+			case COMMA:
 				enterOuterAlt(_localctx, 2);
 				{
 				}
@@ -330,8 +335,8 @@ public class XPathParser extends Parser {
 			case EOF:
 			case 8:
 			case 13:
-			case 16:
 			case OR:
+			case COMMA:
 				enterOuterAlt(_localctx, 2);
 				{
 				}
@@ -441,9 +446,9 @@ public class XPathParser extends Parser {
 			case EOF:
 			case 8:
 			case 13:
-			case 16:
 			case OR:
 			case AND:
+			case COMMA:
 				enterOuterAlt(_localctx, 3);
 				{
 				}
@@ -571,11 +576,11 @@ public class XPathParser extends Parser {
 			case EOF:
 			case 8:
 			case 13:
-			case 16:
 			case OR:
 			case AND:
 			case EQ_S:
 			case NE_S:
+			case COMMA:
 				enterOuterAlt(_localctx, 5);
 				{
 				}
@@ -672,10 +677,10 @@ public class XPathParser extends Parser {
 				setState(141); additiveExpr2();
 				}
 				break;
-			case 17:
+			case 16:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(143); match(17);
+				setState(143); match(16);
 				setState(144); multiplicativeExpr();
 				setState(145); additiveExpr2();
 				}
@@ -683,7 +688,6 @@ public class XPathParser extends Parser {
 			case EOF:
 			case 8:
 			case 13:
-			case 16:
 			case OR:
 			case AND:
 			case EQ_S:
@@ -692,6 +696,7 @@ public class XPathParser extends Parser {
 			case LE_S:
 			case GT_S:
 			case GE_S:
+			case COMMA:
 				enterOuterAlt(_localctx, 3);
 				{
 				}
@@ -809,7 +814,6 @@ public class XPathParser extends Parser {
 			case 13:
 			case 15:
 			case 16:
-			case 17:
 			case OR:
 			case AND:
 			case EQ_S:
@@ -818,6 +822,7 @@ public class XPathParser extends Parser {
 			case LE_S:
 			case GT_S:
 			case GE_S:
+			case COMMA:
 				enterOuterAlt(_localctx, 4);
 				{
 				}
@@ -873,7 +878,7 @@ public class XPathParser extends Parser {
 			case 10:
 			case 11:
 			case 12:
-			case 18:
+			case 17:
 			case TEXTFUNCTION:
 			case SLASH:
 			case SLASHSLASH:
@@ -887,10 +892,10 @@ public class XPathParser extends Parser {
 				setState(168); unionExpr();
 				}
 				break;
-			case 17:
+			case 16:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(169); match(17);
+				setState(169); match(16);
 				setState(170); unaryExpr();
 				}
 				break;
@@ -998,7 +1003,7 @@ public class XPathParser extends Parser {
 			case 7:
 			case 11:
 			case 12:
-			case 18:
+			case 17:
 			case NOT:
 			case STRING_LITERAL:
 			case INTEGER_LITERAL:
@@ -1818,7 +1823,7 @@ public class XPathParser extends Parser {
 			case 3:
 			case 7:
 			case 12:
-			case 18:
+			case 17:
 			case NOT:
 				enterOuterAlt(_localctx, 3);
 				{
@@ -1986,6 +1991,10 @@ public class XPathParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
+		public List<TerminalNode> COMMA() { return getTokens(XPathParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(XPathParser.COMMA, i);
+		}
 		public FunctionCallContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2011,16 +2020,16 @@ public class XPathParser extends Parser {
 			setState(260); match(11);
 			setState(269);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 4) | (1L << 7) | (1L << 9) | (1L << 10) | (1L << 11) | (1L << 12) | (1L << 17) | (1L << 18) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << QNAME_TOKEN) | (1L << STRING_LITERAL) | (1L << INTEGER_LITERAL) | (1L << DECIMAL_LITERAL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 4) | (1L << 7) | (1L << 9) | (1L << 10) | (1L << 11) | (1L << 12) | (1L << 16) | (1L << 17) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << QNAME_TOKEN) | (1L << STRING_LITERAL) | (1L << INTEGER_LITERAL) | (1L << DECIMAL_LITERAL))) != 0)) {
 				{
 				setState(261); expr();
 				setState(266);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==16) {
+				while (_la==COMMA) {
 					{
 					{
-					setState(262); match(16);
+					setState(262); match(COMMA);
 					setState(263); expr();
 					}
 					}
@@ -2070,7 +2079,7 @@ public class XPathParser extends Parser {
 			{
 			setState(273);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 7) | (1L << 12) | (1L << 18) | (1L << NOT))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 7) | (1L << 12) | (1L << 17) | (1L << NOT))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			consume();
@@ -2159,9 +2168,9 @@ public class XPathParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\64\u011a\4\2\t\2"+
-		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
-		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3;\u011a\4\2\t\2\4"+
+		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
 		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\4\'\t\'\3\2\3\2\3\3\3\3\3\4\3\4\3"+
@@ -2180,9 +2189,9 @@ public class XPathParser extends Parser {
 		"\u00f1\13\36\3\37\3\37\3\37\3\37\3 \3 \3 \5 \u00fa\n \3!\3!\5!\u00fe\n"+
 		"!\3\"\3\"\3#\3#\3#\3#\3$\3$\3$\3$\3$\7$\u010b\n$\f$\16$\u010e\13$\5$\u0110"+
 		"\n$\3$\3$\3%\3%\3&\3&\3\'\3\'\3\'\2\2(\2\4\6\b\n\f\16\20\22\24\26\30\32"+
-		"\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJL\2\4\3\2\61\62\7\2\3\5\t\t\16\16"+
-		"\24\24\32\32\u0112\2N\3\2\2\2\4P\3\2\2\2\6R\3\2\2\2\bZ\3\2\2\2\n\\\3\2"+
-		"\2\2\fd\3\2\2\2\16f\3\2\2\2\20r\3\2\2\2\22t\3\2\2\2\24\u0088\3\2\2\2\26"+
+		"\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJL\2\4\3\289\7\2\3\5\t\t\16\16\23"+
+		"\23\32\32\u0112\2N\3\2\2\2\4P\3\2\2\2\6R\3\2\2\2\bZ\3\2\2\2\n\\\3\2\2"+
+		"\2\fd\3\2\2\2\16f\3\2\2\2\20r\3\2\2\2\22t\3\2\2\2\24\u0088\3\2\2\2\26"+
 		"\u008a\3\2\2\2\30\u0096\3\2\2\2\32\u0098\3\2\2\2\34\u00a8\3\2\2\2\36\u00ad"+
 		"\3\2\2\2 \u00af\3\2\2\2\"\u00bc\3\2\2\2$\u00c3\3\2\2\2&\u00c5\3\2\2\2"+
 		"(\u00d0\3\2\2\2*\u00d2\3\2\2\2,\u00d4\3\2\2\2.\u00d7\3\2\2\2\60\u00da"+
@@ -2203,7 +2212,7 @@ public class XPathParser extends Parser {
 		"\2\u0088w\3\2\2\2\u0088{\3\2\2\2\u0088\177\3\2\2\2\u0088\u0083\3\2\2\2"+
 		"\u0088\u0087\3\2\2\2\u0089\25\3\2\2\2\u008a\u008b\5\32\16\2\u008b\u008c"+
 		"\5\30\r\2\u008c\27\3\2\2\2\u008d\u008e\7\21\2\2\u008e\u008f\5\32\16\2"+
-		"\u008f\u0090\5\30\r\2\u0090\u0097\3\2\2\2\u0091\u0092\7\23\2\2\u0092\u0093"+
+		"\u008f\u0090\5\30\r\2\u0090\u0097\3\2\2\2\u0091\u0092\7\22\2\2\u0092\u0093"+
 		"\5\32\16\2\u0093\u0094\5\30\r\2\u0094\u0097\3\2\2\2\u0095\u0097\3\2\2"+
 		"\2\u0096\u008d\3\2\2\2\u0096\u0091\3\2\2\2\u0096\u0095\3\2\2\2\u0097\31"+
 		"\3\2\2\2\u0098\u0099\5\36\20\2\u0099\u009a\5\34\17\2\u009a\33\3\2\2\2"+
@@ -2212,7 +2221,7 @@ public class XPathParser extends Parser {
 		"\34\17\2\u00a2\u00a9\3\2\2\2\u00a3\u00a4\7\6\2\2\u00a4\u00a5\5\36\20\2"+
 		"\u00a5\u00a6\5\34\17\2\u00a6\u00a9\3\2\2\2\u00a7\u00a9\3\2\2\2\u00a8\u009b"+
 		"\3\2\2\2\u00a8\u009f\3\2\2\2\u00a8\u00a3\3\2\2\2\u00a8\u00a7\3\2\2\2\u00a9"+
-		"\35\3\2\2\2\u00aa\u00ae\5 \21\2\u00ab\u00ac\7\23\2\2\u00ac\u00ae\5\36"+
+		"\35\3\2\2\2\u00aa\u00ae\5 \21\2\u00ab\u00ac\7\22\2\2\u00ac\u00ae\5\36"+
 		"\20\2\u00ad\u00aa\3\2\2\2\u00ad\u00ab\3\2\2\2\u00ae\37\3\2\2\2\u00af\u00b4"+
 		"\5\"\22\2\u00b0\u00b1\7\b\2\2\u00b1\u00b3\5\"\22\2\u00b2\u00b0\3\2\2\2"+
 		"\u00b3\u00b6\3\2\2\2\u00b4\u00b2\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5!\3"+
@@ -2238,16 +2247,16 @@ public class XPathParser extends Parser {
 		";\3\2\2\2\u00f1\u00ef\3\2\2\2\u00f2\u00f3\7\7\2\2\u00f3\u00f4\5\4\3\2"+
 		"\u00f4\u00f5\7\n\2\2\u00f5=\3\2\2\2\u00f6\u00fa\5@!\2\u00f7\u00fa\5D#"+
 		"\2\u00f8\u00fa\5F$\2\u00f9\u00f6\3\2\2\2\u00f9\u00f7\3\2\2\2\u00f9\u00f8"+
-		"\3\2\2\2\u00fa?\3\2\2\2\u00fb\u00fe\5B\"\2\u00fc\u00fe\7-\2\2\u00fd\u00fb"+
-		"\3\2\2\2\u00fd\u00fc\3\2\2\2\u00feA\3\2\2\2\u00ff\u0100\t\2\2\2\u0100"+
-		"C\3\2\2\2\u0101\u0102\7\r\2\2\u0102\u0103\5\4\3\2\u0103\u0104\7\17\2\2"+
-		"\u0104E\3\2\2\2\u0105\u0106\5H%\2\u0106\u010f\7\r\2\2\u0107\u010c\5\4"+
-		"\3\2\u0108\u0109\7\22\2\2\u0109\u010b\5\4\3\2\u010a\u0108\3\2\2\2\u010b"+
-		"\u010e\3\2\2\2\u010c\u010a\3\2\2\2\u010c\u010d\3\2\2\2\u010d\u0110\3\2"+
-		"\2\2\u010e\u010c\3\2\2\2\u010f\u0107\3\2\2\2\u010f\u0110\3\2\2\2\u0110"+
+		"\3\2\2\2\u00fa?\3\2\2\2\u00fb\u00fe\5B\"\2\u00fc\u00fe\7\64\2\2\u00fd"+
+		"\u00fb\3\2\2\2\u00fd\u00fc\3\2\2\2\u00feA\3\2\2\2\u00ff\u0100\t\2\2\2"+
+		"\u0100C\3\2\2\2\u0101\u0102\7\r\2\2\u0102\u0103\5\4\3\2\u0103\u0104\7"+
+		"\17\2\2\u0104E\3\2\2\2\u0105\u0106\5H%\2\u0106\u010f\7\r\2\2\u0107\u010c"+
+		"\5\4\3\2\u0108\u0109\7\63\2\2\u0109\u010b\5\4\3\2\u010a\u0108\3\2\2\2"+
+		"\u010b\u010e\3\2\2\2\u010c\u010a\3\2\2\2\u010c\u010d\3\2\2\2\u010d\u0110"+
+		"\3\2\2\2\u010e\u010c\3\2\2\2\u010f\u0107\3\2\2\2\u010f\u0110\3\2\2\2\u0110"+
 		"\u0111\3\2\2\2\u0111\u0112\7\17\2\2\u0112G\3\2\2\2\u0113\u0114\t\3\2\2"+
-		"\u0114I\3\2\2\2\u0115\u0116\7\25\2\2\u0116K\3\2\2\2\u0117\u0118\7,\2\2"+
-		"\u0118M\3\2\2\2\27Zdr\u0088\u0096\u00a8\u00ad\u00b4\u00b9\u00bc\u00c3"+
+		"\u0114I\3\2\2\2\u0115\u0116\7\25\2\2\u0116K\3\2\2\2\u0117\u0118\7\60\2"+
+		"\2\u0118M\3\2\2\2\27Zdr\u0088\u0096\u00a8\u00ad\u00b4\u00b9\u00bc\u00c3"+
 		"\u00c9\u00d0\u00da\u00e0\u00e7\u00ef\u00f9\u00fd\u010c\u010f";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());

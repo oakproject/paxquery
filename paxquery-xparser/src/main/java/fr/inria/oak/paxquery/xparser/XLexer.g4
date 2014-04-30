@@ -1,6 +1,7 @@
 lexer grammar XLexer;
 
 /* Terminals */
+AGGR_FUNCT : 'count' | 'avg' | 'max' | 'min' | 'sum' ;
 TEXTFUNCTION : 'text()' ;
 SLASH : '/' ;
 SLASHSLASH : '//' ;
@@ -22,11 +23,18 @@ GE_S : '>=' ;
 VAR : '$' NCNAME_TOK ;
 LEFTCURL : '{' ;
 RIGHTCURL : '}' ;
-OPEN_TAG : LT_S '/' ;	//'</'
-CLOSE_TAG : '/' GT_S ;	//'/>'
+OPEN_ATTR_VAR_DOUBLE : '"'(WS)?'{' ;
+OPEN_ATTR_VAR_SINGLE : '\''(WS)?'{' ;
+CLOSE_ATTR_VAR_DOUBLE : '}'(WS)?'"' ;
+CLOSE_ATTR_VAR_SINGLE : '}'(WS)?'\'' ;
+OPEN_CLOSING_TAG : LT_S '/' ;	//'</'
+CLOSE_OPENING_TAG : '/' GT_S ;	//'/>'
 QNAME_TOKEN : ( NCNAME_TOK ':' )? LOCAL_PART ;
-STRING_LITERAL : '\"' ( WS | ~[\"{}])* '\"' 				
-				| '\'' ( WS | ~[\'{}])* '\'' ;
+SINGLE_QUOTE : '\'' ;
+DOUBLE_QUOTE : '"' ;
+COMMA : ',' ;
+STRING_LITERAL : DOUBLE_QUOTE ( WS | ~[\"{}])* DOUBLE_QUOTE 				
+				| SINGLE_QUOTE ( WS | ~[\'{}])* SINGLE_QUOTE ;
 REFERENCE : ENTITY_REF | CHAR_REF ;
 ENTITY_REF : '&' NCNAME_TOK ';' ;
 CHAR_REF : '&#' [0-9]+ ';' 
@@ -45,4 +53,3 @@ fragment DIGIT : [\u0030-\u0039\u0660-\u0669\u06f0-\u06f9\u0966-\u096f\u09e6-\u0
 fragment EXTENDER : [\u00b7\u02d0\u02d1\u0387\u0640\u0e46\u0ec6\u3005\u3031-\u3035\u309d-\u309e\u30fc-\u30fe] ;
 fragment LOCAL_PART : NCNAME_TOK ;
 WS : [ \t\r\n]+ -> skip ;
-//AVAL : WS | ~['\"'] ;

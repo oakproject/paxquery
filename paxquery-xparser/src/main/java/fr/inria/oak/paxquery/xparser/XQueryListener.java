@@ -9,6 +9,17 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface XQueryListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#attInner2}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttInner2(@NotNull XQueryParser.AttInner2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#attInner2}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttInner2(@NotNull XQueryParser.AttInner2Context ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#equalityExpr2}.
 	 * @param ctx the parse tree
 	 */
