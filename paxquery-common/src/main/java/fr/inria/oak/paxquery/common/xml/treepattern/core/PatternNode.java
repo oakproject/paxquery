@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
+import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable.VariableDataType;
 
 
 /**
@@ -65,7 +66,8 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
 	 * For example, variable $i would be stored in matchingVariables of “name” for the sentence $i := <whatever>/name 
 	 */
-	private HashSet<String> matchingVariables;	
+	//private HashSet<String> matchingVariables;	
+	private ArrayList<Variable> matchingVariables;
 	
 	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node
@@ -222,6 +224,7 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 			this.selectOnTag = true;
 		}
 		this.edges = (new ArrayList<PatternEdge>());
+		this.matchingVariables = new ArrayList<Variable>();
 		this.storesContent = false;
 		this.storesValue = false;
 		this.storesID = false;
@@ -884,13 +887,65 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
 	 * A String array is provided rather than an iterator to prevent deletion.
 	 */
-	public String[] getMatchingVariables() {
+/*	public String[] getMatchingVariables() {
+		if(matchingVariables == null)
+			//matchingVariables = new HashSet<String>();
+			matchingVariables = new ArrayList<Variable>();
 		return this.matchingVariables.toArray(new String[0]);	//new String[0] indicates the type of the returned array
+	}*/
+	
+	public ArrayList<Variable> getMatchingVariables() {
+		return this.matchingVariables;
+	}
+
+	//returns the names of those variables storing value (if any)
+	public ArrayList<String> getMatchingVariablesStoringValue() {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		for(Variable var : matchingVariables) {
+			if(var.dataType == Variable.VariableDataType.Value)
+				list.add(var.name);
+		}
+		
+		return list;
+	}
+	
+	//returns the names of those variables storing content (if any)
+	public ArrayList<String> getMatchingVariablesStoringContent() {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		for(Variable var : matchingVariables) {
+			if(var.dataType == Variable.VariableDataType.Content)
+				list.add(var.name);
+		}
+		
+		return list;			
+	}
+	
+	public boolean checkAnyMatchingVariableStoresValue()	{
+		for(Variable var: matchingVariables) {
+			if(var.dataType == Variable.VariableDataType.Value)
+				return true;
+		}
+		return false;		
+	}
+	
+	public boolean checkAnyMatchingVariableStoresContent() {
+		for(Variable var: matchingVariables) {
+			if(var.dataType == Variable.VariableDataType.Content)
+				return true;
+		}
+		return false;
 	}
 	
 	/**
 	 * Returns the number of matching variables.
      */
+/*	public int getMatchingVariablesSize() {
+		if(matchingVariables == null)
+			matchingVariables = new HashSet<String>();
+		return matchingVariables.size();
+	}*/
 	public int getMatchingVariablesSize() {
 		return matchingVariables.size();
 	}
@@ -898,36 +953,65 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	/**
 	 * Marks this node as assigned to those variables indicated by {@link #variables}.
 	 */
-	public void addMatchingVariables(String... variables) {
+/*	public void addMatchingVariables(String... variables) {
 		if(matchingVariables == null)
 			matchingVariables = new HashSet<String>();
 		for(String variable : variables)
 			matchingVariables.add(variable);
+	}*/
+	public void addMatchingVariables(Variable... variables) {
+		for(Variable var : variables)
+			matchingVariables.add(var);
 	}
 
 	/**
 	 * Removes all matching variables from this node.
      */
-	public void clearMatchingVariables() {
+/*	public void clearMatchingVariables() {
 		if(matchingVariables == null)
 			matchingVariables = new HashSet<String>();
 		else
 			matchingVariables.clear();
+	}*/
+	
+	public void clearMatchingVariables() {
+		matchingVariables.clear();
 	}
+	
 
 	/**
 	 * Removes the matching variable indicated by {@link #variables} (if present).
 	 */
-	public void removeMatchingVariables(String... variables) {
+/*	public void removeMatchingVariables(String... variables) {
 		if(matchingVariables == null)
 			matchingVariables = new HashSet<String>();
 		else {
 			for(String variable : variables)
 				matchingVariables.remove(variable);
 		}
+	}*/
+	/*public void removeMatchingVariables(Variable... variables) {
+		for(Variable var : variables)
+			matchingVariables.remove(var);
+	}*/
+	
+	public void removeMatchingVariables(String... variableNames) {
+		for(int i = matchingVariables.size()-1; i >= 0; i--) {
+			for(int j = 0; j < variableNames.length; j++) {
+				if(matchingVariables.get(i).name.compareTo(variableNames[j]) == 0)
+					matchingVariables.remove(i);
+			}
+		}
 	}
 	
-	
+	public Variable getMatchingVariable(String variableName) {
+		for(int i = 0; i < matchingVariables.size(); i++) {
+			if(matchingVariables.get(i).name.compareTo(variableName) == 0)
+				return matchingVariables.get(i);
+		}
+		return null;
+	}
+		
 	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node
 	 * from which it originated.
