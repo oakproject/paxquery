@@ -146,4 +146,6 @@ for $li in $p/profile/@income
 let $n := count($l)
 where $li > 200000
 return &#60;items person=&#34;{$li}&#34;>{$n}&#60;/items>"/>
+    <test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) return &#60;items person=&#34;an_attribute&#34;>{$n}&#60;/items>"/>
+    <test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) return &#60;items person=&#39;anattribute&#39;>{$n}&#60;/items>"/>
 </tests>
