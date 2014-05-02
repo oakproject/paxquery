@@ -62,11 +62,10 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	private boolean isAttribute;
 	
 	/**
-	 * If not null, this node (either an attribute or an element) is assigned to one or more variables in the query. 
+	 * If matchingVariables.size() > 0, this node (either an attribute or an element) is assigned to one or more variables in the query. 
 	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
 	 * For example, variable $i would be stored in matchingVariables of “name” for the sentence $i := <whatever>/name 
 	 */
-	//private HashSet<String> matchingVariables;	
 	private ArrayList<Variable> matchingVariables;
 	
 	/**
@@ -883,22 +882,17 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	}
 	
 	/**
-	 * If not null, this node (either an attribute or an element) is assigned to one or more variables in the query. 
-	 * Otherwise, this node (either an attribute or an element) is not assigned to any variable.
-	 * A String array is provided rather than an iterator to prevent deletion.
+	 * Returns the list of variables to which this node is assigned.
+	 * @return An ArrayList<Variable> containing the variables this node is assigned to.
 	 */
-/*	public String[] getMatchingVariables() {
-		if(matchingVariables == null)
-			//matchingVariables = new HashSet<String>();
-			matchingVariables = new ArrayList<Variable>();
-		return this.matchingVariables.toArray(new String[0]);	//new String[0] indicates the type of the returned array
-	}*/
-	
 	public ArrayList<Variable> getMatchingVariables() {
 		return this.matchingVariables;
 	}
 
-	//returns the names of those variables storing value (if any)
+	/**
+	 * Returns the names of those variables to which this node is assigned.
+	 * @return An ArrayList<String> containing the names of the variables this node is assigned to.
+	 */
 	public ArrayList<String> getMatchingVariablesStoringValue() {
 		ArrayList<String> list = new ArrayList<String>();
 		
@@ -909,8 +903,12 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		
 		return list;
 	}
-	
-	//returns the names of those variables storing content (if any)
+
+	/**
+	 * Returns the name of those variables to which this node is assigned that are marked as storing content.
+	 * That is, the names of those variables "var" such that var.dataType == Variable.VariableDataType.Content
+	 * @return An ArrayList<String> containing the names of those variables to which this node is assigned that are marked as storing content.
+	 */
 	public ArrayList<String> getMatchingVariablesStoringContent() {
 		ArrayList<String> list = new ArrayList<String>();
 		
@@ -921,7 +919,12 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		
 		return list;			
 	}
-	
+
+	/**
+	 * Returns true if this node is assigned to at least one variable marked as storing value.
+	 * That is, if this node is assigned to at least one variable "var" such that var.dataType == Variable.VariableDataType.Value
+	 * @return true if this node is assigned to at least one variable marked as storing value.
+	 */
 	public boolean checkAnyMatchingVariableStoresValue()	{
 		for(Variable var: matchingVariables) {
 			if(var.dataType == Variable.VariableDataType.Value)
@@ -930,6 +933,11 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		return false;		
 	}
 	
+	/**
+	 * Returns true if this node is assigned to at least one variable marked as storing content.
+	 * That is, if this node is assigned to at least one variable "var" such that var.dataType == Variable.VariableDataType.Content
+	 * @return true if this node is assigned to at least one variable marked as storing value.
+	 */
 	public boolean checkAnyMatchingVariableStoresContent() {
 		for(Variable var: matchingVariables) {
 			if(var.dataType == Variable.VariableDataType.Content)
@@ -939,62 +947,33 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	}
 	
 	/**
-	 * Returns the number of matching variables.
+	 * Returns the number of matching variables. That is, the number of variables assigned to this node.
+	 * @return the number of matching variables.
      */
-/*	public int getMatchingVariablesSize() {
-		if(matchingVariables == null)
-			matchingVariables = new HashSet<String>();
-		return matchingVariables.size();
-	}*/
 	public int getMatchingVariablesSize() {
 		return matchingVariables.size();
 	}
 
 	/**
 	 * Marks this node as assigned to those variables indicated by {@link #variables}.
+	 * @param variables variables to which this node will be assigned.
 	 */
-/*	public void addMatchingVariables(String... variables) {
-		if(matchingVariables == null)
-			matchingVariables = new HashSet<String>();
-		for(String variable : variables)
-			matchingVariables.add(variable);
-	}*/
 	public void addMatchingVariables(Variable... variables) {
 		for(Variable var : variables)
 			matchingVariables.add(var);
 	}
 
 	/**
-	 * Removes all matching variables from this node.
+	 * Removes all matching variables from this node. As a result, this node is not assigned to any variable any more.
      */
-/*	public void clearMatchingVariables() {
-		if(matchingVariables == null)
-			matchingVariables = new HashSet<String>();
-		else
-			matchingVariables.clear();
-	}*/
-	
 	public void clearMatchingVariables() {
 		matchingVariables.clear();
 	}
 	
 
 	/**
-	 * Removes the matching variable indicated by {@link #variables} (if present).
+	 * Removes the matching variable indicated by {@link #variables} (if present). As a result, this node is not assigned to those variables any more.
 	 */
-/*	public void removeMatchingVariables(String... variables) {
-		if(matchingVariables == null)
-			matchingVariables = new HashSet<String>();
-		else {
-			for(String variable : variables)
-				matchingVariables.remove(variable);
-		}
-	}*/
-	/*public void removeMatchingVariables(Variable... variables) {
-		for(Variable var : variables)
-			matchingVariables.remove(var);
-	}*/
-	
 	public void removeMatchingVariables(String... variableNames) {
 		for(int i = matchingVariables.size()-1; i >= 0; i--) {
 			for(int j = 0; j < variableNames.length; j++) {
@@ -1004,6 +983,11 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		}
 	}
 	
+	/**
+	 * Returns the variable whose name is given by "variableName". 
+	 * @param variableName the name of the expected variable.
+	 * @return the variable whose name is given by "variableName". Null if the node is not assigned to such variable.
+	 */
 	public Variable getMatchingVariable(String variableName) {
 		for(int i = 0; i < matchingVariables.size(); i++) {
 			if(matchingVariables.get(i).name.compareTo(variableName) == 0)
