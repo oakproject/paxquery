@@ -890,31 +890,33 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	}
 
 	/**
-	 * Returns the names of those variables to which this node is assigned.
-	 * @return An ArrayList<String> containing the names of the variables this node is assigned to.
+	 * Returns those variables to which this node is assigned that are marked as storing value.
+	 * That is, those variables "var" such that var.dataType == Variable.VariableDataType.Value
+	 * @return An ArrayList<String> containing those variables this node is assigned to that are marked as storing value.
 	 */
-	public ArrayList<String> getMatchingVariablesStoringValue() {
-		ArrayList<String> list = new ArrayList<String>();
+	public ArrayList<Variable> getMatchingVariablesStoringValue() {
+		ArrayList<Variable> list = new ArrayList<Variable>();
 		
 		for(Variable var : matchingVariables) {
 			if(var.dataType == Variable.VariableDataType.Value)
-				list.add(var.name);
+				list.add(var);
 		}
 		
 		return list;
 	}
 
+
 	/**
-	 * Returns the name of those variables to which this node is assigned that are marked as storing content.
-	 * That is, the names of those variables "var" such that var.dataType == Variable.VariableDataType.Content
-	 * @return An ArrayList<String> containing the names of those variables to which this node is assigned that are marked as storing content.
+	 * Returns those variables to which this node is assigned that are marked as storing content.
+	 * That is, those variables "var" such that var.dataType == Variable.VariableDataType.Content
+	 * @return An ArrayList<String> containing those variables to which this node is assigned that are marked as storing content.
 	 */
-	public ArrayList<String> getMatchingVariablesStoringContent() {
-		ArrayList<String> list = new ArrayList<String>();
+	public ArrayList<Variable> getMatchingVariablesStoringContent() {
+		ArrayList<Variable> list = new ArrayList<Variable>();
 		
 		for(Variable var : matchingVariables) {
 			if(var.dataType == Variable.VariableDataType.Content)
-				list.add(var.name);
+				list.add(var);
 		}
 		
 		return list;			
