@@ -243,9 +243,8 @@ public class XQueryProcessor extends XQueryBaseListener {
 	
 		if(matchingVar != null) {
 			matchingVar.dataType = Variable.VariableDataType.Value;
-			ArrayList<String> varsStoringContent = lastNode.getMatchingVariablesStoringContent();
-			if(varsStoringContent.size() == 0) 	//no vars storing content anymore
-				lastNode.setStoresContent(false);
+			if(lastNode.checkAnyMatchingVariableStoresContent() == false)
+				lastNode.setStoresContent(false);	//no vars storing content anymore
 			lastNode.setStoresValue(true);
 		}
 		else {
