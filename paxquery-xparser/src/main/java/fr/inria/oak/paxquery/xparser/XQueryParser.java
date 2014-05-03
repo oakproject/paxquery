@@ -103,12 +103,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_xquery; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterXquery(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXquery(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXquery(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -150,12 +147,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_flwrexpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterFlwrexpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFlwrexpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFlwrexpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -206,12 +200,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_initial; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterInitial(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitInitial(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitInitial(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -263,12 +254,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_middle; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterMiddle(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitMiddle(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitMiddle(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -328,12 +316,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_forStat; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterForStat(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitForStat(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitForStat(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -383,12 +368,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_forBinding; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterForBinding(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitForBinding(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitForBinding(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -430,12 +412,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_let; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterLet(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitLet(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitLet(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -497,12 +476,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_letBinding; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterLetBinding(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitLetBinding(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitLetBinding(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -565,12 +541,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_arithExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterArithExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitArithExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitArithExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -605,12 +578,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_pathExpr_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExpr_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExpr_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExpr_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -684,36 +654,27 @@ public class XQueryParser extends Parser {
 		public TerminalNode STRING_LITERAL() { return getToken(XQueryParser.STRING_LITERAL, 0); }
 		public PathExprInner_xq_docContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_doc(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_doc(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExprInner_xq_doc(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class PathExprInner_xq_VARContext extends PathExprInner_xqContext {
 		public TerminalNode VAR() { return getToken(XQueryParser.VAR, 0); }
 		public PathExprInner_xq_VARContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_VAR(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_VAR(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExprInner_xq_VAR(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class PathExprInner_xq_collectionContext extends PathExprInner_xqContext {
 		public TerminalNode STRING_LITERAL() { return getToken(XQueryParser.STRING_LITERAL, 0); }
 		public PathExprInner_xq_collectionContext(PathExprInner_xqContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExprInner_xq_collection(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExprInner_xq_collection(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExprInner_xq_collection(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -773,12 +734,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_aggrExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAggrExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAggrExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAggrExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -814,12 +772,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_where; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterWhere(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitWhere(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitWhere(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -860,12 +815,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_orExpr_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterOrExpr_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitOrExpr_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitOrExpr_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -920,12 +872,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_andExpr_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAndExpr_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAndExpr_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAndExpr_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -974,12 +923,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_boolExpr_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterBoolExpr_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitBoolExpr_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitBoolExpr_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1040,12 +986,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_boolExprInner_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterBoolExprInner_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitBoolExprInner_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitBoolExprInner_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1113,12 +1056,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_pred; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPred(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPred(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPred(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1210,12 +1150,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_vcmp; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterVcmp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitVcmp(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitVcmp(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1251,12 +1188,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_ncmp; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNcmp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNcmp(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNcmp(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1295,12 +1229,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_contains; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterContains(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitContains(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitContains(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1336,12 +1267,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_empty; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEmpty(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEmpty(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEmpty(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1382,12 +1310,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_groupBy; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterGroupBy(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitGroupBy(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitGroupBy(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1446,12 +1371,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_returnStat; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterReturnStat(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitReturnStat(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitReturnStat(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1561,12 +1483,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_eleConst; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEleConst(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEleConst(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEleConst(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1674,12 +1593,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_eleConstInner; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEleConstInner(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEleConstInner(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEleConstInner(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1758,12 +1674,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_att; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAtt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAtt(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAtt(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1803,12 +1716,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_attInner; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAttInner(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAttInner(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAttInner(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1865,12 +1775,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_attInner2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAttInner2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAttInner2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAttInner2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1917,12 +1824,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_eaName; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEaName(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEaName(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEaName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1981,12 +1885,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_arithmeticExpr_xq; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterArithmeticExpr_xq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitArithmeticExpr_xq(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitArithmeticExpr_xq(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2115,12 +2016,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_xpath; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterXpath(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXpath(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXpath(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2153,12 +2051,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_expr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2194,12 +2089,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_orExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterOrExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitOrExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitOrExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2237,12 +2129,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_orExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterOrExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitOrExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitOrExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2299,12 +2188,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_andExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAndExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAndExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAndExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2342,12 +2228,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_andExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAndExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAndExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAndExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2405,12 +2288,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_equalityExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEqualityExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEqualityExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEqualityExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2449,12 +2329,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_equalityExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterEqualityExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitEqualityExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitEqualityExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2521,12 +2398,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_relationalExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterRelationalExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRelationalExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRelationalExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2567,12 +2441,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_relationalExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterRelationalExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRelationalExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRelationalExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2657,12 +2528,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_additiveExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAdditiveExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAdditiveExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAdditiveExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2699,12 +2567,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_additiveExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAdditiveExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAdditiveExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAdditiveExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2777,12 +2642,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterMultiplicativeExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitMultiplicativeExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitMultiplicativeExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2819,12 +2681,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpr2; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterMultiplicativeExpr2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitMultiplicativeExpr2(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitMultiplicativeExpr2(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2907,12 +2766,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_unaryExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterUnaryExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitUnaryExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitUnaryExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2979,12 +2835,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_unionExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterUnionExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitUnionExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitUnionExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3035,12 +2888,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_valueExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterValueExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitValueExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitValueExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3119,12 +2969,9 @@ public class XQueryParser extends Parser {
 		public TerminalNode SLASHSLASH() { return getToken(XQueryParser.SLASHSLASH, 0); }
 		public PathExpr_slashslashContext(PathExprContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExpr_slashslash(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExpr_slashslash(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExpr_slashslash(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class PathExpr_slashContext extends PathExprContext {
@@ -3134,12 +2981,9 @@ public class XQueryParser extends Parser {
 		public TerminalNode SLASH() { return getToken(XQueryParser.SLASH, 0); }
 		public PathExpr_slashContext(PathExprContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExpr_slash(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExpr_slash(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExpr_slash(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class PathExpr_relativePathExprContext extends PathExprContext {
@@ -3148,12 +2992,9 @@ public class XQueryParser extends Parser {
 		}
 		public PathExpr_relativePathExprContext(PathExprContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPathExpr_relativePathExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPathExpr_relativePathExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPathExpr_relativePathExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3220,12 +3061,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_relativePathExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterRelativePathExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRelativePathExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRelativePathExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3281,12 +3119,9 @@ public class XQueryParser extends Parser {
 		}
 		public RelativePathExpr2_slashContext(RelativePathExpr2Context ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterRelativePathExpr2_slash(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRelativePathExpr2_slash(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRelativePathExpr2_slash(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class RelativePathExpr2_slashslashContext extends RelativePathExpr2Context {
@@ -3296,12 +3131,9 @@ public class XQueryParser extends Parser {
 		}
 		public RelativePathExpr2_slashslashContext(RelativePathExpr2Context ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterRelativePathExpr2_slashslash(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRelativePathExpr2_slashslash(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRelativePathExpr2_slashslash(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3351,12 +3183,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_stepExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterStepExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitStepExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitStepExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3392,12 +3221,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_axisStep; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAxisStep(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAxisStep(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAxisStep(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3431,12 +3257,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_forwardStep; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterForwardStep(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitForwardStep(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitForwardStep(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3469,12 +3292,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_abbrevForwardStep; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterAbbrevForwardStep(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAbbrevForwardStep(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAbbrevForwardStep(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3519,12 +3339,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_nodeTest; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNodeTest(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNodeTest(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNodeTest(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3572,12 +3389,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_kindTest; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterKindTest(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitKindTest(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitKindTest(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3618,34 +3432,25 @@ public class XQueryParser extends Parser {
 		}
 		public NameTest_qNameContext(NameTestContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTest_qName(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTest_qName(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNameTest_qName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class NameTest_divContext extends NameTestContext {
 		public NameTest_divContext(NameTestContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTest_div(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTest_div(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNameTest_div(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	public static class NameTEst_modContext extends NameTestContext {
 		public NameTEst_modContext(NameTestContext ctx) { copyFrom(ctx); }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNameTEst_mod(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNameTEst_mod(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNameTEst_mod(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3703,12 +3508,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_filterExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterFilterExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFilterExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFilterExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3745,12 +3547,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_predicateList; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPredicateList(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPredicateList(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicateList(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3796,12 +3595,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_predicate; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPredicate(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPredicate(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicate(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3842,12 +3638,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_primaryExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterPrimaryExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitPrimaryExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPrimaryExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3908,12 +3701,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_literal; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterLiteral(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitLiteral(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitLiteral(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3959,12 +3749,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_numericLiteral; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterNumericLiteral(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitNumericLiteral(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitNumericLiteral(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4003,12 +3790,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_parenthesizedExpr; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterParenthesizedExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitParenthesizedExpr(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitParenthesizedExpr(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4053,12 +3837,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_functionCall; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterFunctionCall(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFunctionCall(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFunctionCall(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4114,12 +3895,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_functionName; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterFunctionName(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFunctionName(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFunctionName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4155,12 +3933,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_textTest; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterTextTest(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitTextTest(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitTextTest(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -4191,12 +3966,9 @@ public class XQueryParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_qName; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).enterQName(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitQName(this);
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitQName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 

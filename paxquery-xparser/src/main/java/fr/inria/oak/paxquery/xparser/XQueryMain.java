@@ -8,6 +8,9 @@ import fr.inria.oak.paxquery.common.xml.treepattern.core.PrintingLevel;
 public class XQueryMain {
 	public static void main(String args[]) throws Exception {
 			System.out.println("Enter a valid XQuery expression followed by Enter and Ctrl+D: ");
+		
+			/*
+			//LISTENER VERSION
 			//create a CharStream that reads from standard input
 			ANTLRInputStream input = new ANTLRInputStream(System.in);
 			//create a lexer that feeds off of input CharStream
@@ -32,6 +35,33 @@ public class XQueryMain {
 			System.out.println(processor.applyEeach.toString());
 			System.out.println("fields:");
 			System.out.println(processor.applyFields.toString());
+			*/
+			
+			
+			//VISITOR VERSION
+			//create a CharStream that reads from standard input
+			ANTLRInputStream input = new ANTLRInputStream(System.in);
+			//create a lexer that feeds off of input CharStream
+			XQueryLexer lexer = new XQueryLexer(input);
+
+			//create a buffer of tokens pulled from the lexer
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			//create a parser that feeds off the tokens buffer
+			XQueryParser parser = new XQueryParser(tokens);
+
+			ParseTree tree = parser.xquery();
+			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
+			loader.visit(tree);
+			
+			System.out.println(tree.toStringTree(parser));
+			System.out.println("PatternTree:");
+			System.out.println(loader.treePattern.toString(PrintingLevel.SIMPLIFY));
+			System.out.println("HashMap:");
+			System.out.println(loader.patternNodeMap.toString());
+			System.out.println("each:");
+			System.out.println(loader.applyEeach.toString());
+			System.out.println("fields:");
+			System.out.println(loader.applyFields.toString());
 	}
 		
 	public static boolean test_main(String test_query) {
@@ -61,6 +91,8 @@ public class XQueryMain {
 	public static String test_processor(String test_query) {
 		try {
 			System.out.println("XQuery: "+test_query);
+			/*
+			//LISTENER VERSION
 			//create a CharStream that reads from standard input
 			ANTLRInputStream input = new ANTLRInputStream(new java.io.ByteArrayInputStream(test_query.getBytes()));
 			//create a lexer that feeds off of input CharStream
@@ -88,6 +120,38 @@ public class XQueryMain {
 						
 			System.out.println(sb.toString());
 			return sb.toString();
+			*/
+			
+			//VISITOR VERSION
+			//create a CharStream that reads from standard input
+			ANTLRInputStream input = new ANTLRInputStream(new java.io.ByteArrayInputStream(test_query.getBytes()));
+			//create a lexer that feeds off of input CharStream
+			XQueryLexer lexer = new XQueryLexer(input);
+
+			//create a buffer of tokens pulled from the lexer
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			//create a parser that feeds off the tokens buffer
+			XQueryParser parser = new XQueryParser(tokens);
+
+			ParseTree tree = parser.xquery();
+			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
+			loader.visit(tree);
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("PT:");	//Pattern Tree
+			sb.append(loader.treePattern.toString(PrintingLevel.SIMPLIFY));
+			sb.append("---");
+			sb.append("HM:");	//Hash Map
+			sb.append(loader.patternNodeMap.toString());
+			sb.append("---");
+			sb.append("VP:");	//Vars Pos
+			sb.append(XQueryProcessorUtils.varsPosToString(loader.varsPos));
+			System.out.println(tree.toStringTree(parser));
+						
+			System.out.println(sb.toString());
+			return sb.toString();
+
+
 		}
 		catch(Exception e) {
 			System.out.println("Error in input " + test_query);
