@@ -25,13 +25,13 @@ import org.xml.sax.SAXException;
 import fr.inria.oak.paxquery.xparser.XQueryMain;
 
 @RunWith(Parameterized.class)
-public class TestXQueryProcessor 
+public class TestXQueryVisitorImplementation 
 {
 	public String query;
 	public String output;
 	public String test_number;
 	
-	public TestXQueryProcessor(String query, String output, String test_number)
+	public TestXQueryVisitorImplementation(String query, String output, String test_number)
 	{
 		this.query = query;
 		this.output = output;
