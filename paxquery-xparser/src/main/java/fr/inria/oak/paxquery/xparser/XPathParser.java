@@ -1549,50 +1549,20 @@ public class XPathParser extends Parser {
 	}
 
 	public static class NameTestContext extends ParserRuleContext {
+		public QNameContext qName() {
+			return getRuleContext(QNameContext.class,0);
+		}
 		public NameTestContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_nameTest; }
-	 
-		public NameTestContext() { }
-		public void copyFrom(NameTestContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class NameTest_qNameContext extends NameTestContext {
-		public QNameContext qName() {
-			return getRuleContext(QNameContext.class,0);
-		}
-		public NameTest_qNameContext(NameTestContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNameTest_qName(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNameTest(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNameTest_qName(this);
-		}
-	}
-	public static class NameTest_divContext extends NameTestContext {
-		public NameTest_divContext(NameTestContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNameTest_div(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNameTest_div(this);
-		}
-	}
-	public static class NameTEst_modContext extends NameTestContext {
-		public NameTEst_modContext(NameTestContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterNameTEst_mod(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNameTEst_mod(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitNameTest(this);
 		}
 	}
 
@@ -1603,21 +1573,18 @@ public class XPathParser extends Parser {
 			setState(229);
 			switch (_input.LA(1)) {
 			case 10:
-				_localctx = new NameTest_divContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(226); match(10);
 				}
 				break;
 			case 4:
-				_localctx = new NameTEst_modContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(227); match(4);
 				}
 				break;
 			case QNAME_TOKEN:
-				_localctx = new NameTest_qNameContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(228); qName();

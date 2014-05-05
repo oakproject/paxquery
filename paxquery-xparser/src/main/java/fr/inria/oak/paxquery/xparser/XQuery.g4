@@ -19,7 +19,7 @@ import XLexer, XPath;
 
 
 /* Non-terminals */
-xquery : flwrexpr ;
+xquery : flwrexpr EOF ;
 flwrexpr : initial middle* returnStat ;
 initial : forStat 
 		| let ;
@@ -48,7 +48,7 @@ ncmp : 'is' | '<<' | '>>' ;
 contains : 'contains' '(' VAR COMMA STRING_LITERAL ')' ;
 empty : 'empty' '(' VAR ')' ;
 groupBy : 'group by' VAR (COMMA VAR)* ;
-returnStat : 'return' ( eleConst | (aggrExpr | VAR )+ ) ;
+returnStat : 'return' ( eleConst | aggrExpr | VAR ) ;
 eleConst : LT_S eaName (att)* (CLOSE_OPENING_TAG | (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S )) ;
 eleConstInner : ( VAR | aggrExpr ) ( COMMA ( VAR | aggrExpr ) )* ;
 att : eaName '=' attInner ;

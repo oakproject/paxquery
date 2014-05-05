@@ -93,10 +93,7 @@ forwardStep : abbrevForwardStep ;
 abbrevForwardStep : ( '@' )? nodeTest ;
 nodeTest : kindTest | nameTest ;
 kindTest : textTest;
-nameTest : 'div'    #nameTest_div
-		   | 'mod'  #nameTEst_mod
-		   | qName	#nameTest_qName
-		    ;
+nameTest : 'div' | 'mod' | qName ;
 filterExpr : primaryExpr predicateList ;
 predicateList : ( predicate )* ;
 predicate : '[' expr ']' ;

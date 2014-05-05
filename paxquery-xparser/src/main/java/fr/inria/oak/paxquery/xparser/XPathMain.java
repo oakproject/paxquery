@@ -4,7 +4,8 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 public class XPathMain {
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) {
+		try {
 		System.out.println("Enter a valid XPath expression followed by Enter and Ctrl+D: ");
 		//create a CharStream that reads from standard input
 		ANTLRInputStream input = new ANTLRInputStream(System.in);
@@ -17,6 +18,10 @@ public class XPathMain {
 		
 		ParseTree tree = parser.xpath();	//begin parsing at start rule
 		System.out.println(tree.toStringTree(parser));
+		} catch(Exception e) {
+			System.out.println("Query is malformed or not yet supported.");
+		}
+		
 	}
 	
 	public static boolean test_main(String test_query) {

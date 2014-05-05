@@ -42,17 +42,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitNodeTest(@NotNull XPathParser.NodeTestContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#nameTest_qName}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameTest_qName(@NotNull XPathParser.NameTest_qNameContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#nameTest_qName}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameTest_qName(@NotNull XPathParser.NameTest_qNameContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#pathExpr_slashslash}.
 	 * @param ctx the parse tree
 	 */
@@ -64,15 +53,15 @@ public interface XPathListener extends ParseTreeListener {
 	void exitPathExpr_slashslash(@NotNull XPathParser.PathExpr_slashslashContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#nameTest_div}.
+	 * Enter a parse tree produced by {@link XPathParser#nameTest}.
 	 * @param ctx the parse tree
 	 */
-	void enterNameTest_div(@NotNull XPathParser.NameTest_divContext ctx);
+	void enterNameTest(@NotNull XPathParser.NameTestContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link XPathParser#nameTest_div}.
+	 * Exit a parse tree produced by {@link XPathParser#nameTest}.
 	 * @param ctx the parse tree
 	 */
-	void exitNameTest_div(@NotNull XPathParser.NameTest_divContext ctx);
+	void exitNameTest(@NotNull XPathParser.NameTestContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#additiveExpr}.
@@ -238,17 +227,6 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNumericLiteral(@NotNull XPathParser.NumericLiteralContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link XPathParser#nameTEst_mod}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameTEst_mod(@NotNull XPathParser.NameTEst_modContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#nameTEst_mod}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameTEst_mod(@NotNull XPathParser.NameTEst_modContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#multiplicativeExpr2}.

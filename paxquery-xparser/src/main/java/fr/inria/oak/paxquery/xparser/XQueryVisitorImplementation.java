@@ -63,6 +63,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//since we can have several return clauses but just one XMLConstruct operator.
 		ApplyConstruct apply = new ApplyConstruct("", new String[]{}, "", new int[]{}, null);
 		construct = new XMLConstruct(scan, apply, outputPath);
+		
 		return null;
 	}
 
@@ -233,9 +234,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * Xpath: whatever/node/whatever
 	 * TODO: what with 'div' and 'mod' ?
 	 */
-	public Void visitNameTest_qName(XQueryParser.NameTest_qNameContext ctx) {
-		//create a new node and append it to the last tree
-		String tag = ctx.qName().QNAME_TOKEN().getText();
+	public Void visitNameTest(XQueryParser.NameTestContext ctx) { 
+		String tag = "";
+		if(ctx.qName() != null)
+			tag = ctx.qName().QNAME_TOKEN().getText();
+		else if(ctx.getChild(0).getText().compareTo("div") == 0)
+			tag = "div";
+		else if(ctx.getChild(0).getText().compareTo("mod") == 0)
+			tag = "mod";
+		
 		int nodeCode = PatternNode.globalNodeCounter.getAndIncrement();
 		PatternNode node = new PatternNode("", tag, nodeCode, "", "");
 		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
@@ -263,6 +270,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
 		return null;
 	}
+
 
 	/**
 	 * textTest (in XPath)
@@ -315,16 +323,13 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				System.exit(-1);
 			}
 		}
-		else {
-			for(int i = 0; i < ctx.children.size(); i++) {
-				//either it is an aggrExpr rule
-				if(ctx.getChild(i).getPayload().getClass() == XQueryParser.AggrExprContext.class) 
-					visitAggrExpr((XQueryParser.AggrExprContext)ctx.getChild(i).getPayload());
-				//or a VAR
-				else if(ctx.getChild(i).getText().startsWith("$"))
-					storeVarAndXMLText(ctx.getChild(i).getText());					
-			}			
-		}
+		//either it is an aggrExpr rule
+		else if(ctx.aggrExpr() != null)
+			visitAggrExpr(ctx.aggrExpr());
+		//or a VAR
+		else if(ctx.getChild(1).getText().startsWith("$"))
+			storeVarAndXMLText(ctx.getChild(1).getText());					
+		
 		storeXMLText();		
 		insideReturn = false;
 

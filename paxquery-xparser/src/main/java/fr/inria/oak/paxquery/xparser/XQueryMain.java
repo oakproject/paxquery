@@ -6,7 +6,8 @@ import org.antlr.v4.runtime.tree.*;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.PrintingLevel;
 
 public class XQueryMain {
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) {
+		try {
 			System.out.println("Enter a valid XQuery expression followed by Enter and Ctrl+D: ");
 		
 			/*
@@ -62,6 +63,10 @@ public class XQueryMain {
 			System.out.println(loader.applyEeach.toString());
 			System.out.println("fields:");
 			System.out.println(loader.applyFields.toString());
+		} catch(Exception e) {
+			System.out.println("Query malformed or not supported yet.");
+		}
+		
 	}
 		
 	public static boolean test_main(String test_query) {

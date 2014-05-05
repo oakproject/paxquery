@@ -40,6 +40,13 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitForBinding(@NotNull XQueryParser.ForBindingContext ctx);
 
 	/**
+	 * Visit a parse tree produced by {@link XQueryParser#nameTest}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNameTest(@NotNull XQueryParser.NameTestContext ctx);
+
+	/**
 	 * Visit a parse tree produced by {@link XQueryParser#additiveExpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -136,13 +143,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNumericLiteral(@NotNull XQueryParser.NumericLiteralContext ctx);
-
-	/**
-	 * Visit a parse tree produced by {@link XQueryParser#nameTEst_mod}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNameTEst_mod(@NotNull XQueryParser.NameTEst_modContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#att}.
@@ -278,13 +278,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitNodeTest(@NotNull XQueryParser.NodeTestContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#nameTest_qName}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNameTest_qName(@NotNull XQueryParser.NameTest_qNameContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#andExpr_xq}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -304,13 +297,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFlwrexpr(@NotNull XQueryParser.FlwrexprContext ctx);
-
-	/**
-	 * Visit a parse tree produced by {@link XQueryParser#nameTest_div}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNameTest_div(@NotNull XQueryParser.NameTest_divContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#groupBy}.
