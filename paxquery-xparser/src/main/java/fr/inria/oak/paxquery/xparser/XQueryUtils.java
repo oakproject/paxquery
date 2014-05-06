@@ -7,7 +7,7 @@ import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
 
-public class XQueryProcessorUtils {
+public class XQueryUtils {
 	
 	/**
 	 * Populates the HashMap<Integer, String> varspos with patternNodes that match variables and their position 

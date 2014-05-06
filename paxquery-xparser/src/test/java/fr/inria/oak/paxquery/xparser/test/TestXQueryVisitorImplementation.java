@@ -43,7 +43,7 @@ public class TestXQueryVisitorImplementation
 	{
 		ArrayList<String[]> testCases = new ArrayList<String[]>();
 		
-		String testCaseFilePath = "src/test/resources/treepatt-xquery-tests2.xml";
+		String testCaseFilePath = "src/test/resources/treepatt-xquery-tests.xml";
 		
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();

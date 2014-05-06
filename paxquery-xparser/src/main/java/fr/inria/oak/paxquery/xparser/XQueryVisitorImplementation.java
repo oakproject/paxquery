@@ -324,9 +324,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		insideReturn = true;
 		//go through all pattern trees annotating vars and their overall positions
 		for(int i = 0; i < treePatterns.size(); i++) {
-			XQueryProcessorUtils.buildVarsPos(varsPos, treePatterns.get(i), varsPos.size());
+			XQueryUtils.buildVarsPos(varsPos, treePatterns.get(i), varsPos.size());
 		}
-		System.out.println("varsPos: "+XQueryProcessorUtils.varsPosToString(varsPos));
+		System.out.println("varsPos: "+XQueryUtils.varsPosToString(varsPos));
 		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
 		if(ctx.eleConst()!=null) {

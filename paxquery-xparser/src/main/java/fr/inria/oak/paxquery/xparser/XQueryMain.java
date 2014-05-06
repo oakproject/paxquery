@@ -156,7 +156,7 @@ public class XQueryMain {
 			sb.append(loader.patternNodeMap.toString());
 			sb.append("---");
 			sb.append("VP:");	//Vars Pos
-			sb.append(XQueryProcessorUtils.varsPosToString(loader.varsPos));
+			sb.append(XQueryUtils.varsPosToString(loader.varsPos));
 			System.out.println(tree.toStringTree(parser));
 						
 			System.out.println(sb.toString());
