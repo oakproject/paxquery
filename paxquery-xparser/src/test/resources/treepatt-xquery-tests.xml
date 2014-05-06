@@ -3,122 +3,122 @@
 <tests>
 		<test>
 			<value>let $i := collection('collection') return $i</value>
-			<output>PT:---HM:{$i=}---VP:{$iC=0}</output>
+			<output>PT0:---HM:{$i=}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := collection(&quot;items&quot;)/a return $i</value>
-			<output>PT:/aC---HM:{$i=aC}---VP:{$iC=0}</output>
+			<output>PT0:/aC---HM:{$i=aC}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := collection('items')//a return $i</value>
-			<output>PT://aC---HM:{$i=aC}---VP:{$iC=0}</output>
+			<output>PT0://aC---HM:{$i=aC}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := collection(&quot;items&quot;)/@a return $i</value>
-			<output>PT:/@aV---HM:{$i=@aV}---VP:{$iV=0}</output>
+			<output>PT0:/@aV---HM:{$i=@aV}---VP:{$iV=0}</output>
 		</test>
 		<test>
 			<value>let $i := doc(&quot;items&quot;) return $i</value>
-			<output>PT:---HM:{$i=}---VP:{$iC=0}</output>
+			<output>PT0:---HM:{$i=}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := doc('documents')/a return $i</value>
-			<output>PT:/aC---HM:{$i=aC}---VP:{$iC=0}</output>
+			<output>PT0:/aC---HM:{$i=aC}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := doc(&quot;items&quot;)//a return $i</value>
-			<output>PT://aC---HM:{$i=aC}---VP:{$iC=0}</output>
+			<output>PT0://aC---HM:{$i=aC}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := doc('items')/@a return $i</value>
-			<output>PT:/@aV---HM:{$i=@aV}---VP:{$iV=0}</output>
+			<output>PT0:/@aV---HM:{$i=@aV}---VP:{$iV=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items') let $i := $ic/site/regions//item return $i</value>
-			<output>PT:/site/regions//itemC---HM:{$i=itemC,$ic=}---VP:{$iC=1,$icC=0}</output>
+			<output>PT0:/site/regions//itemC---HM:{$i=itemC,$ic=}---VP:{$iC=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items') let $i := $ic//site//regions//item return $i</value>
-			<output>PT://site//regions//itemC---HM:{$i=itemC,$ic=}---VP:{$iC=1,$icC=0}</output>
+			<output>PT0://site//regions//itemC---HM:{$i=itemC,$ic=}---VP:{$iC=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items') let $i := $ic/site/text() return $i</value>
-			<output>PT:/siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0:/siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items') let $i := $ic/site//text() return $i</value>
-			<output>PT:/siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0:/siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items') let $i := $ic//site//text() return $i</value>
-			<output>PT://siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0://siteV---HM:{$i=siteV,$ic=}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection('items')/site let $i := $ic//regions/text() return $i</value>
-			<output>PT:/siteC//regionsV---HM:{$i=regionsV,$ic=siteC}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0:/siteC//regionsV---HM:{$i=regionsV,$ic=siteC}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := doc('items') let $i := $ic/regions/@name/text() return $i</value>
-			<output>PT:/regions/@nameV---HM:{$i=@nameV,$ic=}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0:/regions/@nameV---HM:{$i=@nameV,$ic=}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := doc('items') let $i := $ic/regions/@name return $i</value>
-			<output>PT:/regions/@nameV---HM:{$i=@nameV,$ic=}---VP:{$iV=1,$icC=0}</output>
+			<output>PT0:/regions/@nameV---HM:{$i=@nameV,$ic=}---VP:{$iV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := doc('items')//@a return $ic</value>
-			<output>PT://@aV---HM:{$ic=@aV}---VP:{$icV=0}</output>
+			<output>PT0://@aV---HM:{$ic=@aV}---VP:{$icV=0}</output>
 		</test>
 		<test>
 			<value>let $ic := doc('items')//@a let $i := $ic/b//c return $ic</value>
-			<output>PT://@aV/b//cC---HM:{$i=cC,$ic=@aV}---VP:{$iC=1,$icV=0}</output>
+			<output>PT0://@aV/b//cC---HM:{$i=cC,$ic=@aV}---VP:{$iC=1,$icV=0}</output>
 		</test>
 				<test>
 			<value>let $i := collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site let $it := $i/text() return $it</value>
-			<output>PT:/siteCV---HM:{$i=siteCV,$it=siteCV}---VP:{$iC=1,$itV=0}</output>
+			<output>PT0:/siteCV---HM:{$i=siteCV,$it=siteCV}---VP:{$iC=1,$itV=0}</output>
 		</test>
 		<test>
 			<value>for $i in collection('items')/site return $i</value>
-			<output>PT:/siteC---HM:{$i=siteC}---VP:{$iC=0}</output>
+			<output>PT0:/siteC---HM:{$i=siteC}---VP:{$iC=0}</output>
 		</test>
 		<test>
 			<value>let $i := collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site for $if in $i/closed_auctions/closed_auction return &lt;item>{$if}&lt;/item></value>
-			<output>PT:/siteC/closed_auctions/closed_auctionC---HM:{$if=closed_auctionC,$i=siteC}---VP:{$ifC=1,$iC=0}</output>
+			<output>PT0:/siteC/closed_auctions/closed_auctionC---HM:{$if=closed_auctionC,$i=siteC}---VP:{$ifC=1,$iC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction return &lt;item>{$ic}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC---HM:{$ic=closed_auctionC}---VP:{$icC=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC---HM:{$ic=closed_auctionC}---VP:{$icC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $p := $ic/seller/@person return &lt;item seller="{$p}">{$ic}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC/seller/@personV---HM:{$p=@personV,$ic=closed_auctionC}---VP:{$pV=1,$icC=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC/seller/@personV---HM:{$p=@personV,$ic=closed_auctionC}---VP:{$pV=1,$icC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction/seller/@person return &lt;item seller="{$ic}"/></value>
-			<output>PT:/site/closed_auctions/closed_auction/seller/@personV---HM:{$ic=@personV}---VP:{$icV=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auction/seller/@personV---HM:{$ic=@personV}---VP:{$icV=0}</output>
 		</test>
 		<test>
 			<value>for $t in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction/annotation/description/parlist/listitem/text let $pt := $t/text() return &lt;description plaintext="{$pt}">{$t}&lt;/description></value>
-			<output>PT:/site/closed_auctions/closed_auction/annotation/description/parlist/listitem/textCV---HM:{$t=textCV,$pt=textCV}---VP:{$tC=1,$ptV=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auction/annotation/description/parlist/listitem/textCV---HM:{$t=textCV,$pt=textCV}---VP:{$tC=1,$ptV=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $sp := $ic/seller/@person let $bp := $ic/buyer/@person return &lt;item seller="{$sp}" buyer="{$bp}">{$ic}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC(/seller/@personV  /buyer/@personV)---HM:{$sp=@personV,$bp=@personV,$ic=closed_auctionC}---VP:{$spV=1,$bpV=2,$icC=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC(/seller/@personV  /buyer/@personV)---HM:{$sp=@personV,$bp=@personV,$ic=closed_auctionC}---VP:{$spV=1,$bpV=2,$icC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $sp := $ic/seller/@person let $ir := $ic/itemref/@item return &lt;item seller="{$sp}" itemref="{$ir}">{$ic}&lt;/item></value>
-		<output>PT:/site/closed_auctions/closed_auctionC(/seller/@personV  /itemref/@itemV)---HM:{$sp=@personV,$ir=@itemV,$ic=closed_auctionC}---VP:{$spV=1,$irV=2,$icC=0}</output>
+		<output>PT0:/site/closed_auctions/closed_auctionC(/seller/@personV  /itemref/@itemV)---HM:{$sp=@personV,$ir=@itemV,$ic=closed_auctionC}---VP:{$spV=1,$irV=2,$icC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $d := $ic/date let $an := $ic/annotation let $p := $an/author/@person return &lt;item author="{$p}">{$d,$an}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC(/dateC /annotationC/author/@personV)---HM:{$d=dateC,$an=annotationC,$p=@personV,$ic=closed_auctionC}---VP:{$dC=1,$anC=2,$pV=3,$icC=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC(/dateC /annotationC/author/@personV)---HM:{$d=dateC,$an=annotationC,$p=@personV,$ic=closed_auctionC}---VP:{$dC=1,$anC=2,$pV=3,$icC=0}</output>
 		</test>
 		<test>
 			<value>for $ic in collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $d := $ic/date let $an := $ic/annotation let $p := $an/author/@person return &lt;item author="{$p}">{count($d),$an}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC(/dateC /annotationC/author/@personV)---HM:{$d=dateC,$an=annotationC,$p=@personV,$ic=closed_auctionC}---VP:{$dC=1,$anC=2,$pV=3,$icC=0}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC(/dateC /annotationC/author/@personV)---HM:{$d=dateC,$an=annotationC,$p=@personV,$ic=closed_auctionC}---VP:{$dC=1,$anC=2,$pV=3,$icC=0}</output>
 		</test>
 		<test>
 			<value>let $ic := collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $nums := $ic/seller let $d := $ic/date let $an := $ic/annotation return &lt;item num_sellers="{count($nums)}">{count($d),$an}&lt;/item></value>
-			<output>PT:/site/closed_auctions/closed_auctionC(/sellerC /dateC /annotationC)---HM:{$d=dateC,$an=annotationC,$ic=closed_auctionC,$nums=sellerC}---VP:{$dC=2,$anC=3,$icC=0,$numsC=1}</output>
+			<output>PT0:/site/closed_auctions/closed_auctionC(/sellerC /dateC /annotationC)---HM:{$d=dateC,$an=annotationC,$ic=closed_auctionC,$nums=sellerC}---VP:{$dC=2,$anC=3,$icC=0,$numsC=1}</output>
 		</test>
 </tests>

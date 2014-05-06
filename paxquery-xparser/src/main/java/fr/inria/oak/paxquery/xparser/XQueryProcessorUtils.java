@@ -10,16 +10,21 @@ import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
 public class XQueryProcessorUtils {
 	
 	/**
-	 * Builds a HashMap<Integer, String> populated by patternNodes that match variables and their position 
+	 * Populates the HashMap<Integer, String> varspos with patternNodes that match variables and their position 
 	 * within the tree. That is, containing pairs with the shape <patterNode_position_in_the_tree, var_name>
 	 * @param treePattern The tree to traverse
-	 * @return a HashMap<Integer, String> populated by <var_name, patterNode_position_in_the_tree>
+	 * @param varspos the data structure to populate
+	 * @param startingPosInTree an initial offset for the position of variables
 	 */
-	public static HashMap<String, Variable> buildVarsPos(TreePattern treePattern) {
+/*	public static HashMap<String, Variable> buildVarsPos(TreePattern treePattern) {
 		HashMap<String, Variable> varspos = new HashMap<String, Variable>();
 		traverseTreePatternDFS(treePattern.getRoot(), varspos, 0);
 		
 		return varspos;
+	}*/	
+	public static void buildVarsPos(HashMap<String, Variable> varspos, TreePattern treePattern, int startingPosInTree) {
+		//HashMap<String, Variable> varspos = new HashMap<String, Variable>();
+		traverseTreePatternDFS(treePattern.getRoot(), varspos, startingPosInTree);		
 	}
 	
 	/**
@@ -60,7 +65,7 @@ public class XQueryProcessorUtils {
 			//count variables storing value first
 			for(int i = 0; i < matchingVariables.size(); i++) {
 				if(matchingVariables.get(i).dataType == Variable.VariableDataType.Value) {
-					matchingVariables.get(i).positionInTree = posInTree;
+					matchingVariables.get(i).positionInForest = posInTree;
 					varspos.put(matchingVariables.get(i).name,  matchingVariables.get(i));
 					posInTree++;
 				}
@@ -68,7 +73,7 @@ public class XQueryProcessorUtils {
 			//then count variables storing content
 			for(int i = 0; i < matchingVariables.size(); i++) {
 				if(matchingVariables.get(i).dataType == Variable.VariableDataType.Content) {
-					matchingVariables.get(i).positionInTree = posInTree;
+					matchingVariables.get(i).positionInForest = posInTree;
 					varspos.put(matchingVariables.get(i).name, matchingVariables.get(i));
 					posInTree++;
 				}
@@ -78,7 +83,7 @@ public class XQueryProcessorUtils {
 			for(int i = 0; i < matchingVariables.size(); i++) {
 				if(matchingVariables.get(i).dataType != Variable.VariableDataType.Value &&
 						matchingVariables.get(i).dataType != Variable.VariableDataType.Content) {
-					matchingVariables.get(i).positionInTree = posInTree;
+					matchingVariables.get(i).positionInForest = posInTree;
 					varspos.put(matchingVariables.get(i).name,  matchingVariables.get(i));
 					posInTree++;
 				}
@@ -106,7 +111,8 @@ public class XQueryProcessorUtils {
 			else if(var.dataType == Variable.VariableDataType.Value)
 				sb.append("V");
 			sb.append("=");
-			sb.append(var.positionInTree);
+			sb.append(var.positionInForest);
+			
 			if(counter < keySetSize-1)
 				sb.append(',');
 			counter++;

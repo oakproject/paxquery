@@ -55,8 +55,10 @@ public class XQueryMain {
 			loader.visit(tree);
 			
 			System.out.println(tree.toStringTree(parser));
-			System.out.println("PatternTree:");
-			System.out.println(loader.treePattern.toString(PrintingLevel.SIMPLIFY));
+			for(int i = 0; i < loader.treePatterns.size(); i++) {
+				System.out.println("PatternTree ("+i+"): ");
+				System.out.println(loader.treePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
+			}
 			System.out.println("HashMap:");
 			System.out.println(loader.patternNodeMap.toString());
 			System.out.println("each:");
@@ -143,8 +145,12 @@ public class XQueryMain {
 			loader.visit(tree);
 			
 			StringBuilder sb = new StringBuilder();
-			sb.append("PT:");	//Pattern Tree
-			sb.append(loader.treePattern.toString(PrintingLevel.SIMPLIFY));
+			for(int i = 0; i < loader.treePatterns.size(); i++) {
+				sb.append("PT"+i+":");	//Pattern Tree
+				sb.append(loader.treePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
+				if(i < loader.treePatterns.size()-1)
+					sb.append(",");
+			}
 			sb.append("---");
 			sb.append("HM:");	//Hash Map
 			sb.append(loader.patternNodeMap.toString());

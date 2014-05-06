@@ -318,7 +318,6 @@
 		<test value="true()"/>
 		<test value="true()=2"/>
 		<test value="width * depth"/>
-		<test value="/"/>
 		<test value="/ic/site/regions//item"/>
 		<test value="/i/location/text()"/>
 		<test value="/pc/site/people/person"/>

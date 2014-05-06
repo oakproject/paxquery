@@ -69,6 +69,11 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 	private ArrayList<Variable> matchingVariables;
 	
 	/**
+	 * The TreePattern this PatternNode belongs to.
+	 */
+	private TreePattern treePattern;
+	
+	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node
 	 * from which it originated.
 	 */
@@ -235,6 +240,43 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		
 		this.startNamespaceDelimiter = startNamespaceDelimiter;
 		this.endNamespaceDelimiter = endNamespaceDelimiter;
+	}
+
+	/**
+	 * Creates a new node with no children. All properties are set to false
+	 * by default.
+	 * 
+	 * @param namespace the namespace associated to this node
+	 * @param tag the tag associated to this node
+	 * @param nodeCode the code associated to this node
+	 * @param treePattern the TreePattern this node belongs to
+	 */
+	public PatternNode(String namespace, String tag, int nodeCode,
+			String startNamespaceDelimiter, String endNamespaceDelimiter, TreePattern treePattern) {
+		this.namespace = namespace;
+		this.tag = tag;
+		this.storesTag = false;
+		if (tag == null || tag.compareTo("*") == 0) {
+			this.namespace = "";
+			this.tag = "*";
+		} else {
+			this.selectOnTag = true;
+		}
+		this.edges = (new ArrayList<PatternEdge>());
+		this.matchingVariables = new ArrayList<Variable>();
+		this.storesContent = false;
+		this.storesValue = false;
+		this.storesID = false;
+		this.requiresID = false;
+		this.requiresTag = false;
+		this.requiresVal = false;
+		this.isTopReturningNode = -1;
+		this.nodeCode = nodeCode;
+		
+		this.startNamespaceDelimiter = startNamespaceDelimiter;
+		this.endNamespaceDelimiter = endNamespaceDelimiter;
+		
+		this.treePattern = treePattern;
 	}
 	
 	/**
@@ -997,6 +1039,23 @@ public final class PatternNode implements Serializable, Comparable<PatternNode> 
 		}
 		return null;
 	}
+	
+	/**
+	 * Returns the TreePattern this node belongs to.
+	 * @return the TreePattern this node belongs to.
+	 */
+	public TreePattern getTreePattern() {
+		return treePattern;
+	}
+	
+	/**
+	 * Assigns this node to a given TreePattern
+	 * @param treePattern the TreePattern to which this node is assigned.
+	 */
+	public void setTreePattern(TreePattern treePattern) {
+		this.treePattern = treePattern;
+	}
+	
 		
 	/**
 	 * If the xam is built from a XAM, this is the hash code of the XAM node

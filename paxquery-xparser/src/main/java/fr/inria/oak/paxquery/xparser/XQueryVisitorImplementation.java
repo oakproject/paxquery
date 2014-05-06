@@ -14,21 +14,22 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * Operators
 	 */
-	public XMLScan scan;
+	public ArrayList<XMLScan> scans;
 	public XMLConstruct construct;
 
 	/**
 	 * Data structures
 	 */
 	public HashMap<String, Variable> varsPos;	//for use when creating the XMLConstruct operator in return clause
-	public HashMap<String, PatternNode> patternNodeMap;
-	public TreePattern treePattern;
+	public HashMap<String, PatternNode> patternNodeMap;	//each tuple <String, PatternNode> stores the name of a variable and the PatternNode it addresses
+	public ArrayList<TreePattern> treePatterns;	//the list of all TreePattern objects built for a given query
 	public ArrayList<String> applyEeach;		//holds a String array for ApplyConstruct.each
 	public ArrayList<Integer> applyFields;		//holds a Integer array for ApplyConstruct.fields
 
 	/**
 	 * State variables for parsing
 	 */
+	private TreePattern lastTreePattern;
 	private PatternNode lastNode;
 	private String lastVarLeftSide;
 	private int lastSlashToken;
@@ -44,10 +45,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public XQueryVisitorImplementation(String outputPath) {
 		this.outputPath = outputPath;
 		patternNodeMap = new HashMap<String, PatternNode>();
-		treePattern = new TreePattern();
+		treePatterns = new ArrayList<TreePattern>();
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
 		insideReturn = false;
+		scans = new ArrayList<XMLScan>();
 		varsPos = new HashMap<String, Variable>();
 		applyEeach = new ArrayList<String>();
 		applyFields = new ArrayList<Integer>();
@@ -56,13 +58,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * xquery
 	 * Starting rule. We build the XMLConstruct object here, after having processed the query
+	 * TODO: so far we connect the XMLConstruct object to the first of the XMLScans, this needs to be addressed (we need a binary algebraic operator)
 	 */
 	public Void visitXquery(XQueryParser.XqueryContext ctx) { 
 		visitChildren(ctx);
 		//we instantiate the XMLConstruct operator here rather than in exitReturnStat 
 		//since we can have several return clauses but just one XMLConstruct operator.
 		ApplyConstruct apply = new ApplyConstruct("", new String[]{}, "", new int[]{}, null);
-		construct = new XMLConstruct(scan, apply, outputPath);
+		//so far we connect the XMLConstruct object to the first of the XMLScans, this needs to be addressed
+		construct = new XMLConstruct(scans.get(0), apply, outputPath);
 		
 		return null;
 	}
@@ -77,7 +81,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastVarLeftSide = ctx.VAR().getText();		
 		//do visit, ctx.getChild(2) can be (pathExpr_xq | flwrexpr | aggrExpr | arithmeticExpr_xq | literal)
 		visit(ctx.getChild(2));
-		//reset last used var and node
+		//reset last used TreePattern, var and node
+		lastTreePattern = null;
 		lastVarLeftSide = null;
 		lastNode = null;
 		lastSlashToken = 0;
@@ -94,9 +99,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastVarLeftSide = ctx.VAR().getText();
 		//do visit
 		visit(ctx.pathExpr_xq());
-		//reset last used var and node
+		//reset last used TreePattern, var and node
+		lastTreePattern = null;
 		lastVarLeftSide = null;
 		lastNode = null;
+		lastSlashToken = 0;
 		
 		return null;
 	}
@@ -108,18 +115,21 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitPathExprInner_xq_collection(XQueryParser.PathExprInner_xq_collectionContext ctx) {
 		//root node construction
 		String rootTag = "";
+		lastTreePattern = new TreePattern();
 		int rootCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "");
-		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content));
+		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "", lastTreePattern);
+		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content, rootNode));
 		lastNode = rootNode;
 		patternNodeMap.put(lastVarLeftSide, rootNode);		
 		//tree pattern construction
-		treePattern.setRoot(rootNode);
+		lastTreePattern.setRoot(rootNode);
+		treePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
 		String pathDocuments = ctx.STRING_LITERAL().getText();
 		System.out.println("STRING_LITERAL: "+pathDocuments);
-		scan = new XMLScan(false, treePattern, pathDocuments);
+		//add a new XMLScan object
+		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
@@ -132,18 +142,21 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitPathExprInner_xq_doc(XQueryParser.PathExprInner_xq_docContext ctx) { 
 		//root node construction
 		String rootTag = "";
+		lastTreePattern = new TreePattern();
 		int rootCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "");
-		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content));
+		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "", lastTreePattern);
+		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content, rootNode));
 		lastNode = rootNode;
 		patternNodeMap.put(lastVarLeftSide, rootNode);
 		//tree pattern construction
-		treePattern.setRoot(rootNode);
+		lastTreePattern.setRoot(rootNode);
+		treePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
 		String pathDocuments = ctx.STRING_LITERAL().getText();
 		System.out.println("STRING_LITERAL: "+pathDocuments);
-		scan = new XMLScan(false, treePattern, pathDocuments);
+		//add a new XMLScan object
+		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
@@ -207,11 +220,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
 	/**
 	 * pathExprInner_xq_VAR
-	 * Retrieve the appropriate tree for further expansion in the following case: another_var := VAR/whatever
+	 * Retrieve the appropriate tree and node for further expansion in the following case: another_var := VAR/whatever
 	 */
 	public Void visitPathExprInner_xq_VAR(XQueryParser.PathExprInner_xq_VARContext ctx) {
 		String var_to_expand = ctx.VAR().getText();
 		lastNode = patternNodeMap.get(var_to_expand);
+		lastTreePattern = lastNode.getTreePattern();
 		
 		return null;
 	}
@@ -244,7 +258,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			tag = "mod";
 		
 		int nodeCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode node = new PatternNode("", tag, nodeCode, "", "");
+		PatternNode node = new PatternNode("", tag, nodeCode, "", "", lastTreePattern);
 		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
 		lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
 		lastNode.removeMatchingVariables(lastVarLeftSide);
@@ -253,7 +267,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			lastNode.setStoresValue(false);
 		if(lastNode.checkAnyMatchingVariableStoresContent() == false)
 			lastNode.setStoresContent(false);
-		Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content);
+		Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, node);
 		node.addMatchingVariables(newVar);
 		node.setStoresContent(true);
 		if(nextNodeIsAttribute) {
@@ -289,7 +303,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		else {
 			//lastVarLeftSide does not exist in lastNode.matchingVariables
-			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Value);
+			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Value, lastNode);
 			lastNode.addMatchingVariables(newVar);
 			lastNode.setStoresValue(true);
 			patternNodeMap.put(lastVarLeftSide, lastNode);
@@ -300,17 +314,18 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	
 	/**
 	 * returnStat
-	 * Builds varsPos before parsing on. After that "manually" visits the rules within the return (using custom methods that don't override those in XQueryBaseListener)
-	 * and builds the data structures needed by XMLConstruct
+	 * Builds varsPos before parsing on. After that it visits the rules within the return
+	 * and builds the data structures needed by XMLConstruct.
 	 * 
 	 * Terminates the program when an attribute is used as an XML value in the input query
 	 * i.e.: <item>@attrib</item> rather than <item attrib="@attrib"></item>
 	 */
 	public Void visitReturnStat(XQueryParser.ReturnStatContext ctx) {
 		insideReturn = true;
-		System.out.println("patternNodeMap: "+patternNodeMap);
-		//go through the whole tree annotating vars and their position in the tree
-		varsPos = XQueryProcessorUtils.buildVarsPos(treePattern);
+		//go through all pattern trees annotating vars and their overall positions
+		for(int i = 0; i < treePatterns.size(); i++) {
+			XQueryProcessorUtils.buildVarsPos(varsPos, treePatterns.get(i), varsPos.size());
+		}
 		System.out.println("varsPos: "+XQueryProcessorUtils.varsPosToString(varsPos));
 		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
@@ -485,8 +500,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private void storeVarAndXMLText(String var_text) {
 		//store the current piece of XML string in applyEach
 		storeXMLText();
-		//store the variable position in the tree into appyFields
-		applyFields.add(varsPos.get(var_text).positionInTree);
+		//store the variable overall position position in the trees into appyFields
+		applyFields.add(varsPos.get(var_text).positionInForest);
 	}
 
 	/**
