@@ -9,35 +9,6 @@ public class XQueryMain {
 	public static void main(String args[]) {
 		try {
 			System.out.println("Enter a valid XQuery expression followed by Enter and Ctrl+D: ");
-		
-			/*
-			//LISTENER VERSION
-			//create a CharStream that reads from standard input
-			ANTLRInputStream input = new ANTLRInputStream(System.in);
-			//create a lexer that feeds off of input CharStream
-			XQueryLexer lexer = new XQueryLexer(input);
-
-			//create a buffer of tokens pulled from the lexer
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			//create a parser that feeds off the tokens buffer
-			XQueryParser parser = new XQueryParser(tokens);
-			
-			ParseTree tree = parser.xquery();						//begin parsing at start rule
-			ParseTreeWalker walker = new ParseTreeWalker();			//create a standard walker
-			XQueryProcessor processor = new XQueryProcessor("");
-			walker.walk(processor,  tree);
-	
-			System.out.println(tree.toStringTree(parser));
-			System.out.println("PatternTree:");
-			System.out.println(processor.treePattern.toString(PrintingLevel.SIMPLIFY));
-			System.out.println("HashMap:");
-			System.out.println(processor.patternNodeMap.toString());
-			System.out.println("each:");
-			System.out.println(processor.applyEeach.toString());
-			System.out.println("fields:");
-			System.out.println(processor.applyFields.toString());
-			*/
-			
 			
 			//VISITOR VERSION
 			//create a CharStream that reads from standard input
@@ -65,6 +36,8 @@ public class XQueryMain {
 			System.out.println(loader.applyEeach.toString());
 			System.out.println("fields:");
 			System.out.println(loader.applyFields.toString());
+			System.out.println("Algebraic tree:");
+			System.out.println(XQueryUtils.algebraicTreeToString(loader.construct));
 		} catch(Exception e) {
 			System.out.println("Query malformed or not supported yet.");
 		}
@@ -98,36 +71,6 @@ public class XQueryMain {
 	public static String test_processor(String test_query) {
 		try {
 			System.out.println("XQuery: "+test_query);
-			/*
-			//LISTENER VERSION
-			//create a CharStream that reads from standard input
-			ANTLRInputStream input = new ANTLRInputStream(new java.io.ByteArrayInputStream(test_query.getBytes()));
-			//create a lexer that feeds off of input CharStream
-			XQueryLexer lexer = new XQueryLexer(input);
-			//create a buffer of tokens pulled from the lexer
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			//create a parser that feeds off the tokens buffer
-			XQueryParser parser = new XQueryParser(tokens);
-			
-			ParseTree tree = parser.xquery();						//begin parsing at start rule
-			ParseTreeWalker walker = new ParseTreeWalker();			//create a standard walker
-			XQueryProcessor processor = new XQueryProcessor("");
-			walker.walk(processor,  tree);
-	
-			StringBuilder sb = new StringBuilder();
-			sb.append("PT:");	//Pattern Tree
-			sb.append(processor.treePattern.toString(PrintingLevel.SIMPLIFY));
-			sb.append("---");
-			sb.append("HM:");	//Hash Map
-			sb.append(processor.patternNodeMap.toString());
-			sb.append("---");
-			sb.append("VP:");	//Vars Pos
-			sb.append(XQueryProcessorUtils.varsPosToString(processor.varsPos));
-			System.out.println(tree.toStringTree(parser));
-						
-			System.out.println(sb.toString());
-			return sb.toString();
-			*/
 			
 			//VISITOR VERSION
 			//create a CharStream that reads from standard input
@@ -144,6 +87,7 @@ public class XQueryMain {
 			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
 			loader.visit(tree);
 			
+			//Print out normalized results
 			StringBuilder sb = new StringBuilder();
 			for(int i = 0; i < loader.treePatterns.size(); i++) {
 				sb.append("PT"+i+":");	//Pattern Tree
@@ -157,7 +101,9 @@ public class XQueryMain {
 			sb.append("---");
 			sb.append("VP:");	//Vars Pos
 			sb.append(XQueryUtils.varsPosToString(loader.varsPos));
-			System.out.println(tree.toStringTree(parser));
+			sb.append("---");
+			sb.append("AT:");	//Algebraic Tree
+			sb.append(XQueryUtils.algebraicTreeToString(loader.construct));
 						
 			System.out.println(sb.toString());
 			return sb.toString();
