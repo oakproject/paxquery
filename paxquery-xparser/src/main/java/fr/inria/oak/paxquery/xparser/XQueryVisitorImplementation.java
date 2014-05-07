@@ -1,5 +1,6 @@
 package fr.inria.oak.paxquery.xparser;
 
+import fr.inria.oak.paxquery.algebra.operators.*;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.*;
@@ -7,14 +8,13 @@ import fr.inria.oak.paxquery.common.xml.treepattern.core.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * Operators
 	 */
-	public ArrayList<XMLScan> scans;
+	public ArrayList<BaseLogicalOperator> operatorBranches;
 	public XMLConstruct construct;
 
 	/**
@@ -49,7 +49,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
 		insideReturn = false;
-		scans = new ArrayList<XMLScan>();
+		operatorBranches = new ArrayList<BaseLogicalOperator>();
 		varsPos = new HashMap<String, Variable>();
 		applyEeach = new ArrayList<String>();
 		applyFields = new ArrayList<Integer>();
@@ -66,7 +66,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//since we can have several return clauses but just one XMLConstruct operator.
 		ApplyConstruct apply = new ApplyConstruct("", new String[]{}, "", new int[]{}, null);
 		//so far we connect the XMLConstruct object to the first of the XMLScans, this needs to be addressed
-		construct = new XMLConstruct(scans.get(0), apply, outputPath);
+		construct = new XMLConstruct(operatorBranches.get(0), apply, outputPath);
 		
 		return null;
 	}
@@ -129,7 +129,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		String pathDocuments = ctx.STRING_LITERAL().getText();
 		System.out.println("STRING_LITERAL: "+pathDocuments);
 		//add a new XMLScan object
-		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		operatorBranches.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
@@ -156,7 +156,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		String pathDocuments = ctx.STRING_LITERAL().getText();
 		System.out.println("STRING_LITERAL: "+pathDocuments);
 		//add a new XMLScan object
-		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		operatorBranches.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
