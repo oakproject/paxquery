@@ -35,7 +35,7 @@ public class Variable {
 	public Variable(String name, VariableDataType dataType, PatternNode node) {
 		this.name = name;
 		this.dataType = dataType;
-		this.node = null;
+		this.node = node;
 		this.positionInForest = -1;
 	}
 	
