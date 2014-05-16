@@ -3,19 +3,23 @@ package fr.inria.oak.paxquery.xparser;
 import fr.inria.oak.paxquery.algebra.operators.*;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
+import fr.inria.oak.paxquery.algebra.operators.binary.*;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * Operators
 	 */
-	public ArrayList<BaseLogicalOperator> operatorBranches;
-	public XMLConstruct construct;
+	public ArrayList<XMLScan> scans;			//the leaves of the algebraic operators tree
+	public XMLConstruct construct;				//the root of the algebraic operators tree
+	public BaseLogicalOperator constructChild;	//pointer to the immediate descendant of the XMLconstruct operator
 
 	/**
 	 * Data structures
@@ -36,6 +40,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean nextNodeIsAttribute;
 	private StringBuilder returnXMLTags;		//accumulates XML constant text from the return construction. This text is eventually inserted into XMLConstruct.apply.each
 	private boolean insideReturn;
+	private int whereHits;						//number of times a where statement is entered
+	private int groupByHits;					//number of times a group-by statement is entered
+	private BaseLogicalOperator lastOp = null;	//for algebraic operators tree construction
+	private BaseLogicalOperator thisOp = null;	//for algebraic operators tree construction
+	private boolean[] treePatternVisited = null;//for algebraic operators tree construction
 	
 	/**
 	 * Others
@@ -49,10 +58,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
 		insideReturn = false;
-		operatorBranches = new ArrayList<BaseLogicalOperator>();
+		scans = new ArrayList<XMLScan>();
 		varsPos = new HashMap<String, Variable>();
 		applyEeach = new ArrayList<String>();
 		applyFields = new ArrayList<Integer>();
+		whereHits = 0;
+		groupByHits = 0;
 	}
 	
 	/**
@@ -65,8 +76,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//we instantiate the XMLConstruct operator here rather than in exitReturnStat 
 		//since we can have several return clauses but just one XMLConstruct operator.
 		ApplyConstruct apply = new ApplyConstruct("", new String[]{}, "", new int[]{}, null);
-		//so far we connect the XMLConstruct object to the first of the XMLScans, this needs to be addressed
-		construct = new XMLConstruct(operatorBranches.get(0), apply, outputPath);
+		//instantiate the XMLConstruct operator and set "constructChild" as immediate descendant
+		construct = new XMLConstruct(constructChild, apply, outputPath);
 		
 		return null;
 	}
@@ -127,9 +138,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		//XMLScan operator construction
 		String pathDocuments = ctx.STRING_LITERAL().getText();
-		System.out.println("STRING_LITERAL: "+pathDocuments);
 		//add a new XMLScan object
-		operatorBranches.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
@@ -154,9 +164,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		//XMLScan operator construction
 		String pathDocuments = ctx.STRING_LITERAL().getText();
-		System.out.println("STRING_LITERAL: "+pathDocuments);
 		//add a new XMLScan object
-		operatorBranches.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
 		
 		return null;
@@ -229,6 +238,26 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		return null;
 	}
+	
+	/**
+	 * where
+	 * Increase whereHits by one.
+	 */
+	public Void visitWhere(XQueryParser.WhereContext ctx) { 
+		whereHits++;
+		return visitChildren(ctx); 
+	}
+	
+	/**
+	 * groupBy
+	 * Increase groupByHits by one.
+	 */
+	public Void visitGroupBy(XQueryParser.GroupByContext ctx) { 
+		groupByHits++;
+		return visitChildren(ctx); 
+	}
+
+
 
 	/**
 	 * abbrevForwardStep (xpath)
@@ -326,7 +355,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		for(int i = 0; i < treePatterns.size(); i++) {
 			XQueryUtils.buildVarsPos(varsPos, treePatterns.get(i), varsPos.size());
 		}
-		System.out.println("varsPos: "+XQueryUtils.varsPosToString(varsPos));
 		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
 		if(ctx.eleConst()!=null) {
@@ -342,8 +370,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		else if(ctx.aggrExpr() != null)
 			visitAggrExpr(ctx.aggrExpr());
 		//or a VAR
-		else if(ctx.getChild(1).getText().startsWith("$"))
-			storeVarAndXMLText(ctx.getChild(1).getText());					
+		else if(ctx.getChild(1).getText().startsWith("$")) {
+			storeVarAndXMLText(ctx.getChild(1).getText());	
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, varsPos, ctx.getChild(1).getText());
+			if(patternTreeIndex != -1)
+				constructChild = scans.get(patternTreeIndex);
+			else if(scans.size() > 0)
+				constructChild = scans.get(0);
+		}
 		
 		storeXMLText();		
 		insideReturn = false;
@@ -353,6 +387,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	
 	/**
 	 * visitEleConst
+	 * TODO: for the case eleConst : LT_S eaName att* CLOSE_OPENING_TAG we just plug the first XMLScan object to the XMLConstruct object. ANY BETTER SOLUTION?
 	 */
 	public Void visitEleConst(XQueryParser.EleConstContext ctx) {
 		System.out.println("Entering enterEleConst: "+ctx.getText());
@@ -371,6 +406,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		if(ctx.CLOSE_OPENING_TAG()!=null) {
 			System.out.println("Printing  /> ");
 			returnXMLTags.append(ctx.CLOSE_OPENING_TAG());	
+			//no variable inside element, simply plug the first tree pattern to the XMLConstruct object
+			if(scans.size() > 0)
+				constructChild = scans.get(0);
 		}
 		//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
 		else if(ctx.GT_S().size() > 0) {
@@ -490,6 +528,39 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			}
 			//we don't care about the commas
 		}		
+
+		//check if Cartesian Product is needed
+		int lastTreePatternVisited = -1;
+		if(ctx.VAR().size() > 0 && whereHits == 0 && groupByHits == 0) {
+			if(treePatternVisited == null)
+				treePatternVisited = new boolean[scans.size()];
+			for(int i = 0; i < ctx.VAR().size(); i++) {
+				String varName = ctx.VAR().get(i).getText();
+				//get which tree ctx.VAR().get(i) is in
+				int thisVarTreeIndex = XQueryUtils.findVarInPatternTree(scans, varsPos, varName);
+				if(thisVarTreeIndex != -1 && treePatternVisited[thisVarTreeIndex]==false) {
+					lastTreePatternVisited = thisVarTreeIndex;
+					lastOp = thisOp;
+					treePatternVisited[thisVarTreeIndex] = true;
+					thisOp = scans.get(thisVarTreeIndex);
+					
+					//instantiate a new cartesian product if needed
+					if(lastOp!=null && thisOp!=null) {
+						constructChild = new CartesianProduct(lastOp, thisOp);
+						//lastOp = null;
+						thisOp = constructChild;
+					}
+				}
+			}
+		}
+
+		//one variable in tree pattern was found, no cartesian product was built, we just plug the appropriate tree pattern to the XMLConstruct
+		if(lastOp==null && thisOp!=null && lastTreePatternVisited != -1)
+			constructChild = scans.get(lastTreePatternVisited);
+		//no variable in tree pattern was found, simply plug the first tree pattern to the XMLConstruct object as a bail out solution
+		else if(lastOp==null && thisOp == null && scans.size() > 0)
+			constructChild = scans.get(0);
+				
 		return null;
 	}	
 	

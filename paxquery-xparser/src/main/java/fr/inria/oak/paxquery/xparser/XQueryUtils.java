@@ -2,9 +2,11 @@ package fr.inria.oak.paxquery.xparser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
@@ -56,7 +58,7 @@ public class XQueryUtils {
 	 * @return posInTree
 	 */
 	private static int visitNodeInTreePattern(PatternNode node, HashMap<String, Variable> varspos, int posInTree) {
-		System.out.println("Visiting "+node.getTag());
+		//System.out.println("Visiting "+node.getTag());
 		ArrayList<Variable> matchingVariables = node.getMatchingVariables();
 
 		//save a position for the ID
@@ -152,4 +154,31 @@ public class XQueryUtils {
 		}
 		return sb.toString();
 	}	
+	
+	/**
+	 * Returns a by-value-copy of the list "source". 
+	 * Since the copy is by-value the objects in both lists are different, 
+	 * and thus manipulating one will not affect the other.
+	 * @param source the list to be copied
+	 * @return a new list with the same values as source, but different references
+	 */
+/*
+	public static <T> List<T> copyList(List<T> source) {
+	    List<T> dest = new ArrayList<T>();
+	    for (T item : source) { dest.add(item); }
+	    return dest;
+	}*/
+
+	
+	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, Variable> varsPos, String varName) {
+		Variable varObject = varsPos.get(varName);
+		for(int i = 0 ; i < scans.size(); i++) {
+			TreePattern varObjectTP = varObject.getTreePattern();
+			TreePattern scansTP = scans.get(i).getNavigationTreePattern();
+			if(varObject.getTreePattern() == scans.get(i).getNavigationTreePattern())
+				return i;
+		}
+		return -1;
+	}
+	
 }

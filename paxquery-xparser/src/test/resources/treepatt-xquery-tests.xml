@@ -121,4 +121,132 @@
 			<value>let $ic := collection("XMarkDocs/XMarkClosedAuctions/file0.xml")/site/closed_auctions/closed_auction let $nums := $ic/seller let $d := $ic/date let $an := $ic/annotation return &lt;item num_sellers="{count($nums)}">{count($d),$an}&lt;/item></value>
 			<output>PT0:/site/closed_auctions/closed_auctionC(/sellerC /dateC /annotationC)---HM:{$d=dateC,$an=annotationC,$ic=closed_auctionC,$nums=sellerC}---VP:{$dC=2,$anC=3,$icC=0,$numsC=1}---AT:XMLConstruct(XMLCollectionNav("XMarkDocs/XMarkClosedAuctions/file0.xml"/*)) -> XMLCollectionNav("XMarkDocs/XMarkClosedAuctions/file0.xml"/*)</output>
 		</test>
+		<!--
+		CARTESSIAN PRODUCT TESTS BELOW
+		-->
+				<test>
+			<value>let $ic1:=collection('items1')/auctions/auction, $ic2:=collection('items2')/persons/person return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions/auctionC,PT1:/persons/personC---HM:{$ic1=auctionC,$ic2=personC}---VP:{$ic1C=0,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')//auctions//auction, $ic2:=collection('items2')//persons//person return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0://auctions//auctionC,PT1://persons//personC---HM:{$ic1=auctionC,$ic2=personC}---VP:{$ic1C=0,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')/auctions/auction/text(), $ic2:=collection('items2')/persons/person return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions/auctionV,PT1:/persons/personC---HM:{$ic1=auctionV,$ic2=personC}---VP:{$ic1V=0,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')/auctions/auction, $ic2:=collection('items2')/persons/person let $i1:=$ic1/buyer return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions/auctionC/buyerC,PT1:/persons/personC---HM:{$ic1=auctionC,$ic2=personC,$i1=buyerC}---VP:{$ic1C=0,$ic2C=2,$i1C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')/auctions/auction, $ic2:=collection('items2')/persons/person let $i1:=$ic1/text() return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions/auctionCV,PT1:/persons/personC---HM:{$ic1=auctionCV,$ic2=personC,$i1=auctionCV}---VP:{$ic1C=1,$ic2C=2,$i1V=0}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')/auctions//auction, $ic2:=collection('items2')//persons/person let $i1:=$ic1//buyer return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions//auctionC//buyerC,PT1://persons/personC---HM:{$ic1=auctionC,$ic2=personC,$i1=buyerC}---VP:{$ic1C=0,$ic2C=2,$i1C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1:=collection('items1')/auctions/auction, $ic2:=collection('items2')/persons/person let $i1:=$ic1/buyer/@id return &lt;res>{$ic1,$ic2}&lt;/res></value>
+			<output>PT0:/auctions/auctionC/buyer/@idV,PT1:/persons/personC---HM:{$ic1=auctionC,$ic2=personC,$i1=@idV}---VP:{$ic1C=0,$ic2C=2,$i1V=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav
+			('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic1, $ic3}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic3, $ic1}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic2,$ic3}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*))) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic2, $ic3}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*))) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') return &lt;res>{$ic1, $ic2, $ic3}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') return &lt;res>{$ic2, $ic3, $ic1}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)),XMLCollectionNav('items1'/*))) -> CartProd(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)),XMLCollectionNav('items1'/*)) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') return &lt;res>{$ic3, $ic1, $ic2}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*))) -> CartProd(CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*)) -> CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items3'/*)XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') let $ic4 := doc('items4') return &lt;res>{$ic1, $ic2, $ic3, $ic4}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:,PT3:---HM:{$ic1=,$ic3=,$ic2=,$ic4=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1,$ic4C=3}---AT:XMLConstruct(CartProd(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)),XMLCollectionNav('items4'/*))) -> CartProd(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)),XMLCollectionNav('items4'/*)) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)XMLCollectionNav('items4'/*)</output>
+		</test>
+				<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') let $ic4 := doc('items4') return &lt;res>{$ic2, $ic3, $ic4, $ic1}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:,PT3:---HM:{$ic1=,$ic3=,$ic2=,$ic4=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1,$ic4C=3}---AT:XMLConstruct(CartProd(CartProd(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)),XMLCollectionNav('items4'/*)),XMLCollectionNav('items1'/*))) -> CartProd(CartProd(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)),XMLCollectionNav('items4'/*)),XMLCollectionNav('items1'/*)) -> CartProd(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)),XMLCollectionNav('items4'/*)) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)XMLCollectionNav('items4'/*)XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') let $ic4 := doc('items4') return &lt;res>{$ic3, $ic4, $ic1, $ic2}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:,PT3:---HM:{$ic1=,$ic3=,$ic2=,$ic4=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1,$ic4C=3}---AT:XMLConstruct(CartProd(CartProd(CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items4'/*)),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*))) -> CartProd(CartProd(CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items4'/*)),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*)) -> CartProd(CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items4'/*)),XMLCollectionNav('items1'/*)) -> CartProd(XMLCollectionNav('items3'/*),XMLCollectionNav('items4'/*)) -> XMLCollectionNav('items3'/*)XMLCollectionNav('items4'/*)XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := doc('items2') let $ic3 := collection('items3') let $ic4 := doc('items4') return &lt;res>{$ic4, $ic1, $ic2, $ic3}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:,PT3:---HM:{$ic1=,$ic3=,$ic2=,$ic4=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1,$ic4C=3}---AT:XMLConstruct(CartProd(CartProd(CartProd(XMLCollectionNav('items4'/*),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(CartProd(XMLCollectionNav('items4'/*),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(CartProd(XMLCollectionNav('items4'/*),XMLCollectionNav('items1'/*)),XMLCollectionNav('items2'/*)) -> CartProd(XMLCollectionNav('items4'/*),XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items4'/*)XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic1, $ic2, $ic3}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic2, $ic3, $ic1}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*))) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items1'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items1'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res>{$ic1, $ic3, $ic2}&lt;/res></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') return &lt;res at="{$ic1}">{$ic1, $ic2}&lt;/res></value>
+			<output>PT0:,PT1:---HM:{$ic1=,$ic2=}---VP:{$ic1C=0,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := collection('items3') return &lt;res at="{$ic1}">{$ic2, $ic3}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*))) -> CartProd(XMLCollectionNav('items2'/*),XMLCollectionNav('items3'/*)) -> XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') return &lt;res1>{$ic1}&lt;res2>{$ic2}&lt;/res2>&lt;/res1></value>
+			<output>PT0:,PT1:---HM:{$ic1=,$ic2=}---VP:{$ic1C=0,$ic2C=1}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := collection('items3') return &lt;res>{$ic1,$ic2,$ic3}&lt;/res></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := collection('items3') return &lt;res1>{$ic1}&lt;res2>{$ic2}&lt;res3>{$ic3}&lt;/res3>&lt;/res2>&lt;/res1></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := collection('items3') return &lt;res1>{$ic1,$ic2}&lt;res2>{$ic3}&lt;/res2>&lt;/res1></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := collection('items3') return &lt;res1>{$ic1}&lt;res2>{$ic2,$ic3}&lt;/res2>&lt;/res1></value>
+			<output>PT0:,PT1:,PT2:---HM:{$ic1=,$ic3=,$ic2=}---VP:{$ic1C=0,$ic3C=2,$ic2C=1}---AT:XMLConstruct(CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*))) -> CartProd(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)),XMLCollectionNav('items3'/*)) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)XMLCollectionNav('items3'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res1>{$ic1,$ic2}&lt;res2>{$ic3}&lt;/res2>&lt;/res1></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var return &lt;res1>{$ic1,$ic3}&lt;res2>{$ic2}&lt;/res2>&lt;/res1></value>
+			<output>PT0:/varC,PT1:---HM:{$ic1=,$ic3=varC,$ic2=}---VP:{$ic1C=0,$ic3C=1,$ic2C=2}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
+		<test>
+			<value>let $ic1 := collection('items1') let $ic2 := collection('items2') let $ic3 := $ic1/var let $ic4 := $ic2/item return &lt;res1 at1="{$ic4}">{$ic1,$ic3}&lt;res2 at2="$ic4">{$ic2}&lt;/res2>&lt;/res1></value>
+			<output>PT0:/varC,PT1:/itemC---HM:{$ic1=,$ic3=varC,$ic2=,$ic4=itemC}---VP:{$ic1C=0,$ic3C=1,$ic2C=2,$ic4C=3}---AT:XMLConstruct(CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*))) -> CartProd(XMLCollectionNav('items1'/*),XMLCollectionNav('items2'/*)) -> XMLCollectionNav('items1'/*)XMLCollectionNav('items2'/*)</output>
+		</test>
 </tests>

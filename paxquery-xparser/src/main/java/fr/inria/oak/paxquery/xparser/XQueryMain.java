@@ -70,7 +70,7 @@ public class XQueryMain {
 	
 	public static String test_processor(String test_query) {
 		try {
-			System.out.println("XQuery: "+test_query);
+			//System.out.println("XQuery: "+test_query);
 			
 			//VISITOR VERSION
 			//create a CharStream that reads from standard input
@@ -86,6 +86,9 @@ public class XQueryMain {
 			ParseTree tree = parser.xquery();
 			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
 			loader.visit(tree);
+			
+			System.out.println("applyEach: "+loader.applyEeach);
+			System.out.println("applyFields: "+loader.applyFields);
 			
 			//Print out normalized results
 			StringBuilder sb = new StringBuilder();
