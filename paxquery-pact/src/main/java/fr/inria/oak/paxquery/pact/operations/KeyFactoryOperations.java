@@ -26,7 +26,7 @@ import eu.stratosphere.types.Key;
  *
  */
 public class KeyFactoryOperations {
-	
+	/*
 	public static void addKey(ReduceOperator.Builder builder, Class<? extends Key> keyClass, int keyIndex) {
 		builder.keyField(keyClass, keyIndex);
 	}
@@ -38,5 +38,17 @@ public class KeyFactoryOperations {
 	public static void addKey(JoinOperator.Builder builder, Class<? extends Key> keyClass, int keyIndex1, int keyIndex2) {
 		builder.keyField(keyClass, keyIndex1, keyIndex2);
 	}
+	*/
 	
+	public static void addKey(ReduceOperator.Builder builder, Class<? extends Key<?>> keyClass, int keyIndex) {
+		builder.keyField(keyClass, keyIndex);
+	}
+
+	public static void addKey(CoGroupOperator.Builder builder, Class<? extends Key<?>> keyClass, int keyIndex1, int keyIndex2) {
+		builder.keyField(keyClass, keyIndex1, keyIndex2);
+	}
+
+	public static void addKey(JoinOperator.Builder builder, Class<? extends Key<?>> keyClass, int keyIndex1, int keyIndex2) {
+		builder.keyField(keyClass, keyIndex1, keyIndex2);
+	}	
 }

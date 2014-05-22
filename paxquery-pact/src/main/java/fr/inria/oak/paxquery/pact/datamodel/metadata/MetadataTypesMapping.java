@@ -33,6 +33,7 @@ import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
  */
 public class MetadataTypesMapping {
 	
+	/*
 	public static Class<? extends Key> getKeyClass(MetadataTypes metadataTypes) {
 		switch(metadataTypes) {
 			case STRUCTURAL_ID:
@@ -57,6 +58,32 @@ public class MetadataTypesMapping {
 				return null;
 		}
 	}
+	*/
+	public static Class<? extends Key<?>> getKeyClass(MetadataTypes metadataTypes) {
+		switch(metadataTypes) {
+			case STRUCTURAL_ID:
+				return StringValue.class;
+			case ORDERED_ID:
+				return StringValue.class;
+			case UPDATE_ID:
+				return StringValue.class;
+			case NULL_ID:
+				return NullValue.class;
+			case TUPLE_TYPE:
+				return null;
+			case STRING_TYPE:
+				return StringValue.class;
+			case INTEGER_TYPE:
+				return IntValue.class;
+			case LONG_TYPE:
+				return LongValue.class;
+			case DOUBLE_TYPE:
+				return DoubleValue.class;
+			default:
+				return null;
+		}
+	}
+
 	
 	/**
 	 * @param keyColumns

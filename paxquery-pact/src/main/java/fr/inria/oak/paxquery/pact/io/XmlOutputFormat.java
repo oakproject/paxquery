@@ -68,9 +68,18 @@ public class XmlOutputFormat extends FileOutputFormat {
 		this.apply = apply;
 	}
 	
+	/*
 	@Override
 	public void open(int taskNumber) throws IOException {
 		super.open(taskNumber);
+				
+		this.wrt = new OutputStreamWriter(new BufferedOutputStream(this.stream, 4096));
+		this.wrt.write(this.apply.getBefore());
+	}
+	*/
+	@Override
+	public void open(int taskNumber, int numTasks) throws IOException {
+		super.open(taskNumber, numTasks);
 				
 		this.wrt = new OutputStreamWriter(new BufferedOutputStream(this.stream, 4096));
 		this.wrt.write(this.apply.getBefore());

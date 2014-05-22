@@ -119,6 +119,7 @@ public class XmlNavInputFormat extends FileInputFormat {
 				this.streamReader);
 	}
 
+	/*
 	@Override
 	public boolean nextRecord(Record record) throws IOException {
     	if(this.pactRecordsIterator!=null) {
@@ -173,7 +174,65 @@ public class XmlNavInputFormat extends FileInputFormat {
 			return false;
 		}
 	}
-	
+	 */
+	@Override
+	public Record nextRecord(Record record) throws IOException {
+    	if(this.pactRecordsIterator!=null) {
+    		if(this.pactRecordsIterator.hasNext()) {
+    			if(this.attachDocumentID) {
+    				record.addField(new StringValue(this.documentID));
+    				RecordOperations.concatenate(record,this.pactRecordsIterator.next());
+    			}
+    			else
+    				this.pactRecordsIterator.next().copyTo(record);
+    			
+    			//return true;
+    			return record;
+    		}
+
+    		this.pactRecordsIterator = null;
+    		this.extractor.getRecords().clear();
+    	}
+		
+		try {
+			while(this.streamReader.hasNext()) {
+			    this.streamReader.next();
+			    if(this.streamReader.getEventType() == XMLStreamConstants.START_ELEMENT) {			    	
+			    	this.extractor.startElement();
+			    }
+			    else if(this.streamReader.getEventType() == XMLStreamConstants.END_ELEMENT) {
+			    	this.extractor.endElement();
+			    }
+			    else if(this.streamReader.getEventType() == XMLStreamConstants.CHARACTERS) {
+			    	this.extractor.characters();
+			    }
+			    else if(this.streamReader.getEventType() == XMLStreamConstants.END_DOCUMENT) {
+			    	this.reachedEnd = true;
+			    }
+			    			    
+		    	if(this.extractor.getRecords().size() != 0) {
+		    		this.pactRecordsIterator = this.extractor.getRecords().iterator();
+	    			if(this.attachDocumentID) {
+	    				record.addField(new StringValue(this.documentID));
+	    				RecordOperations.concatenate(record,this.pactRecordsIterator.next());
+	    			}
+	    			else
+	    				this.pactRecordsIterator.next().copyTo(record);
+
+		    		//return true;
+	    			return record;
+		    	}
+
+			}
+						
+			//return false;
+			return null;
+		} catch (XMLStreamException e) {
+			logger.error("XMLStreamException", e);
+			//return false;
+			return null;
+		}
+	}
 	
 	
 	// ============================================================================================
