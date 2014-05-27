@@ -38,10 +38,16 @@ public class XMLConstruct extends BaseUnaryOperator {
 		this.ownName = "XMLConstruct";
 		this.apply = apply;
 		this.outputPath = outputPath;
-		this.nestedMetadata = this.getChild().getNRSMD();
 		this.visible = true;
 	}
 
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = this.getChild().getNRSMD();
+	}
+	
 	public String getOutputPath() {
 		return this.outputPath;
 	}
@@ -49,5 +55,4 @@ public class XMLConstruct extends BaseUnaryOperator {
 	public ApplyConstruct getApply() {
 		return this.apply;
 	}
-	
 }

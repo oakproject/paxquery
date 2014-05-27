@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
+import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 
 
@@ -91,7 +93,14 @@ public abstract class BaseJoinOperator extends BaseBinaryOperator {
 		}
 		return childNumber2;
 	}
-
+	
+	@Override
+	public void buildNRSMD() {
+		if(this.children != null && this.children.size() >= 2)
+			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.children.get(0).getNRSMD(), this.children.get(1).getNRSMD());
+		else
+			throw new PAXQueryExecutionException("Cannot build metadata for join operator.");
+	}
 
 	@Override
 	public void recDisplayNRSMD() {

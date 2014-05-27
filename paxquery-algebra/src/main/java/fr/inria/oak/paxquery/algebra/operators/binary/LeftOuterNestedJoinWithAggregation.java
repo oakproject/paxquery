@@ -48,7 +48,11 @@ public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 		this.aggregationType = aggregationType;
 		
 		this.excludeNestedField = excludeNestedField;
-		
+	}
+
+	@Override
+	public void buildNRSMD() {
+		super.buildNRSMD();
 		if(this.excludeNestedField) {
 			int[] keepColumns = new int[this.nestedMetadata.colNo-1];
 			for(int i=0; i<this.nestedMetadata.colNo-1; i++) 
@@ -61,6 +65,7 @@ public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 		NestedMetadata aggregationColumnNRSMD = new NestedMetadata(1,attScanMeta);
 		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.nestedMetadata, aggregationColumnNRSMD);
 	}
+
 	
 	public int getAggregationColumn() {
 		return this.aggregationColumn;

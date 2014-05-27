@@ -16,6 +16,7 @@
 package fr.inria.oak.paxquery.algebra.operators.unary;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 
@@ -35,7 +36,13 @@ public class Selection extends BaseUnaryOperator {
 		this.visible = true;
 		this.ownName = "Select";
 		this.ownDetails = pred.toString();
-		this.nestedMetadata = child.getNRSMD();
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = children.get(0).getNRSMD();
 	}
 	
 	public BasePredicate getPred() {

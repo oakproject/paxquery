@@ -33,71 +33,39 @@ public class XMLScan extends BaseLeafOperator {
 	
 	private static int i = 0;
 	
-	private final String pathDocuments;
+	private String pathDocuments;
 	
-	private final String[] documentNames;
+	private String[] documentNames;
 	
-	private final TreePattern navigationTreePattern;
+	private TreePattern navigationTreePattern;
 	
 	private final boolean attachDocumentID;
 	
 	
 	public XMLScan(boolean attachDocumentID, String pathDocuments) throws PAXQueryExecutionException {
 		this.ownName = "XMLCollectionParse";
-		this.pathDocuments = pathDocuments;
-		this.documentNames = null;
-		this.navigationTreePattern = null;
 		this.attachDocumentID = attachDocumentID;
-		if(this.attachDocumentID)
-			this.nestedMetadata = new NestedMetadata(2, new MetadataTypes[]{MetadataTypes.STRING_TYPE, MetadataTypes.STRING_TYPE});
-		else
-			this.nestedMetadata = new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE});
+		this.pathDocuments = pathDocuments;
 		this.visible = true;
+	}
+	
+	public XMLScan(boolean attachDocumentID, String pathDocuments, String... documentNames) {
+		this(attachDocumentID, pathDocuments);
+		this.documentNames = documentNames;
 	}
 	
 	public XMLScan(boolean attachDocumentID, TreePattern navigationTreePattern, String pathDocuments) {
 		this.ownName = "XMLCollectionNav";
 		this.ownDetails = navigationTreePattern.getName();
-		this.pathDocuments = pathDocuments;
-		this.documentNames = null;
+		this.attachDocumentID = attachDocumentID;
 		this.navigationTreePattern = navigationTreePattern;
-		this.attachDocumentID = attachDocumentID;
-		if(this.attachDocumentID)
-			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(
-					new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE}),
-					NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
-		else
-			this.nestedMetadata = NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>());
-		this.visible = true;
-	}
-	
-	public XMLScan(boolean attachDocumentID, String pathDocuments, String... documentNames) {
-		this.ownName = "XMLCollectionParse";
 		this.pathDocuments = pathDocuments;
-		this.documentNames = documentNames;
-		this.navigationTreePattern = null;
-		this.attachDocumentID = attachDocumentID;
-		if(this.attachDocumentID)
-			this.nestedMetadata = new NestedMetadata(2, new MetadataTypes[]{MetadataTypes.STRING_TYPE, MetadataTypes.STRING_TYPE});
-		else
-			this.nestedMetadata = new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE});
 		this.visible = true;
 	}
 	
 	public XMLScan(boolean attachDocumentID, TreePattern navigationTreePattern, String pathDocuments, String... documentNames) {
-		this.ownName = "XMLCollectionNav";
-		this.ownDetails = navigationTreePattern.getName();
-		this.pathDocuments = pathDocuments;
+		this(attachDocumentID, navigationTreePattern, pathDocuments);
 		this.documentNames = documentNames;
-		this.navigationTreePattern = navigationTreePattern;
-		this.attachDocumentID = attachDocumentID;
-		if(this.attachDocumentID)
-			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(
-					new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE}),
-					NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
-		else
-			this.nestedMetadata = NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>());
-		this.visible = true;
 	}
 	
 	public String getPathDocuments() {
@@ -179,6 +147,24 @@ public class XMLScan extends BaseLeafOperator {
 		}
 		
 		return firstAvailableNo;
+	}
+
+	@Override
+	public void buildNRSMD() {
+		if(this.navigationTreePattern == null) {
+			if(this.attachDocumentID)
+				this.nestedMetadata = new NestedMetadata(2, new MetadataTypes[]{MetadataTypes.STRING_TYPE, MetadataTypes.STRING_TYPE});
+			else
+				this.nestedMetadata = new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE});
+		}
+		else {
+			if(this.attachDocumentID)
+				this.nestedMetadata = NestedMetadataUtils.appendNRSMD(
+						new NestedMetadata(1, new MetadataTypes[]{MetadataTypes.STRING_TYPE}),
+						NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
+			else
+				this.nestedMetadata = NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>());
+		}
 	}
 
 }

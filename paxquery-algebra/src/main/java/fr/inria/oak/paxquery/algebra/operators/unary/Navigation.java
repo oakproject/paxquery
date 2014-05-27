@@ -46,8 +46,6 @@ public class Navigation extends BaseUnaryOperator {
 		
 		this.navigationTreePattern = navigationTreePattern;
 		this.pos = pos;
-		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.getChild().getNRSMD(),
-				NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
 		this.ownName = "Navigation";
 		StringBuffer sb = new StringBuffer();
 		sb.append("[");
@@ -55,5 +53,13 @@ public class Navigation extends BaseUnaryOperator {
 		sb.append("]");
 		this.ownDetails = new String(sb);
 		this.visible = true;
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.getChild().getNRSMD(),
+				NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
 	}
 }

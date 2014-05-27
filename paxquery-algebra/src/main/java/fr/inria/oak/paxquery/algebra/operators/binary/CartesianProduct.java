@@ -35,8 +35,12 @@ public class CartesianProduct extends BaseBinaryOperator {
 	public CartesianProduct(BaseLogicalOperator left, BaseLogicalOperator right) throws PAXQueryExecutionException{
 		super(left,right);
 		this.ownName = "CartProd";
-		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(left.getNRSMD(), right.getNRSMD());
 		this.visible = true;
+	}
+	
+	public void buildNRSMD() {
+		if(this.children != null && this.children.size() >= 2)
+			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.children.get(0).getNRSMD(), this.children.get(1).getNRSMD());
 	}
 	
 }

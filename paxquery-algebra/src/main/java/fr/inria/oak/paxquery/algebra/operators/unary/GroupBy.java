@@ -65,11 +65,16 @@ public class GroupBy extends BaseUnaryOperator {
 		}
 		sb.append("]");
 		this.ownDetails = new String(sb);
-		
-		//Then we keep only the columns that are useful at the highest level (the group-by columns,
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		//We keep only the columns that are useful at the highest level (the group-by columns,
 		//the aggregation columns and the nested column)
-		final NestedMetadata groupByNRSMD = NestedMetadataUtils.makeProjectRSMD(child.getNRSMD(), this.groupByColumns);
-		final NestedMetadata nestedNRSMD = NestedMetadataUtils.makeProjectRSMD(child.getNRSMD(), this.nestColumns);
+		final NestedMetadata groupByNRSMD = NestedMetadataUtils.makeProjectRSMD(children.get(0).getNRSMD(), this.groupByColumns);
+		final NestedMetadata nestedNRSMD = NestedMetadataUtils.makeProjectRSMD(children.get(0).getNRSMD(), this.nestColumns);
 		
 		this.nestedMetadata = NestedMetadataUtils.addNestedField(groupByNRSMD, nestedNRSMD);
 	}

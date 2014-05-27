@@ -101,11 +101,18 @@ public abstract class BaseLogicalOperator {
 	}
 
 	public NestedMetadata getNRSMD() {
+		if(this.nestedMetadata == null)
+			buildNRSMD();
+				
 		return this.nestedMetadata;
 	}
-
-	public void setNRSMD(NestedMetadata nestedMetadata) {
-		this.nestedMetadata = nestedMetadata;
+	
+	public abstract void buildNRSMD();
+		
+	public void resetNRSMD() {
+		for(BaseLogicalOperator child : children)
+			child.resetNRSMD();
+		nestedMetadata = null;
 	}
 
 	public ArrayList<BaseLogicalOperator> getChildren() {

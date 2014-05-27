@@ -40,9 +40,6 @@ public class LeftOuterNestedJoin extends BaseJoinOperator {
 		this.ownName = "LeftOuterNestedJoin";
 		this.documentIDColumn = documentIDColumn;
 		this.nodeIDColumn = nodeIDColumn;
-		
-		//We add the nested field and the aggregation fields		
-		this.nestedMetadata = NestedMetadataUtils.addNestedField(left.getNRSMD(), right.getNRSMD());	
 	}
 	
 	public int getDocumentIDColumn() {

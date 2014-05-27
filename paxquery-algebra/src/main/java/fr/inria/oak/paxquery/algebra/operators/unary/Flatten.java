@@ -36,7 +36,6 @@ public class Flatten extends BaseUnaryOperator {
 		super(child);
 
 		this.unnestPath = calculateCompleteUnnestPath(child.getNRSMD());
-		this.nestedMetadata = NestedMetadataUtils.unnestField(child.getNRSMD(), this.unnestPath);
 		this.visible = true;
 		this.ownName = "Flatten";
 
@@ -47,7 +46,6 @@ public class Flatten extends BaseUnaryOperator {
 		super(child);
 
 		this.unnestPath = unnestPath;
-		this.nestedMetadata = NestedMetadataUtils.unnestField(child.getNRSMD(), this.unnestPath);
 		this.visible = true;
 		this.ownName = "Flatten";
 		
@@ -68,7 +66,6 @@ public class Flatten extends BaseUnaryOperator {
 		super(child);
 		
 		this.unnestPath = new int[]{column};
-		this.nestedMetadata = NestedMetadataUtils.unnestField(child.getNRSMD(), column);
 		this.visible = true;
 		this.ownName = "Flatten";
 		this.ownDetails = "" + column + "";
@@ -80,6 +77,13 @@ public class Flatten extends BaseUnaryOperator {
 				iMask ++;
 			}
 		}
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = NestedMetadataUtils.unnestField(children.get(0).getNRSMD(), this.unnestPath);
 	}
 
 	public int[] getUnnestPath() {

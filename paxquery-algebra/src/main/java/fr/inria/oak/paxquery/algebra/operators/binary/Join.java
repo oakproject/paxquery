@@ -30,7 +30,5 @@ public class Join extends BaseJoinOperator {
 		super(left,right,pred);
 		this.ownName = "Join";
 		this.visible = true;
-		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(left.getNRSMD(), right.getNRSMD());
 	}
-	
 }

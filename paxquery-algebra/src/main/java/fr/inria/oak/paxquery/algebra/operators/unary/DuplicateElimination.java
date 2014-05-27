@@ -44,7 +44,12 @@ public class DuplicateElimination extends BaseUnaryOperator {
 		this.ownDetails = new String(sb);
 		this.columns = columns;
 		this.visible = true;
-		this.nestedMetadata = child.getNRSMD();
 	}
 	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = this.getChild().getNRSMD();
+	}
 }

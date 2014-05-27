@@ -33,13 +33,13 @@ public class Aggregation extends BaseUnaryOperator {
 	
 	private static final Log logger = LogFactory.getLog(Aggregation.class);
 	
-	private final int[] aggregationPath;
+	private int[] aggregationPath;
 	
-	private final AggregationType aggregationType;
+	private AggregationType aggregationType;
 	
-	private final boolean excludeNestedField;
+	private boolean excludeNestedField;
 	
-	private final int documentIDColumn;
+	private int documentIDColumn;
 	
 
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType) {
@@ -49,27 +49,6 @@ public class Aggregation extends BaseUnaryOperator {
 		this.aggregationType = aggregationType;
 		this.documentIDColumn = -1;
 		this.excludeNestedField = false;
-		
-		MetadataTypes[] attScanMeta = new MetadataTypes[1];
-		attScanMeta[0] = MetadataTypes.STRING_TYPE;
-		NestedMetadata aggregationColumnNRSMD = new NestedMetadata(1,attScanMeta);
-		if(aggregationPath.length > 1) {
-			final int length = aggregationPath.length - 2;
-			if(length != 0) {
-				int[] pathExceptLasts = new int[length];
-				System.arraycopy(aggregationPath, 0, pathExceptLasts, 0, length);
-				NestedMetadata newNestedNRSMD = NestedMetadataUtils.appendNRSMD(child.getNRSMD().getNestedChild(pathExceptLasts), aggregationColumnNRSMD);
-				this.nestedMetadata = NestedMetadataUtils.addNestedField(child.getNRSMD(), pathExceptLasts, newNestedNRSMD);
-			}
-			else
-				this.nestedMetadata = NestedMetadataUtils.appendNRSMD(child.getNRSMD(), aggregationColumnNRSMD);
-		}
-		else {
-			NestedMetadata emptyNRSMD = NestedMetadataUtils.emptyNRSMD();
-			NestedMetadata nestedNRSMD = NestedMetadataUtils.addNestedField(emptyNRSMD, child.getNRSMD());
-			
-			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(nestedNRSMD, aggregationColumnNRSMD);
-		}
 		
 		this.visible = true;
 		this.ownName = "Aggregation";
@@ -88,12 +67,15 @@ public class Aggregation extends BaseUnaryOperator {
 	
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType,
 			int documentIDColumn, boolean excludeNestedField) {
-		super(child);
+		this(child, aggregationPath, aggregationType);
 
-		this.aggregationPath = aggregationPath;
-		this.aggregationType = aggregationType;
 		this.documentIDColumn = documentIDColumn;
 		this.excludeNestedField = excludeNestedField;
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		BaseLogicalOperator child = children.get(0);
 		
 		MetadataTypes[] attScanMeta = new MetadataTypes[1];
 		attScanMeta[0] = MetadataTypes.STRING_TYPE;
@@ -118,20 +100,6 @@ public class Aggregation extends BaseUnaryOperator {
 			else
 				this.nestedMetadata = NestedMetadataUtils.appendNRSMD(emptyNRSMD, aggregationColumnNRSMD);
 		}
-		
-		this.visible = true;
-		this.ownName = "Aggregation";
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		for (int i = 0; i < this.aggregationPath.length; i ++){
-			sb.append(this.aggregationPath[i]);
-			if (i < this.aggregationPath.length - 1){
-				sb.append(".");
-			}
-		}
-		sb.append("]");
-		this.ownDetails = new String(sb);
 	}
 	
 	

@@ -37,11 +37,10 @@ public class LeftOuterJoin extends BaseJoinOperator {
 		super(left,right,pred);
 		this.ownName = "LeftOuterJoin";
 		this.visible = true;
-		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(left.getNRSMD(), right.getNRSMD());
 		this.documentIDColumn = documentIDColumn;
 		this.nodeIDColumn = nodeIDColumn;
 	}
-
+	
 	public int getDocumentIDColumn() {
 		return this.documentIDColumn;
 	}

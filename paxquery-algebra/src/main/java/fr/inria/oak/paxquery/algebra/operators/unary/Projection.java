@@ -15,6 +15,9 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.algebra.operators.unary;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
@@ -45,7 +48,13 @@ public class Projection extends BaseUnaryOperator {
 		this.ownDetails = new String(sb);
 		this.columns = columns;
 		this.visible = true;
-		this.nestedMetadata = NestedMetadataUtils.makeProjectRSMD(child.getNRSMD(), columns);
+	}
+	
+	@Override
+	public void buildNRSMD() {
+		for(BaseLogicalOperator op : children)
+			op.buildNRSMD();
+		this.nestedMetadata = NestedMetadataUtils.makeProjectRSMD(children.get(0).getNRSMD(), columns);
 	}
 
 }
