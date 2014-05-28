@@ -33,7 +33,7 @@ public class XQueryMain {
 			System.out.println("HashMap:");
 			System.out.println(loader.patternNodeMap.toString());
 			System.out.println("each:");
-			System.out.println(loader.applyEeach.toString());
+			System.out.println(loader.applyEach.toString());
 			System.out.println("fields:");
 			System.out.println(loader.applyFields.toString());
 			System.out.println("Algebraic tree:");
@@ -87,7 +87,7 @@ public class XQueryMain {
 			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
 			loader.visit(tree);
 			
-			System.out.println("applyEach: "+loader.applyEeach);
+			System.out.println("applyEach: "+loader.applyEach);
 			System.out.println("applyFields: "+loader.applyFields);
 			
 			//Print out normalized results

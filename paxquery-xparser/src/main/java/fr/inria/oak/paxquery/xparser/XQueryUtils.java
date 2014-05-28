@@ -20,12 +20,6 @@ public class XQueryUtils {
 	 * @param varspos the data structure to populate
 	 * @param startingPosInTree an initial offset for the position of variables
 	 */
-/*	public static HashMap<String, Variable> buildVarsPos(TreePattern treePattern) {
-		HashMap<String, Variable> varspos = new HashMap<String, Variable>();
-		traverseTreePatternDFS(treePattern.getRoot(), varspos, 0);
-		
-		return varspos;
-	}*/	
 	public static void buildVarsPos(HashMap<String, Variable> varspos, TreePattern treePattern, int startingPosInTree) {
 		//HashMap<String, Variable> varspos = new HashMap<String, Variable>();
 		traverseTreePatternDFS(treePattern.getRoot(), varspos, startingPosInTree);		
@@ -58,7 +52,6 @@ public class XQueryUtils {
 	 * @return posInTree
 	 */
 	private static int visitNodeInTreePattern(PatternNode node, HashMap<String, Variable> varspos, int posInTree) {
-		//System.out.println("Visiting "+node.getTag());
 		ArrayList<Variable> matchingVariables = node.getMatchingVariables();
 
 		//save a position for the ID
@@ -149,36 +142,25 @@ public class XQueryUtils {
 		if(root.getChildren() != null) {
 			sb.append(" -> ");
 			for(BaseLogicalOperator child : root.getChildren())
-				//sb.append(visitNodeInAlgebraicTree(child));
 				sb.append(traverseAlgebraicOperatorsTree(child));
 		}
 		return sb.toString();
 	}	
-	
-	/**
-	 * Returns a by-value-copy of the list "source". 
-	 * Since the copy is by-value the objects in both lists are different, 
-	 * and thus manipulating one will not affect the other.
-	 * @param source the list to be copied
-	 * @return a new list with the same values as source, but different references
-	 */
-/*
-	public static <T> List<T> copyList(List<T> source) {
-	    List<T> dest = new ArrayList<T>();
-	    for (T item : source) { dest.add(item); }
-	    return dest;
-	}*/
 
 	
-	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, Variable> varsPos, String varName) {
-		Variable varObject = varsPos.get(varName);
-		for(int i = 0 ; i < scans.size(); i++) {
-			TreePattern varObjectTP = varObject.getTreePattern();
-			TreePattern scansTP = scans.get(i).getNavigationTreePattern();
-			if(varObject.getTreePattern() == scans.get(i).getNavigationTreePattern())
+	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, PatternNode> patternNodeMap, String varName) {
+		PatternNode node = patternNodeMap.get(varName);
+		if(node == null)
+			return -1;
+		
+		TreePattern tp = node.getTreePattern();
+		if(tp == null)
+			return -1;
+		
+		for(int i = 0; i < scans.size(); i++) {
+			if(tp == scans.get(i).getNavigationTreePattern())
 				return i;
 		}
 		return -1;
 	}
-	
 }

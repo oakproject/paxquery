@@ -16,7 +16,22 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
-  	<dependency>
+      <dependency>
+		<groupId>eu.stratosphere</groupId>
+		<artifactId>stratosphere-java</artifactId>
+		<version>${core.version}</version>
+	</dependency>
+      <dependency>
+		<groupId>eu.stratosphere</groupId>
+		<artifactId>stratosphere-core</artifactId>
+		<version>${core.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>eu.stratosphere</groupId>
+		<artifactId>stratosphere-clients</artifactId>
+		<version>${core.version}</version>
+	</dependency>
+   	<dependency>
 		<groupId>fr.inria.oak</groupId>
 		<artifactId>paxquery-algebra</artifactId>
 		<version>${project.version}</version>
@@ -24,6 +39,11 @@
    	 <dependency>
 		<groupId>fr.inria.oak</groupId>
 		<artifactId>paxquery-common</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>fr.inria.oak</groupId>
+		<artifactId>paxquery-translation</artifactId>
 		<version>${project.version}</version>
 	</dependency>
   	<dependency>
