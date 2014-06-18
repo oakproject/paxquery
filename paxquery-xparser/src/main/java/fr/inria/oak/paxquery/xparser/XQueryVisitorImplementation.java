@@ -13,7 +13,11 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+
 public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
+
+	public enum StatementType { NONE, LET, FOR };
+	
 	/**
 	 * Operators
 	 */
@@ -29,7 +33,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public ArrayList<TreePattern> treePatterns;	//the list of all TreePattern objects built for a given query
 	public ArrayList<String> applyEach;			//holds a String array for ApplyConstruct.each
 	public ArrayList<Integer> applyFields;		//holds a Integer array for ApplyConstruct.fields
-
+	public HashMap<String, ApplyConstruct> mappedApplys;	//stores all ApplyConstruct objects instantiated during query processing (lets and nested sub-queries). The mapping is <variable_name, associated_applyconstruc>
+	public ArrayList<ApplyConstruct> nestedApplys;	//this is XMLConstruct.NestedApplyConstruc[]
+	
 	/**
 	 * State variables for parsing
 	 */
@@ -45,6 +51,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private BaseLogicalOperator lastOp = null;	//for algebraic operators tree construction
 	private BaseLogicalOperator thisOp = null;	//for algebraic operators tree construction
 	private boolean[] treePatternVisited = null;//for algebraic operators tree construction
+	private StatementType currentStatement = StatementType.NONE;	//for tree pattern construction (so we can decide on nested and optional edges)
+	private boolean specialEdgeFlag = false;	//set to true for edges VAR/whatever, so we can decided whether the edge is nested and optional or not
 	
 	/**
 	 * Others
@@ -62,6 +70,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		varsPos = new HashMap<String, Variable>();
 		applyEach = new ArrayList<String>();
 		applyFields = new ArrayList<Integer>();
+		mappedApplys = new HashMap<String, ApplyConstruct>();
+		nestedApplys = new ArrayList<ApplyConstruct>();
 		whereHits = 0;
 		groupByHits = 0;
 	}
@@ -78,7 +88,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			if(treePatternVisited[i] == false) {
 				XQueryUtils.buildVarsPos(varsPos, scans.get(i).getNavigationTreePattern(), varsPos.size());
 			}
-		}		
+		}	
 		
 		//we instantiate the XMLConstruct operator here rather than in exitReturnStat since we can have several return clauses but just one XMLConstruct operator.
 		//we need to convert applyEach (ArrayList<String> to String[]
@@ -88,7 +98,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		int i = 0;
 		for(Integer integer : applyFields)
 			fields_array[i++] = integer.intValue();		
-		ApplyConstruct apply = new ApplyConstruct("", each_array, "", fields_array, new ApplyConstruct[0]);
+		ApplyConstruct apply = new ApplyConstruct("", each_array, "", fields_array, nestedApplys.toArray(new ApplyConstruct[0]));
 		//instantiate the XMLConstruct operator and set "constructChild" as immediate descendant
 		//no algebraic op was set as child of XMLConstruct, we just plug the first XMLScan as a bail out solution, simply plug the first tree pattern to the XMLConstruct object
 		if(constructChild == null && scans.size() > 0)
@@ -104,6 +114,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * VAR := whatever
 	 */
 	public Void visitLetBinding(XQueryParser.LetBindingContext ctx) {
+		
+		currentStatement = StatementType.LET;
+		
 		//store the left-side var so we can assign the xpath tree to it
 		lastVarLeftSide = ctx.VAR().getText();		
 		//do visit, ctx.getChild(2) can be (pathExpr_xq | flwrexpr | aggrExpr | arithmeticExpr_xq | literal)
@@ -114,6 +127,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastNode = null;
 		lastSlashToken = 0;
 		
+		currentStatement = StatementType.LET;
+		
 		return null;	//// Java says must return something even when Void
 	}
 
@@ -122,6 +137,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * store the left-side var so we can assign the xpath tree to it
 	 */	
 	public Void visitForBinding(XQueryParser.ForBindingContext ctx) { 
+		
+		currentStatement = StatementType.FOR;
+		
 		//store the left-side var so we can assign the xpath tree to it
 		lastVarLeftSide = ctx.VAR().getText();
 		//do visit
@@ -131,6 +149,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastVarLeftSide = null;
 		lastNode = null;
 		lastSlashToken = 0;
+		
+		currentStatement = StatementType.FOR;
 		
 		return null;
 	}
@@ -157,7 +177,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//add a new XMLScan object
 		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		//nothing to visit
-		XMLScan scan = scans.get(scans.size()-1);
 		
 		return null;
 	}
@@ -252,6 +271,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		String var_to_expand = ctx.VAR().getText();
 		lastNode = patternNodeMap.get(var_to_expand);
 		lastTreePattern = lastNode.getTreePattern();
+		specialEdgeFlag = true;
 		
 		return null;
 	}
@@ -273,8 +293,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		groupByHits++;
 		return visitChildren(ctx); 
 	}
-
-
 
 	/**
 	 * abbrevForwardStep (xpath)
@@ -305,9 +323,16 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		int nodeCode = PatternNode.globalNodeCounter.getAndIncrement();
 		PatternNode node = new PatternNode("", tag, nodeCode, "", "", lastTreePattern);
 		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
-		lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+		//handle let-nesting
+		if(specialEdgeFlag && currentStatement == StatementType.LET) {
+			lastNode.addEdge(node, parent, true, true);
+			specialEdgeFlag = false;
+			mappedApplys.put(lastVarLeftSide, (new ApplyConstruct("", new String[] {""}, "", null, new ApplyConstruct[0])));	//the null fields must be filled after varsPos is built
+		}
+		else
+			lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+
 		lastNode.removeMatchingVariables(lastVarLeftSide);
-		
 		if(lastNode.checkAnyMatchingVariableStoresValue() == false)
 			lastNode.setStoresValue(false);
 		if(lastNode.checkAnyMatchingVariableStoresContent() == false)
@@ -393,6 +418,13 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				//add varsPos for this tree
 				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
 				storeVarAndXMLText(ctx.getChild(1).getText());	
+				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
+				if(mappedApplys.containsKey(ctx.getChild(1).getText())) {
+					ApplyConstruct ac = mappedApplys.get(ctx.getChild(1).getText());
+					//now that varsPos has been updated we can check the varible's position
+					ac.setFields(new int[] {0});
+					nestedApplys.add(ac);
+				}
 				treePatternVisited[patternTreeIndex] = true;
 			}
 			else if(scans.size() > 0) {
@@ -510,6 +542,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				}
 				//store the var's position and the XML text so far
 				storeVarAndXMLText(ctx.VAR().getText());
+				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
+				if(mappedApplys.containsKey(ctx.VAR().getText())) {
+					ApplyConstruct ac = mappedApplys.get(ctx.VAR().getText());
+					ac.setFields(new int[] {0});
+					nestedApplys.add(ac);	
+				}
 			}
 		}
 		//attInner2 : aggrExpr
@@ -520,7 +558,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		return null;
 	}
 
-
 	/**
 	 * aggrExpr
 	 * TODO: currently we store the aggregation expression as XML text: obviously we need to treat this differently
@@ -529,7 +566,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		if(insideReturn && whereHits == 0 && groupByHits == 0) {
 			//add the function name and the left parenthesis
 			String aggrfunct = ctx.AGGR_FUNCT().getText();
-			//returnXMLTags.append(ctx.AGGR_FUNCT().getText()).append('(');
 			returnXMLTags.append(aggrfunct).append('(');
 			
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.VAR().getText());
@@ -543,13 +579,18 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
 					//instantiate a new cartesian product if needed
 					if(lastOp != null && thisOp != null) {
-						//constructChild = scans.get(patternTreeIndex);
 						constructChild = new CartesianProduct(lastOp, thisOp);
 						thisOp = constructChild;
 					}
 				}
 				//store the var's position and the XML text so far
 				storeVarAndXMLText(ctx.VAR().getText());
+				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
+				if(mappedApplys.containsKey(ctx.VAR().getText())) {
+					ApplyConstruct ac = mappedApplys.get(ctx.VAR().getText());
+					ac.setFields(new int[] {0});
+					nestedApplys.add(ac);
+				}
 			}
 			//add the right parenthesis
 			returnXMLTags.append(')');
@@ -616,6 +657,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					System.exit(-1);
 				}
 				storeVarAndXMLText(child.getText());					
+				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
+				if(mappedApplys.containsKey(child.getText())) {
+					ApplyConstruct ac = mappedApplys.get(child.getText());
+					ac.setFields(new int[] {0});
+					nestedApplys.add(ac);					
+				}
 			}
 			//we don't care about the commas
 		}
@@ -631,7 +678,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private void storeVarAndXMLText(String var_text) {
 		//store the current piece of XML string in applyEach
 		storeXMLText();
-		//store the variable overall position position in the trees into appyFields
+		//store the variable overall position position in the trees into applyFields
 		applyFields.add(varsPos.get(var_text).positionInForest);
 	}
 

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.io.FilenameUtils;
 
 import eu.stratosphere.api.common.Plan;
 import eu.stratosphere.api.common.Program;
@@ -15,12 +14,16 @@ import eu.stratosphere.core.fs.FileSystem;
 import eu.stratosphere.core.fs.Path;
 import eu.stratosphere.client.LocalExecutor;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.common.xml.treepattern.core.PrintingLevel;
 import fr.inria.oak.paxquery.translation.Logical2Pact;
 import fr.inria.oak.paxquery.xparser.XQueryLexer;
 import fr.inria.oak.paxquery.xparser.XQueryParser;
+import fr.inria.oak.paxquery.xparser.XQueryUtils;
 import fr.inria.oak.paxquery.xparser.XQueryVisitorImplementation;
 
 public class XClient implements Program, ProgramDescription {
+
+	private static final long serialVersionUID = 1808382941034073434L;
 
 	@Override
 	public String getDescription() {
@@ -77,8 +80,28 @@ public class XClient implements Program, ProgramDescription {
 		ParseTree tree = parser.xquery();
 		XQueryVisitorImplementation loader = new XQueryVisitorImplementation("file:///Users/jalvaro/xoutput.txt");
 		loader.visit(tree);
+
+		printParseDetails(tree, parser, loader);
 		
 		return loader.construct;
+	}
+	
+	private void printParseDetails(ParseTree tree, XQueryParser parser, XQueryVisitorImplementation loader) {
+		System.out.println("Parse output: ");
+		System.out.println(tree.toStringTree(parser));
+		for(int i = 0; i < loader.treePatterns.size(); i++) {
+			System.out.println("PatternTree ("+i+"): ");
+			System.out.println(loader.treePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
+		}
+		System.out.println("HashMap:");
+		System.out.println(loader.patternNodeMap.toString());
+		System.out.println("each:");
+		System.out.println(loader.applyEach.toString());
+		System.out.println("fields:");
+		System.out.println(loader.applyFields.toString());
+		System.out.println("Algebraic tree:");
+		System.out.println(XQueryUtils.algebraicTreeToString(loader.construct));
+
 	}
 	
 	public static void main(String[] args) {

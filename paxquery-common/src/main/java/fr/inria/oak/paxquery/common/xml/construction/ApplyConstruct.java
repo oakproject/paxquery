@@ -28,7 +28,8 @@ public class ApplyConstruct implements Serializable {
 	private final String[] each; // Holds constant XML tags 
 	private final String after; // Tag to apply after each group of tuples/records
 	
-	private final int[] fields; // Positions in the tuples/records
+	//private final int[] fields; // Positions in the tuples/records
+	private int[] fields; // Positions in the tuples/records
 	private final ApplyConstruct[] nested; // Construct for nested collections
 	
 	
@@ -54,6 +55,10 @@ public class ApplyConstruct implements Serializable {
 
 	public int[] getFields() {
 		return this.fields;
+	}
+	
+	public void setFields(int[] fields) {
+		this.fields = fields;
 	}
 
 
