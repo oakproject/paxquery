@@ -413,7 +413,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		else if(ctx.getChild(1).getText().startsWith("$")) {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
 			if(patternTreeIndex != -1) {
-				//the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
 				if(treePatternVisited.get(patternTreeIndex) == false) {
 					constructChild = scans.get(patternTreeIndex);
 					//add varsPos for this tree
@@ -516,7 +517,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitAttInner2(XQueryParser.AttInner2Context ctx) {
 		//attInner2 : VAR
-		if(ctx.VAR() != null && whereHits == 0 && groupByHits == 0) {
+		if(ctx.VAR() != null) {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.VAR().getText());
 			if(patternTreeIndex != -1) {
 				if(treePatternVisited.get(patternTreeIndex) == false) {
@@ -531,6 +532,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						//constructChild = scans.get(patternTreeIndex);
 						constructChild = new CartesianProduct(lastOp, thisOp);
 						thisOp = constructChild;
+					}
+					//or just plug the current operator to constructChild
+					else if(lastOp == null && thisOp != null) {
+						constructChild = thisOp;
 					}
 				}
 				//store the var's position and the XML text so far
@@ -575,6 +580,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						constructChild = new CartesianProduct(lastOp, thisOp);
 						thisOp = constructChild;
 					}
+					//or just plug the current operator to constructChild
 					else if(lastOp == null && thisOp != null) {
 						constructChild = thisOp;
 					}
@@ -607,7 +613,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//////////////////////////////////////////////////////////////////////////////////
 		//check if Cartesian Product is needed
 		int lastTreePatternVisited = -1;
-		if(ctx.VAR().size() > 0 && whereHits == 0 && groupByHits == 0) {
+		//if(ctx.VAR().size() > 0 && whereHits == 0 && groupByHits == 0) {
+		if(ctx.VAR().size() > 0) {
 			for(int i = 0; i < ctx.VAR().size(); i++) {
 				String varName = ctx.VAR().get(i).getText();
 				//get which tree ctx.VAR().get(i) is in
@@ -631,7 +638,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		//one variable in tree pattern was found, no cartesian product was built, we just plug the appropriate tree pattern to the XMLConstruct
 		if(lastOp==null && thisOp!=null && lastTreePatternVisited != -1)
-			constructChild = scans.get(lastTreePatternVisited);
+			//constructChild = scans.get(lastTreePatternVisited);
+			constructChild = thisOp;
 		//no variable in tree pattern was found, simply plug the first tree pattern to the XMLConstruct object as a bail out solution
 		else if(lastOp==null && thisOp == null && scans.size() > 0)
 			constructChild = scans.get(0);
