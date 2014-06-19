@@ -50,7 +50,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private int groupByHits;					//number of times a group-by statement is entered
 	private BaseLogicalOperator lastOp = null;	//for algebraic operators tree construction
 	private BaseLogicalOperator thisOp = null;	//for algebraic operators tree construction
-	private boolean[] treePatternVisited = null;//for algebraic operators tree construction
+	private ArrayList<Boolean> treePatternVisited = null; //for algebraic operators tree construction
 	private StatementType currentStatement = StatementType.NONE;	//for tree pattern construction (so we can decide on nested and optional edges)
 	private boolean specialEdgeFlag = false;	//set to true for edges VAR/whatever, so we can decided whether the edge is nested and optional or not
 	
@@ -72,6 +72,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		applyFields = new ArrayList<Integer>();
 		mappedApplys = new HashMap<String, ApplyConstruct>();
 		nestedApplys = new ArrayList<ApplyConstruct>();
+		treePatternVisited = new ArrayList<Boolean>();
 		whereHits = 0;
 		groupByHits = 0;
 	}
@@ -84,10 +85,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		visitChildren(ctx);
 		
 		//the variables appearing in return statements are already inside varsPos, now include the the rest
-		for(int i = 0; i < treePatternVisited.length; i++) {
-			if(treePatternVisited[i] == false) {
+		for(int i = 0; i < treePatternVisited.size(); i++) {
+			if(treePatternVisited.get(i) == false)
 				XQueryUtils.buildVarsPos(varsPos, scans.get(i).getNavigationTreePattern(), varsPos.size());
-			}
 		}	
 		
 		//we instantiate the XMLConstruct operator here rather than in exitReturnStat since we can have several return clauses but just one XMLConstruct operator.
@@ -176,6 +176,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		String pathDocuments = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
 		//add a new XMLScan object
 		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		treePatternVisited.add(false);
 		//nothing to visit
 		
 		return null;
@@ -202,6 +203,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		String pathDocuments = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
 		//add a new XMLScan object
 		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
+		treePatternVisited.add(false);
 		//nothing to visit
 		
 		return null;
@@ -392,8 +394,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitReturnStat(XQueryParser.ReturnStatContext ctx) {
 		insideReturn = true;
-		if(treePatternVisited == null)
-			treePatternVisited = new boolean[scans.size()];
 		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
 		if(ctx.eleConst()!=null) {
@@ -411,9 +411,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			visitAggrExpr(ctx.aggrExpr());
 		//or a VAR
 		else if(ctx.getChild(1).getText().startsWith("$")) {
-			//int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, varsPos, ctx.getChild(1).getText());
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
-			if(patternTreeIndex != -1 && treePatternVisited[patternTreeIndex] == false) {				
+			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
 				constructChild = scans.get(patternTreeIndex);
 				//add varsPos for this tree
 				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
@@ -425,14 +424,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					ac.setFields(new int[] {0});
 					nestedApplys.add(ac);
 				}
-				treePatternVisited[patternTreeIndex] = true;
+				treePatternVisited.set(patternTreeIndex, true);
 			}
 			else if(scans.size() > 0) {
 				constructChild = scans.get(0);
 				//add varsPos for this tree
 				XQueryUtils.buildVarsPos(varsPos, scans.get(0).getNavigationTreePattern(), varsPos.size());
 				storeVarAndXMLText(ctx.getChild(1).getText());	
-				treePatternVisited[patternTreeIndex] = true;
+				treePatternVisited.set(patternTreeIndex, true);
 			}
 		}
 		
@@ -454,12 +453,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		for(int i = 0; i < ctx.children.size(); i++) {
 			if(ctx.children.get(i).getPayload().getClass() == XQueryParser.AttContext.class) {
 				visitAtt((XQueryParser.AttContext)ctx.children.get(i).getPayload());
-				//append the rest of the eleConst rule!
 			}
 		}
 		//eleConst : LT_S eaName att* CLOSE_OPENING_TAG
 		if(ctx.CLOSE_OPENING_TAG()!=null) {
-			//System.out.println("Printing  /> ");
 			returnXMLTags.append(ctx.CLOSE_OPENING_TAG());	
 		}
 		//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
@@ -526,8 +523,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		if(ctx.VAR() != null && whereHits == 0 && groupByHits == 0) {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.VAR().getText());
 			if(patternTreeIndex != -1) {
-				if(treePatternVisited[patternTreeIndex] == false) {
-					treePatternVisited[patternTreeIndex] = true;
+				if(treePatternVisited.get(patternTreeIndex) == false) {
+					treePatternVisited.set(patternTreeIndex, true);
 					lastOp = thisOp;
 					thisOp = scans.get(patternTreeIndex);
 					//add varsPos for this tree
@@ -570,8 +567,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.VAR().getText());
 			if(patternTreeIndex != -1) {
-				if(treePatternVisited[patternTreeIndex] == false) {
-					treePatternVisited[patternTreeIndex] = true;
+				if(treePatternVisited.get(patternTreeIndex) == false) {
+					treePatternVisited.set(patternTreeIndex, true);
 					lastOp = thisOp;
 					thisOp = scans.get(patternTreeIndex);
 					//add varsPos for this tree
@@ -616,8 +613,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				String varName = ctx.VAR().get(i).getText();
 				//get which tree ctx.VAR().get(i) is in
 				int thisVarTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
-				if(thisVarTreeIndex != -1 && treePatternVisited[thisVarTreeIndex]==false) {
-					treePatternVisited[thisVarTreeIndex] = true;
+				if(thisVarTreeIndex != -1 && treePatternVisited.get(thisVarTreeIndex) == false) {
+					treePatternVisited.set(thisVarTreeIndex, true);
 					lastTreePatternVisited = thisVarTreeIndex;
 					lastOp = thisOp;
 					thisOp = scans.get(thisVarTreeIndex);
@@ -627,7 +624,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					//instantiate a new cartesian product if needed
 					if(lastOp!=null && thisOp!=null) {
 						constructChild = new CartesianProduct(lastOp, thisOp);
-						//lastOp = null;
 						thisOp = constructChild;
 					}
 				}
