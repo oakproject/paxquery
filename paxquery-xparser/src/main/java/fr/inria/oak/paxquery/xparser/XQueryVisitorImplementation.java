@@ -412,26 +412,22 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		//or a VAR
 		else if(ctx.getChild(1).getText().startsWith("$")) {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
-			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-				constructChild = scans.get(patternTreeIndex);
-				//add varsPos for this tree
-				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
+			if(patternTreeIndex != -1) {
+				//the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+				if(treePatternVisited.get(patternTreeIndex) == false) {
+					constructChild = scans.get(patternTreeIndex);
+					//add varsPos for this tree
+					XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
+					treePatternVisited.set(patternTreeIndex, true);
+				}
 				storeVarAndXMLText(ctx.getChild(1).getText());	
-				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
+				//if the variable contains nested tuples we also add the corresponding ApplyConstruct object
 				if(mappedApplys.containsKey(ctx.getChild(1).getText())) {
 					ApplyConstruct ac = mappedApplys.get(ctx.getChild(1).getText());
 					//now that varsPos has been updated we can check the varible's position
 					ac.setFields(new int[] {0});
 					nestedApplys.add(ac);
 				}
-				treePatternVisited.set(patternTreeIndex, true);
-			}
-			else if(scans.size() > 0) {
-				constructChild = scans.get(0);
-				//add varsPos for this tree
-				XQueryUtils.buildVarsPos(varsPos, scans.get(0).getNavigationTreePattern(), varsPos.size());
-				storeVarAndXMLText(ctx.getChild(1).getText());	
-				treePatternVisited.set(patternTreeIndex, true);
 			}
 		}
 		
@@ -560,7 +556,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * TODO: currently we store the aggregation expression as XML text: obviously we need to treat this differently
 	 */
 	public Void visitAggrExpr(XQueryParser.AggrExprContext ctx) {
-		if(insideReturn && whereHits == 0 && groupByHits == 0) {
+		if(insideReturn) {
 			//add the function name and the left parenthesis
 			String aggrfunct = ctx.AGGR_FUNCT().getText();
 			returnXMLTags.append(aggrfunct).append('(');
@@ -578,6 +574,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					if(lastOp != null && thisOp != null) {
 						constructChild = new CartesianProduct(lastOp, thisOp);
 						thisOp = constructChild;
+					}
+					else if(lastOp == null && thisOp != null) {
+						constructChild = thisOp;
 					}
 				}
 				//store the var's position and the XML text so far
