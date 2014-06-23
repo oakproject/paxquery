@@ -170,7 +170,7 @@ public class RecordPredicateEvaluation {
 						Matcher m = p.matcher(record.getField(simplePred.getColumn1(), StringValue.class));
 						return m.find();
 					}
-					return record.getField(simplePred.getColumn1(), StringValue.class)
+					return record.getField(simplePred.getColumn1(), StringValue.class).toString()
 							.equals(simplePred.getStringConstant());
 				case PREDICATE_NOTEQUAL:
 					if (simplePred.getStringConstant().startsWith("~")) {
@@ -178,7 +178,7 @@ public class RecordPredicateEvaluation {
 						Matcher m = p.matcher(record.getField(simplePred.getColumn1(), StringValue.class));
 						return !m.find();
 					}
-					return !record.getField(simplePred.getColumn1(), StringValue.class)
+					return !record.getField(simplePred.getColumn1(), StringValue.class).toString()
 							.equals(simplePred.getStringConstant());
 				default:
 					throw new PAXQueryExecutionException("Predicate " + simplePred.toString() + " not implemented yet!");
