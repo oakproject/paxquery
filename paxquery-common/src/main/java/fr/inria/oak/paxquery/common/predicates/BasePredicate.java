@@ -47,6 +47,39 @@ public abstract class BasePredicate implements Serializable {
 		PREDICATE_DESCENDANT,
 		PREDICATE_BEFORE;
 		
+		/*
+		 * Returns the PredicateType enum value that matches the input string symbol.
+		 * Note that only "=","!=","<=","<",">" and ">=" are currently supported. 
+		 * Any other input value is treated as "=", hence PredicateType.PREDICATE_EQUAL is returned.
+		 * @return the enum value for the input string representation.
+		 */
+		public static PredicateType parse(String predicateSymbol) {
+			PredicateType predType;
+			switch(predicateSymbol) {
+			case "=":
+				predType = PredicateType.PREDICATE_EQUAL;
+				break;
+			case "!=":
+				predType = PredicateType.PREDICATE_NOTEQUAL;
+				break;
+			case "<=":
+				predType = PredicateType.PREDICATE_SMALLEROREQUALTHAN;
+				break;
+			case "<":
+				predType = PredicateType.PREDICATE_SMALLERTHAN;
+				break;
+			case ">=":
+				predType = PredicateType.PREDICATE_GREATEROREQUALTHAN;
+				break;
+			case ">":
+				predType = PredicateType.PREDICATE_GREATERTHAN;
+				break;
+			default:
+				predType = PredicateType.PREDICATE_EQUAL;	//return by default
+			}
+			return predType;
+		}
+		
 		/**
 		 * Returns the string representation of the current value of the enumerated type.
 		 * @return the string representation for this predicate
