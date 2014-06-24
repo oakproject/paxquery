@@ -95,6 +95,8 @@ public class XClient implements Program, ProgramDescription {
 		}
 		System.out.println("HashMap:");
 		System.out.println(loader.patternNodeMap.toString());
+		System.out.println("VarsPos:");
+		System.out.println(XQueryUtils.varsPosToString(loader.varsPos));
 		System.out.println("each:");
 		System.out.println(loader.applyEach.toString());
 		System.out.println("fields:");
