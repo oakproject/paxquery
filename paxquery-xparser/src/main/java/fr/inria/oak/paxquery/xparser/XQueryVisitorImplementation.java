@@ -80,8 +80,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		mappedApplys = new HashMap<String, ApplyConstruct>();
 		nestedApplys = new ArrayList<ApplyConstruct>();
 		treePatternVisited = new ArrayList<Boolean>();
-		//whereHits = 0;
-		//groupByHits = 0;
+		whereHits = 0;
+		groupByHits = 0;
 		predicateStack = new Stack<BasePredicate>();
 	}
 	
@@ -292,35 +292,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitWhere(XQueryParser.WhereContext ctx) { 
 		whereHits++;
+				
 		visitChildren(ctx); 
 		
-		//so far only one simple predicate is supported
-		/*DisjunctivePredicate predicate = (DisjunctivePredicate) predicateStack.pop();
-		int[][] leftColumns = predicate.getLeftColumns();
-		int[][] rightColumns = predicate.getRightColumns();*/
-		/*
-		SimplePredicate predicate = (SimplePredicate) predicateStack.pop();
-		// VAR op VAR case
-		if(predicate.getColumn1() != -1 && predicate.getColumn2() != -1) {
-		
-		}
-		// VAR op double
-		else if(predicate.getColumn1() != -1 && predicate.getDoubleConstant() != -1) {
-			//look for the appropriate algebraic subtree
-			//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
-			//build varsPos for the left-hand VAR if needed
-			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, leftExpr);
-			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
-				treePatternVisited.set(patternTreeIndex, true);
-			}
-
-		}
-		// VAR op string
-		else if(predicate.getColumn1() != -1 && predicate.getStringConstant() != null) {
-			
-		}*/
-		
+		BasePredicate predicate = predicateStack.pop();
+		if(constructChild != null && predicate != null)
+			constructChild = new Selection(constructChild, predicate);
 		
 		return null;
 	}
@@ -331,7 +308,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitOrExpr_xq(XQueryParser.OrExpr_xqContext ctx) { 
 		visitChildren(ctx); 
-		/*
+		
 		ArrayList<ConjunctivePredicate> conjPreds = new ArrayList<ConjunctivePredicate>();
 		
 		//collect all pending ConjunctivePredicates
@@ -342,7 +319,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			DisjunctivePredicate disjPred = new DisjunctivePredicate(conjPreds);
 			predicateStack.push(disjPred);
 		}
-		*/
+		
 		return null;
 	}
 
@@ -352,7 +329,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitAndExpr_xq(XQueryParser.AndExpr_xqContext ctx) { 
 		visitChildren(ctx); 
-		/*
+		
 		ArrayList<SimplePredicate> simplePreds = new ArrayList<SimplePredicate>();
 		
 		//collect all pending SimplePredicates
@@ -364,7 +341,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			ConjunctivePredicate conjPred = new ConjunctivePredicate(simplePreds);
 			predicateStack.push(conjPred);
 		}
-		*/
+		
 		return null;
 	}
 	
@@ -376,24 +353,34 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		SimplePredicate predicate = null;
 		PredicateType predType = PredicateType.parse(ctx.vcmp().getText());
 		String leftExpr = ctx.arithmeticExpr_xq(0).VAR().getText();
-		String rightExpr;
+		String rightExpr = "";
 		
 		//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
 		//build varsPos for the left-hand VAR if needed
 		int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, leftExpr);
 		if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexLeft) == false) {
 			XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexLeft).getNavigationTreePattern(), varsPos.size());
-			treePatternVisited.set(patternTreeIndexLeft, true);
+		}
+		
+		int patternTreeIndexRight = -1;
+		if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {
+			rightExpr = ctx.arithmeticExpr_xq(1).VAR().getText();
+			patternTreeIndexRight = XQueryUtils.findVarInPatternTree(scans,  patternNodeMap, rightExpr);
+			if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexRight) == false)
+				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexRight).getNavigationTreePattern(), varsPos.size());
 		}
 		
 		//We build the predicate now, it can be...
 		// VAR op string_literal,
 		if(ctx.literal() != null) {
-			//rightExpr = ctx.literal().getText();
 			rightExpr = ctx.literal().getText().substring(1, ctx.literal().getText().length()-1);
 			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, rightExpr, predType);			
 			if(constructChild == null)
-				constructChild = new Selection(scans.get(patternTreeIndexLeft), predicate);
+				constructChild = scans.get(patternTreeIndexLeft);
+			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+			treePatternVisited.set(patternTreeIndexLeft, true);
 		}
 		// VAR op numeric_literal, or
 		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
@@ -401,30 +388,50 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, Double.parseDouble(rightExpr), predType);
 			//build the operator
 			if(constructChild == null)
-				constructChild = new Selection(scans.get(patternTreeIndexLeft), predicate);
+				constructChild = scans.get(patternTreeIndexLeft);
+			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+			treePatternVisited.set(patternTreeIndexLeft, true);
 		}
 		// VAR op VAR
-		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {
-			rightExpr = ctx.arithmeticExpr_xq(1).VAR().getText();
-			int patternTreeIndexRight = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, rightExpr);
-						
-			//both variables are in the same tree pattern, we need a Selection operator
-			if(patternTreeIndexRight == patternTreeIndexLeft) {
-				predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
-				if(constructChild == null)
-					constructChild = new Selection(scans.get(patternTreeIndexLeft), predicate);
-			}
-			else {
-				if(patternTreeIndexRight != -1 && treePatternVisited.get(patternTreeIndexRight) == false) {
-					//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
-					//build varsPos for the left-hand VAR if needed
-					XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexRight).getNavigationTreePattern(), varsPos.size());
+		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {   
+			if(patternTreeIndexRight != -1) {
+				if(patternTreeIndexRight == patternTreeIndexLeft) {
 					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
-					treePatternVisited.set(patternTreeIndexRight, true);
 					if(constructChild == null)
-						constructChild = new Join(scans.get(patternTreeIndexLeft), scans.get(patternTreeIndexRight), predicate);
+						constructChild = scans.get(patternTreeIndexLeft);
+					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+					//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains both variables
+				}
+				else {
+					if(constructChild == null) {
+						if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+							treePatternVisited.set(patternTreeIndexLeft, true);
+							treePatternVisited.set(patternTreeIndexRight, true);
+							constructChild = new CartesianProduct(scans.get(patternTreeIndexLeft),  scans.get(patternTreeIndexRight));
+						}						
+					}
+					else {
+						if(treePatternVisited.get(patternTreeIndexLeft) == true && treePatternVisited.get(patternTreeIndexRight) == false) {
+							treePatternVisited.set(patternTreeIndexRight, true);
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+						}
+						else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == true) {
+							constructChild = new CartesianProduct(scans.get(patternTreeIndexRight), constructChild);
+							treePatternVisited.set(patternTreeIndexLeft, true);
+						}
+						else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+							treePatternVisited.set(patternTreeIndexLeft, true);
+							treePatternVisited.set(patternTreeIndexRight, true);
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+						}
+					}
 				}
 			}
+			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
 		}
 	
 		//insert the new predicate in the predicate stack
@@ -432,6 +439,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		return null;
 	}
+
 	
 	
 	/**
