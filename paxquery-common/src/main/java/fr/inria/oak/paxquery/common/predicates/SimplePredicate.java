@@ -59,9 +59,29 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		this.predCode = predCode;
 	}
 	
+	public SimplePredicate(int column1, ArithmeticOperation operation1, String stringConstant, PredicateType predCode) {
+		this.column1 = column1;
+		this.operation1 = operation1;
+		this.stringConstant = stringConstant;
+		this.doubleConstant = -1;
+		this.column2 = -1;
+		this.operation2 = null;
+		this.predCode = predCode;
+	}
+	
 	public SimplePredicate(int column1, double doubleConstant, PredicateType predCode) {
 		this.column1 = column1;
 		this.operation1 = null;
+		this.stringConstant = null;
+		this.doubleConstant = doubleConstant;
+		this.column2 = -1;
+		this.operation2 = null;
+		this.predCode = predCode;
+	}
+	
+	public SimplePredicate(int column1, ArithmeticOperation operation1, double doubleConstant, PredicateType predCode) {
+		this.column1 = column1;
+		this.operation1 = operation1;
 		this.stringConstant = null;
 		this.doubleConstant = doubleConstant;
 		this.column2 = -1;
