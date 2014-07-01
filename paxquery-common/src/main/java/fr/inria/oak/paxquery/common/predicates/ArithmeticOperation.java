@@ -27,8 +27,30 @@ public class ArithmeticOperation implements Serializable {
     	ADD,
     	MUL,
     	SUB,
-    	DIV
-    };
+    	DIV;
+    	
+    	public static Operation parse(String op_symbol) {
+    		Operation op;
+    		switch(op_symbol) {
+    			case "+":
+    				op = Operation.ADD;
+    				break;
+    			case "*":
+    				op = Operation.MUL;
+    				break;
+    			case "-":
+    				op = Operation.SUB;
+    				break;
+    			case "/":
+    				op = Operation.DIV;
+    				break;
+    			default:
+    				op = Operation.ADD;
+    				break;
+    		}
+    		return op;
+    	}
+    }
     
     
     private final double x;
