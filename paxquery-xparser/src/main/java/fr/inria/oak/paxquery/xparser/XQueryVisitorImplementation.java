@@ -2,6 +2,8 @@ package fr.inria.oak.paxquery.xparser;
 
 import fr.inria.oak.paxquery.algebra.operators.*;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
+import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation;
+import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation.Operation;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
@@ -354,12 +356,21 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		PredicateType predType = PredicateType.parse(ctx.vcmp().getText());
 		String leftExpr = ctx.arithmeticExpr_xq(0).VAR().getText();
 		String rightExpr = "";
+		ArithmeticOperation arithOpLeft = null;
+		ArithmeticOperation arithOpRight = null;
+		
 		
 		//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
 		//build varsPos for the left-hand VAR if needed
 		int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, leftExpr);
 		if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexLeft) == false) {
 			XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexLeft).getNavigationTreePattern(), varsPos.size());
+		}
+		//left arith-expr, if any
+		if(ctx.arithmeticExpr_xq(0).numericLiteral()!=null) {
+			String arithOp = ctx.arithmeticExpr_xq(0).ARITH_OP().getText();
+			String operand_string = ctx.arithmeticExpr_xq(0).OP_SUB()!=null ? ctx.arithmeticExpr_xq(0).OP_SUB().getText()+ctx.arithmeticExpr_xq(0).numericLiteral().getText() : ctx.arithmeticExpr_xq(0).numericLiteral().getText(); 
+			arithOpLeft = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 		}
 		
 		int patternTreeIndexRight = -1;
@@ -371,10 +382,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		
 		//We build the predicate now, it can be...
-		// VAR op string_literal,
-		if(ctx.literal() != null) {
-			rightExpr = ctx.literal().getText().substring(1, ctx.literal().getText().length()-1);
-			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, rightExpr, predType);			
+		// VAR ARITH_OP op string_literal,
+		if(ctx.STRING_LITERAL() != null) {
+			rightExpr = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
+			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, rightExpr, predType);
 			if(constructChild == null)
 				constructChild = scans.get(patternTreeIndexLeft);
 			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
@@ -382,10 +393,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
 			treePatternVisited.set(patternTreeIndexLeft, true);
 		}
-		// VAR op numeric_literal, or
-		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
-			rightExpr = ctx.arithmeticExpr_xq(1).numericLiteral().getText();
-			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, Double.parseDouble(rightExpr), predType);
+		// VAR ARITH_OP op ('-')? numeric_literal, or
+		else if(ctx.numericLiteral() != null) {
+			rightExpr = ctx.OP_SUB()!=null ? ctx.OP_SUB().getText()+ctx.numericLiteral().getText() : ctx.numericLiteral().getText();
+			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, Double.parseDouble(rightExpr), predType);
 			//build the operator
 			if(constructChild == null)
 				constructChild = scans.get(patternTreeIndexLeft);
@@ -394,8 +405,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
 			treePatternVisited.set(patternTreeIndexLeft, true);
 		}
-		// VAR op VAR
+		// VAR ARITH_OP op VAR ARITH_OP
 		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {   
+			//if needed, pile cartesian produts to include all variables in the algebraic tree
 			if(patternTreeIndexRight != -1) {
 				if(patternTreeIndexRight == patternTreeIndexLeft) {
 					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
@@ -430,8 +442,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 					}
 				}
+			}			
+			//right arith-expr, if any
+			if(ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
+				String arithOp = ctx.arithmeticExpr_xq(1).ARITH_OP().getText();
+				String operand_string = ctx.arithmeticExpr_xq(1).OP_SUB()!=null ? ctx.arithmeticExpr_xq(1).OP_SUB().getText()+ctx.arithmeticExpr_xq(1).numericLiteral().getText() : ctx.arithmeticExpr_xq(1).numericLiteral().getText(); 
+				arithOpRight = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 			}
-			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
+			
+			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, varsPos.get(rightExpr).positionInForest, arithOpRight, predType);
 		}
 	
 		//insert the new predicate in the predicate stack

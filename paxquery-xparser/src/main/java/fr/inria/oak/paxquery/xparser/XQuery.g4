@@ -42,7 +42,7 @@ orExpr_xq : andExpr_xq (OR andExpr_xq)* ;
 andExpr_xq : boolExpr_xq (AND boolExpr_xq)* ;
 boolExpr_xq : NOT '(' boolExprInner_xq ')' | boolExprInner_xq ;
 boolExprInner_xq : pred | contains | empty ;
-pred : arithmeticExpr_xq ( ( vcmp | ncmp ) ( arithmeticExpr_xq | literal) )?;
+pred : arithmeticExpr_xq ( ( vcmp | ncmp ) ( arithmeticExpr_xq | STRING_LITERAL | (OP_SUB)? numericLiteral ) )?;
 vcmp : EQ | NE | LT | LE | GT | GE | EQ_S | NE_S | LT_S | LE_S | GT_S | GE_S ;
 ncmp : 'is' | '<<' | '>>' ;
 contains : 'contains' '(' VAR COMMA STRING_LITERAL ')' ;
@@ -57,8 +57,4 @@ attInner : OPEN_ATTR_VAR_DOUBLE attInner2 CLOSE_ATTR_VAR_DOUBLE
 			| STRING_LITERAL ;
 attInner2 : VAR | aggrExpr ;
 eaName : functionName | QNAME_TOKEN ;
-arithmeticExpr_xq : arithmeticExpr_xq ( '+' | '-' ) arithmeticExpr_xq
-					| arithmeticExpr_xq ( '*' | 'div' | 'mod' ) arithmeticExpr_xq
-					| '(' arithmeticExpr_xq ')' 
-					| ( '-' )? numericLiteral
-					| ( '-' )? VAR ;
+arithmeticExpr_xq : VAR ( ARITH_OP (OP_SUB)? numericLiteral )? ;
