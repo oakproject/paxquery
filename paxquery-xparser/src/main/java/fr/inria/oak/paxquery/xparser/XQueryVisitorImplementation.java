@@ -167,6 +167,37 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	}
 	
 	/**
+	 * visitPathExpr_xq
+	 */
+	public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
+		//by visiting the children we build the tree pattern and set up the XMLScan algop
+		visitChildren(ctx); 
+
+		if(ctx.getText().startsWith("distinct-values")) {
+			//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
+			//build varsPos for the left-hand VAR if needed
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, lastVarLeftSide);
+			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
+				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
+			}
+			if(constructChild == null) {
+				constructChild = scans.get(patternTreeIndex);
+				//constructChild = new DuplicateElimination(constructChild, new int[] {varsPos.get(lastVarLeftSide).positionInForest});
+				constructChild = new DuplicateElimination(constructChild, new int[] {0});
+				treePatternVisited.set(patternTreeIndex, true);
+			}
+			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false) {
+				DuplicateElimination dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {0});
+				constructChild = new CartesianProduct(constructChild, dupel);
+				treePatternVisited.set(patternTreeIndex, true);
+			}
+		}
+		
+		return null;
+	}
+
+	
+	/**
 	 * pathExprInner_xq_collection - enter
 	 * Creates a XMLScanOperator, an associated tree pattern and a root node for the tree
 	 */
