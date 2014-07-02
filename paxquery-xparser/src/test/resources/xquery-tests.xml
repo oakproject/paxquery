@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tests>
+<!-- Paper queries -->
 		<test value="let $ic := collection('items')
 let $i := $ic/site/regions//item
 let $c := count($i)
@@ -139,7 +140,7 @@ for $o in $oc/site/open_auctions/open_auction,
   $i in $o/initial/text(),
   $si in $p/profile/@income,
   $a in $o/annotation//text/text()
-let $x := 5000*$i
+let $x := $i*5000
 where $si > $x and contains($a,&#34;car&#34;) 
 return $i
 for $li in $p/profile/@income
@@ -148,4 +149,12 @@ where $li > 200000
 return &#60;items person=&#34;{$li}&#34;>{$n}&#60;/items>"/>
     <test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) return &#60;items person=&#34;an_attribute&#34;>{$n}&#60;/items>"/>
     <test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) return &#60;items person=&#39;anattribute&#39;>{$n}&#60;/items>"/>
+<!-- Other queries -->
+	<test value="for $cas in collection(&#34;file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml&#34;)/site/closed_auctions/closed_auction
+let $seller := $cas/seller/@person
+let $buyer := $cas/buyer/@person
+for $item in $cas/itemref
+group by $seller, $buyer
+return &#60;res seller=&#34;{$seller}&#34; buyer=&#34;{$buyer}&#34;>{count($item)}&#60;/res>
+	"/>
 </tests>
