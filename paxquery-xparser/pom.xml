@@ -58,5 +58,10 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    <groupId>xmlunit</groupId>
+    <artifactId>xmlunit</artifactId>
+    <version>1.5</version>
+</dependency>
   </dependencies>
 </project>

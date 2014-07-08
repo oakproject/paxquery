@@ -1,5 +1,6 @@
 package fr.inria.oak.paxquery.xparser.client;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -9,7 +10,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import eu.stratosphere.api.common.Plan;
 import eu.stratosphere.api.common.Program;
 import eu.stratosphere.api.common.ProgramDescription;
-import eu.stratosphere.core.fs.FSDataInputStream;
 import eu.stratosphere.core.fs.FileSystem;
 import eu.stratosphere.core.fs.Path;
 import eu.stratosphere.client.LocalExecutor;
@@ -27,25 +27,31 @@ public class XClient implements Program, ProgramDescription {
 
 	@Override
 	public String getDescription() {
-		return "Parameters: [queryfile] [numbersubtasks]";
+		return "Parameters: file://[queryfile] file://[resultsfile] [numbersubtasks]\nor\nParameters: query_string file://[resultsfile] [numbersubtasks]";
 	}
 	
 	@Override
 	public Plan getPlan(String... args) {
 		// parse program parameters
-		final String queryfile = (args.length > 0 ? args[0] : "");
-		final int noSubtasks = (args.length > 1 ? Integer.parseInt(args[1]) : -1);
+		final String query = (args.length > 0 ? args[0] : "");
+		final String outputfile = (args.length > 1 ? args[1] : "");
+		final int noSubtasks = (args.length > 2 ? Integer.parseInt(args[2]) : -1);
 			
 		Plan plan = null;
 		BaseLogicalOperator op = null;
 		
-		//parse the query with the XQueryVisitorImplementation
 		try {
-			Path pathToQueryFile = new Path(queryfile);
-			final FileSystem fs = pathToQueryFile.getFileSystem();
-			FSDataInputStream fsdis = fs.open(pathToQueryFile);
-
-			op = this.parseQuery(fsdis);			
+			InputStream inputStream;
+			
+			if(query.startsWith("file://")) {
+				Path pathToQueryFile = new Path(query);
+				final FileSystem fs = pathToQueryFile.getFileSystem();
+				inputStream = fs.open(pathToQueryFile);
+			}
+			else
+				inputStream = new ByteArrayInputStream(query.getBytes("UTF-8"));
+			op = this.parseQuery(inputStream, outputfile);
+			
 		} catch(Exception e) {
 			System.err.println("Query malformed or not supported yet.");
 			e.printStackTrace();
@@ -65,7 +71,7 @@ public class XClient implements Program, ProgramDescription {
 		return plan;
 	}
 	
-	private BaseLogicalOperator parseQuery(InputStream inputStream) throws Exception {
+	private BaseLogicalOperator parseQuery(InputStream inputStream, String outputpath) throws Exception {
 		//VISITOR VERSION
 		//create a CharStream that reads from standard input
 		ANTLRInputStream input = new ANTLRInputStream(inputStream);
@@ -78,7 +84,7 @@ public class XClient implements Program, ProgramDescription {
 		XQueryParser parser = new XQueryParser(tokens);
 
 		ParseTree tree = parser.xquery();
-		XQueryVisitorImplementation loader = new XQueryVisitorImplementation("file:///Users/jalvaro/xoutput.txt");
+		XQueryVisitorImplementation loader = new XQueryVisitorImplementation("file://"+outputpath);
 		loader.visit(tree);
 
 		printParseDetails(tree, parser, loader);
@@ -107,19 +113,39 @@ public class XClient implements Program, ProgramDescription {
 	}
 	
 	public static void main(String[] args) {
-		try {
-			//only temporary
-			(new java.io.File("/Users/jalvaro/xoutput.txt")).delete();
 
-			XClient client = new XClient();
-			
-			if(args.length < 2) {
+		XClient client = new XClient();
+
+		try {
+			if(args.length < 3) {
 				System.err.println(client.getDescription());
 				System.exit(1);
 			}
 			
+			//delete output file (only temporary)
+			if(args.length > 2 && args[1].startsWith("file://")) {
+				String path = args[1].substring(7);
+				(new java.io.File(path)).delete();
+			}
+	
 			System.out.println("Creating plan");
 			Plan plan = client.getPlan(args);
+			System.out.println("Plan created");
+			LocalExecutor.execute(plan);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void test_main(String query, String outputfile, String procs) {
+		try {
+			//delete output file (only temporary)
+			(new java.io.File(outputfile)).delete();
+						
+			XClient client = new XClient();
+						
+			System.out.println("Creating plan");
+			Plan plan = client.getPlan(query, outputfile, procs);
 			System.out.println("Plan created");
 			LocalExecutor.execute(plan);
 		} catch(Exception e) {
