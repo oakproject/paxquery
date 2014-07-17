@@ -1,7 +1,6 @@
 grammar XQuery;
 
 import XLexer, XPath;
-//import XPath;
 
 /*
  * CONSIDERATIONS
@@ -15,8 +14,6 @@ import XLexer, XPath;
  * TODO:
  * -Scape characters
  */
-
-
 
 /* Non-terminals */
 xquery : flwrexpr EOF ;
@@ -57,4 +54,4 @@ attInner : OPEN_ATTR_VAR_DOUBLE attInner2 CLOSE_ATTR_VAR_DOUBLE
 			| STRING_LITERAL ;
 attInner2 : VAR | aggrExpr ;
 eaName : functionName | QNAME_TOKEN ;
-arithmeticExpr_xq : VAR ( ARITH_OP (OP_SUB)? numericLiteral )? ;
+arithmeticExpr_xq : VAR ( ( OP_ADD | OP_SUB | OP_MUL | SLASH) numericLiteral )? ;

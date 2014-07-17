@@ -30,13 +30,13 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEqualityExpr2(@NotNull XPathParser.EqualityExpr2Context ctx) { }
+	@Override public void enterRelationalExpr_xp(@NotNull XPathParser.RelationalExpr_xpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEqualityExpr2(@NotNull XPathParser.EqualityExpr2Context ctx) { }
+	@Override public void exitRelationalExpr_xp(@NotNull XPathParser.RelationalExpr_xpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -82,13 +82,26 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAdditiveExpr(@NotNull XPathParser.AdditiveExprContext ctx) { }
+	@Override public void enterEqualityExpr_xp(@NotNull XPathParser.EqualityExpr_xpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAdditiveExpr(@NotNull XPathParser.AdditiveExprContext ctx) { }
+	@Override public void exitEqualityExpr_xp(@NotNull XPathParser.EqualityExpr_xpContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAndExpr_xp(@NotNull XPathParser.AndExpr_xpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAndExpr_xp(@NotNull XPathParser.AndExpr_xpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -238,19 +251,6 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOrExpr2(@NotNull XPathParser.OrExpr2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOrExpr2(@NotNull XPathParser.OrExpr2Context ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterPathExpr_slash(@NotNull XPathParser.PathExpr_slashContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -277,13 +277,13 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMultiplicativeExpr2(@NotNull XPathParser.MultiplicativeExpr2Context ctx) { }
+	@Override public void enterMultiplicativeExpr_xp(@NotNull XPathParser.MultiplicativeExpr_xpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMultiplicativeExpr2(@NotNull XPathParser.MultiplicativeExpr2Context ctx) { }
+	@Override public void exitMultiplicativeExpr_xp(@NotNull XPathParser.MultiplicativeExpr_xpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -303,19 +303,6 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOrExpr(@NotNull XPathParser.OrExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOrExpr(@NotNull XPathParser.OrExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFilterExpr(@NotNull XPathParser.FilterExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -323,19 +310,6 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFilterExpr(@NotNull XPathParser.FilterExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAdditiveExpr2(@NotNull XPathParser.AdditiveExpr2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAdditiveExpr2(@NotNull XPathParser.AdditiveExpr2Context ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -368,19 +342,6 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRelationalExpr(@NotNull XPathParser.RelationalExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitRelationalExpr(@NotNull XPathParser.RelationalExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterKindTest(@NotNull XPathParser.KindTestContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -388,19 +349,6 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitKindTest(@NotNull XPathParser.KindTestContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAndExpr2(@NotNull XPathParser.AndExpr2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAndExpr2(@NotNull XPathParser.AndExpr2Context ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -420,13 +368,13 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRelationalExpr2(@NotNull XPathParser.RelationalExpr2Context ctx) { }
+	@Override public void enterAdditiveExpr_xp(@NotNull XPathParser.AdditiveExpr_xpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRelationalExpr2(@NotNull XPathParser.RelationalExpr2Context ctx) { }
+	@Override public void exitAdditiveExpr_xp(@NotNull XPathParser.AdditiveExpr_xpContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -459,6 +407,19 @@ public class XPathBaseListener implements XPathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterOrExpr_xp(@NotNull XPathParser.OrExpr_xpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOrExpr_xp(@NotNull XPathParser.OrExpr_xpContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPathExpr_relativePathExpr(@NotNull XPathParser.PathExpr_relativePathExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -479,45 +440,6 @@ public class XPathBaseListener implements XPathListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitForwardStep(@NotNull XPathParser.ForwardStepContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterMultiplicativeExpr(@NotNull XPathParser.MultiplicativeExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitMultiplicativeExpr(@NotNull XPathParser.MultiplicativeExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterEqualityExpr(@NotNull XPathParser.EqualityExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEqualityExpr(@NotNull XPathParser.EqualityExprContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAndExpr(@NotNull XPathParser.AndExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAndExpr(@NotNull XPathParser.AndExprContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

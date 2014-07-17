@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -57,11 +58,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private StringBuilder returnXMLTags;		//accumulates XML constant text from the return construction. This text is eventually inserted into XMLConstruct.apply.each
 	private boolean insideReturn;
 	private int whereHits;						//number of times a where statement is entered
-	private int groupByHits;					//number of times a group-by statement is entered
 	private ArrayList<Boolean> treePatternVisited = null; //for algebraic operators tree construction
 	private StatementType currentStatement = StatementType.NONE;	//for tree pattern construction (so we can decide on nested and optional edges)
 	private boolean specialEdgeFlag = false;	//set to true for edges VAR/whatever, so we can decided whether the edge is nested and optional or not
 	private Stack<BasePredicate> predicateStack;
+	private boolean insideXPathPredicate = false;	//for XPath predicate building
 	
 	
 	/**
@@ -84,7 +85,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		nestedApplys = new ArrayList<ApplyConstruct>();
 		treePatternVisited = new ArrayList<Boolean>();
 		whereHits = 0;
-		groupByHits = 0;
 		predicateStack = new Stack<BasePredicate>();
 	}
 	
@@ -392,15 +392,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		ArithmeticOperation arithOpRight = null;
 		
 		
-		//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
-		//build varsPos for the left-hand VAR if needed
 		int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, leftExpr);
 		if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexLeft) == false) {
 			XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexLeft).getNavigationTreePattern(), varsPos.size());
 		}
 		//left arith-expr, if any
 		if(ctx.arithmeticExpr_xq(0).numericLiteral()!=null) {
-			String arithOp = ctx.arithmeticExpr_xq(0).ARITH_OP().getText();
+			//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
+			String arithOp = ctx.arithmeticExpr_xq(0).children.get(1).getText();
 			String operand_string = ctx.arithmeticExpr_xq(0).OP_SUB()!=null ? ctx.arithmeticExpr_xq(0).OP_SUB().getText()+ctx.arithmeticExpr_xq(0).numericLiteral().getText() : ctx.arithmeticExpr_xq(0).numericLiteral().getText(); 
 			arithOpLeft = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 		}
@@ -477,7 +476,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			}			
 			//right arith-expr, if any
 			if(ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
-				String arithOp = ctx.arithmeticExpr_xq(1).ARITH_OP().getText();
+				//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
+				String arithOp = ctx.arithmeticExpr_xq(1).children.get(1).getText();
 				String operand_string = ctx.arithmeticExpr_xq(1).OP_SUB()!=null ? ctx.arithmeticExpr_xq(1).OP_SUB().getText()+ctx.arithmeticExpr_xq(1).numericLiteral().getText() : ctx.arithmeticExpr_xq(1).numericLiteral().getText(); 
 				arithOpRight = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 			}
@@ -490,16 +490,65 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		return null;
 	}
-
+	
+	/**
+	 * predicate_xp
+	 * predicate_xp : '[' expr_xp ']' ;
+	 */
+	/*
+	public Void visitPredicate_xp(XQueryParser.Predicate_xpContext ctx) { 
+		insideXPathPredicate = true;
+		
+		visitChildren(ctx); 
+		
+		insideXPathPredicate = false;
+		
+		//we create a Selection object for every predicate ([expr_xp]) we find, even if there is more than one predicate for a given tree
+		//TODO: create Selection object and set it as parent of this xmlscan
+		
+		return null;
+	}
+	*/
+	/**
+	 * orExpr_xp
+	 * orExpr_xp : andExpr_xp (OR andExpr_xp)* ;
+	 */
+	/*
+	public Void visitOrExpr_xp(XQueryParser.OrExpr_xpContext ctx) { 
+		return visitChildren(ctx); 
+	}
+	*/
 	
 	
 	/**
 	 * groupBy
-	 * Increase groupByHits by one.
+	 * groupBy : 'group by' VAR (COMMA VAR)* ;
 	 */
 	public Void visitGroupBy(XQueryParser.GroupByContext ctx) { 
-		groupByHits++;
-		return visitChildren(ctx); 
+		return visitChildren(ctx);
+		/*
+		int[] groupByColumns = new int[ctx.VAR().size()];
+		String currentVar;
+		
+		for(int i = 0; i < ctx.VAR().size(); i++) {
+			currentVar = ctx.VAR(i).getText();
+			//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
+			//build varsPos for the left-hand VAR if needed
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, currentVar);
+			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
+				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
+			}
+			if(constructChild == null)
+				constructChild = scans.get(patternTreeIndex);
+			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false)
+				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
+			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the variable
+			treePatternVisited.set(patternTreeIndex, true);
+			groupByColumns[i] = varsPos.get(currentVar).positionInForest;
+		}
+		//constructChild = new GroupBy(constructChild, groupByColumns, new int[] {});
+	
+		return null;*/
 	}
 
 	/**

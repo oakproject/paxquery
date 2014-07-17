@@ -66,21 +66,7 @@ for $c in $cc/site/closed_auctions/closed_auction, $i in $p/@id, $b in $c/buyer/
 where $i = $b
 group by $a
 return &#60;res>&#60;city>{$a}&#60;/city>&#60;num>{count($p)}&#60;/num>&#60;/res>"/>
-		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;),
-$cc := collection('XMarkDocs/XMarkClosedAuctions/file0.xml'), $ic := collection('XMarkDocs/XMarkItems/file0.xml')
-let $ca := $cc/site/closed_auctions/closed_auction, $ei := $ic/site/regions/europe/item
-for $p in $pc/site/people/person let $pn := $p/name/text()
-  let $a :=
-    for $t in $ca, $i in $p/@id, $b in $t/buyer/@person 
-    where $i = $b
-    return
-      let $n :=
-      for $t2 in $ei, $ti2 in $t2/@id, $ti in $t/itemref/@item 
-      where $ti = $ti2
-      return $t2
-      let $in := $n/name/text()
-      return &#60;item>{$in}&#60;/item>
-return &#60;person name=&#34;{$pn}&#34;>{$a}&#60;/person>"/>
+		<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;), $cc := collection('XMarkDocs/XMarkClosedAuctions/file0.xml'), $ic := collection('XMarkDocs/XMarkItems/file0.xml') let $ca := $cc/site/closed_auctions/closed_auction, $ei := $ic/site/regions/europe/item for $p in $pc/site/people/person let $pn := $p/name/text() let $a := for $t in $ca, $i in $p/@id, $b in $t/buyer/@person where $i = $b return let $n := for $t2 in $ei, $ti2 in $t2/@id, $ti in $t/itemref/@item where $ti = $ti2 return $t2 let $in := $n/name/text() return &#60;item>{$in}&#60;/item> return &#60;person name=&#34;{$pn}&#34;>{$a}&#60;/person>"/>
 		<test value="let $pc := collection('XMarkDocs/XMarkPeople/file0.xml')
 for $i in distinct-values($pc/site/people/person/
                      profile/interest/@category)
@@ -157,4 +143,5 @@ for $item in $cas/itemref
 group by $seller, $buyer
 return &#60;res seller=&#34;{$seller}&#34; buyer=&#34;{$buyer}&#34;>{count($item)}&#60;/res>
 	"/>
+	<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) let $seller := $pc/seller[pepe + 6 > 10] return $seller"/>
 </tests>

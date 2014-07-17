@@ -3,7 +3,10 @@
 <tests>
 		<test value="' #text'"/>
 		<test value="' 6 ' div 2"/>
+		<test value="' 6 ' div pepe"/>
 		<test value="' 6 '*div"/>
+		<test value="' 6 ' * 2"/>
+		<test value="' 6 '*pepe"/>
 		<test value="' x 4'"/>
 		<test value="' x 4'"/>
 		<test value="'....5....|'"/>
@@ -344,5 +347,8 @@
 		<test value="/ic/site[@a mod 3 = 5]"/>
 		<test value="/ic/site[@a div 3 = 5]"/>
 		<test value="/employee[@secretary and @assistant]"/>
+		<test value="--3"/>
+		<test value="---3"/>
+		<test value="n-- -3"/>
 		<test value="Juan&#193;lvaroMu&#241;ozNaranjo"/>
 </tests>
