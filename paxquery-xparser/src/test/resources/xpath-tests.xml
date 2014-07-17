@@ -350,5 +350,7 @@
 		<test value="--3"/>
 		<test value="---3"/>
 		<test value="n-- -3"/>
+		<test value="/ic/site[@a=2][@b&lt;3][c='xpathisfun']"/>
+		<test value="/ic/site[@a=2][@b&lt;3][c='xpathisfun']/sofun"/>
 		<test value="Juan&#193;lvaroMu&#241;ozNaranjo"/>
 </tests>

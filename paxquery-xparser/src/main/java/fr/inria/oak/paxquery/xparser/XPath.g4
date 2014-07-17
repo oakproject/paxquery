@@ -3,8 +3,8 @@ grammar XPath;
 import XLexer;
 
 /* Non-terminals */
-xpath: expr ;
-expr: orExpr_xp ;
+xpath: expr_xp ;
+expr_xp : orExpr_xp ;
 orExpr_xp : andExpr_xp ( OR andExpr_xp )* ;
 andExpr_xp : equalityExpr_xp ( AND equalityExpr_xp )* ;
 equalityExpr_xp : relationalExpr_xp ( ( EQ_S | NE_S ) relationalExpr_xp )* ;
@@ -27,20 +27,20 @@ relativePathExpr2 :  SLASH stepExpr			#relativePathExpr2_slash
 					;
 
 stepExpr : axisStep ;
-axisStep : forwardStep predicateList ;
+axisStep : forwardStep predicateList_xp ;
 forwardStep : abbrevForwardStep ;
 abbrevForwardStep : ( '@' )? nodeTest ;
 nodeTest : kindTest | nameTest ;
 kindTest : textTest;
 nameTest : 'div' | 'mod' | qName ;
-filterExpr : primaryExpr predicateList ;
-predicateList : ( predicate )* ;
-predicate : '[' expr ']' ;
+filterExpr : primaryExpr predicateList_xp ;
+predicateList_xp : ( predicate_xp )* ;
+predicate_xp : '[' expr_xp ']' ;
 primaryExpr : literal | parenthesizedExpr | functionCall ;
 literal :  numericLiteral | STRING_LITERAL ;
 numericLiteral : (OP_SUB)? ( INTEGER_LITERAL | DECIMAL_LITERAL ) ;
-parenthesizedExpr : '(' expr ')' ;
-functionCall : functionName '(' ( expr ( COMMA expr )* )? ')' ;
+parenthesizedExpr : '(' expr_xp ')' ;
+functionCall : functionName '(' ( expr_xp ( COMMA expr_xp )* )? ')' ;
 functionName : 'concat' | 'substring' | NOT | 'floor' | 'ceiling' | 'true' | 'false' ;
 textTest : 'text()' ;
 qName : QNAME_TOKEN ;

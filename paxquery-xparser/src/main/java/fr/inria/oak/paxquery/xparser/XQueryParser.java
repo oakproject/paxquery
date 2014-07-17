@@ -48,28 +48,28 @@ public class XQueryParser extends Parser {
 		RULE_ncmp = 19, RULE_contains = 20, RULE_empty = 21, RULE_groupBy = 22, 
 		RULE_returnStat = 23, RULE_eleConst = 24, RULE_eleConstInner = 25, RULE_att = 26, 
 		RULE_attInner = 27, RULE_attInner2 = 28, RULE_eaName = 29, RULE_arithmeticExpr_xq = 30, 
-		RULE_xpath = 31, RULE_expr = 32, RULE_orExpr_xp = 33, RULE_andExpr_xp = 34, 
+		RULE_xpath = 31, RULE_expr_xp = 32, RULE_orExpr_xp = 33, RULE_andExpr_xp = 34, 
 		RULE_equalityExpr_xp = 35, RULE_relationalExpr_xp = 36, RULE_additiveExpr_xp = 37, 
 		RULE_multiplicativeExpr_xp = 38, RULE_unaryExpr = 39, RULE_unionExpr = 40, 
 		RULE_valueExpr = 41, RULE_pathExpr = 42, RULE_relativePathExpr = 43, RULE_relativePathExpr2 = 44, 
 		RULE_stepExpr = 45, RULE_axisStep = 46, RULE_forwardStep = 47, RULE_abbrevForwardStep = 48, 
 		RULE_nodeTest = 49, RULE_kindTest = 50, RULE_nameTest = 51, RULE_filterExpr = 52, 
-		RULE_predicateList = 53, RULE_predicate = 54, RULE_primaryExpr = 55, RULE_literal = 56, 
-		RULE_numericLiteral = 57, RULE_parenthesizedExpr = 58, RULE_functionCall = 59, 
-		RULE_functionName = 60, RULE_textTest = 61, RULE_qName = 62;
+		RULE_predicateList_xp = 53, RULE_predicate_xp = 54, RULE_primaryExpr = 55, 
+		RULE_literal = 56, RULE_numericLiteral = 57, RULE_parenthesizedExpr = 58, 
+		RULE_functionCall = 59, RULE_functionName = 60, RULE_textTest = 61, RULE_qName = 62;
 	public static final String[] ruleNames = {
 		"xquery", "flwrexpr", "initial", "middle", "forStat", "forBinding", "let", 
 		"letBinding", "arithExpr", "pathExpr_xq", "pathExprInner_xq", "aggrExpr", 
 		"where", "orExpr_xq", "andExpr_xq", "boolExpr_xq", "boolExprInner_xq", 
 		"pred", "vcmp", "ncmp", "contains", "empty", "groupBy", "returnStat", 
 		"eleConst", "eleConstInner", "att", "attInner", "attInner2", "eaName", 
-		"arithmeticExpr_xq", "xpath", "expr", "orExpr_xp", "andExpr_xp", "equalityExpr_xp", 
+		"arithmeticExpr_xq", "xpath", "expr_xp", "orExpr_xp", "andExpr_xp", "equalityExpr_xp", 
 		"relationalExpr_xp", "additiveExpr_xp", "multiplicativeExpr_xp", "unaryExpr", 
 		"unionExpr", "valueExpr", "pathExpr", "relativePathExpr", "relativePathExpr2", 
 		"stepExpr", "axisStep", "forwardStep", "abbrevForwardStep", "nodeTest", 
-		"kindTest", "nameTest", "filterExpr", "predicateList", "predicate", "primaryExpr", 
-		"literal", "numericLiteral", "parenthesizedExpr", "functionCall", "functionName", 
-		"textTest", "qName"
+		"kindTest", "nameTest", "filterExpr", "predicateList_xp", "predicate_xp", 
+		"primaryExpr", "literal", "numericLiteral", "parenthesizedExpr", "functionCall", 
+		"functionName", "textTest", "qName"
 	};
 
 	@Override
@@ -1907,8 +1907,8 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class XpathContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
 		public XpathContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1927,7 +1927,7 @@ public class XQueryParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(356); expr();
+			setState(356); expr_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1941,24 +1941,24 @@ public class XQueryParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ExprContext extends ParserRuleContext {
+	public static class Expr_xpContext extends ParserRuleContext {
 		public OrExpr_xpContext orExpr_xp() {
 			return getRuleContext(OrExpr_xpContext.class,0);
 		}
-		public ExprContext(ParserRuleContext parent, int invokingState) {
+		public Expr_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expr; }
+		@Override public int getRuleIndex() { return RULE_expr_xp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitExpr(this);
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitExpr_xp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final ExprContext expr() throws RecognitionException {
-		ExprContext _localctx = new ExprContext(_ctx, getState());
-		enterRule(_localctx, 64, RULE_expr);
+	public final Expr_xpContext expr_xp() throws RecognitionException {
+		Expr_xpContext _localctx = new Expr_xpContext(_ctx, getState());
+		enterRule(_localctx, 64, RULE_expr_xp);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -2801,8 +2801,8 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class AxisStepContext extends ParserRuleContext {
-		public PredicateListContext predicateList() {
-			return getRuleContext(PredicateListContext.class,0);
+		public PredicateList_xpContext predicateList_xp() {
+			return getRuleContext(PredicateList_xpContext.class,0);
 		}
 		public ForwardStepContext forwardStep() {
 			return getRuleContext(ForwardStepContext.class,0);
@@ -2825,7 +2825,7 @@ public class XQueryParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(453); forwardStep();
-			setState(454); predicateList();
+			setState(454); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3061,11 +3061,11 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class FilterExprContext extends ParserRuleContext {
-		public PredicateListContext predicateList() {
-			return getRuleContext(PredicateListContext.class,0);
-		}
 		public PrimaryExprContext primaryExpr() {
 			return getRuleContext(PrimaryExprContext.class,0);
+		}
+		public PredicateList_xpContext predicateList_xp() {
+			return getRuleContext(PredicateList_xpContext.class,0);
 		}
 		public FilterExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3085,7 +3085,7 @@ public class XQueryParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(474); primaryExpr();
-			setState(475); predicateList();
+			setState(475); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3099,27 +3099,27 @@ public class XQueryParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PredicateListContext extends ParserRuleContext {
-		public PredicateContext predicate(int i) {
-			return getRuleContext(PredicateContext.class,i);
+	public static class PredicateList_xpContext extends ParserRuleContext {
+		public List<Predicate_xpContext> predicate_xp() {
+			return getRuleContexts(Predicate_xpContext.class);
 		}
-		public List<PredicateContext> predicate() {
-			return getRuleContexts(PredicateContext.class);
+		public Predicate_xpContext predicate_xp(int i) {
+			return getRuleContext(Predicate_xpContext.class,i);
 		}
-		public PredicateListContext(ParserRuleContext parent, int invokingState) {
+		public PredicateList_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_predicateList; }
+		@Override public int getRuleIndex() { return RULE_predicateList_xp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicateList(this);
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicateList_xp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final PredicateListContext predicateList() throws RecognitionException {
-		PredicateListContext _localctx = new PredicateListContext(_ctx, getState());
-		enterRule(_localctx, 106, RULE_predicateList);
+	public final PredicateList_xpContext predicateList_xp() throws RecognitionException {
+		PredicateList_xpContext _localctx = new PredicateList_xpContext(_ctx, getState());
+		enterRule(_localctx, 106, RULE_predicateList_xp);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -3130,7 +3130,7 @@ public class XQueryParser extends Parser {
 			while (_la==15) {
 				{
 				{
-				setState(477); predicate();
+				setState(477); predicate_xp();
 				}
 				}
 				setState(482);
@@ -3150,29 +3150,29 @@ public class XQueryParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PredicateContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+	public static class Predicate_xpContext extends ParserRuleContext {
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
-		public PredicateContext(ParserRuleContext parent, int invokingState) {
+		public Predicate_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_predicate; }
+		@Override public int getRuleIndex() { return RULE_predicate_xp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicate(this);
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitPredicate_xp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final PredicateContext predicate() throws RecognitionException {
-		PredicateContext _localctx = new PredicateContext(_ctx, getState());
-		enterRule(_localctx, 108, RULE_predicate);
+	public final Predicate_xpContext predicate_xp() throws RecognitionException {
+		Predicate_xpContext _localctx = new Predicate_xpContext(_ctx, getState());
+		enterRule(_localctx, 108, RULE_predicate_xp);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(483); match(15);
-			setState(484); expr();
+			setState(484); expr_xp();
 			setState(485); match(19);
 			}
 		}
@@ -3357,8 +3357,8 @@ public class XQueryParser extends Parser {
 	}
 
 	public static class ParenthesizedExprContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
 		public ParenthesizedExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3378,7 +3378,7 @@ public class XQueryParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(501); match(10);
-			setState(502); expr();
+			setState(502); expr_xp();
 			setState(503); match(27);
 			}
 		}
@@ -3397,13 +3397,13 @@ public class XQueryParser extends Parser {
 		public FunctionNameContext functionName() {
 			return getRuleContext(FunctionNameContext.class,0);
 		}
-		public List<ExprContext> expr() {
-			return getRuleContexts(ExprContext.class);
-		}
-		public ExprContext expr(int i) {
-			return getRuleContext(ExprContext.class,i);
+		public List<Expr_xpContext> expr_xp() {
+			return getRuleContexts(Expr_xpContext.class);
 		}
 		public List<TerminalNode> COMMA() { return getTokens(XQueryParser.COMMA); }
+		public Expr_xpContext expr_xp(int i) {
+			return getRuleContext(Expr_xpContext.class,i);
+		}
 		public TerminalNode COMMA(int i) {
 			return getToken(XQueryParser.COMMA, i);
 		}
@@ -3431,7 +3431,7 @@ public class XQueryParser extends Parser {
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 2) | (1L << 3) | (1L << 7) | (1L << 10) | (1L << 12) | (1L << 13) | (1L << 14) | (1L << 21) | (1L << 24) | (1L << 26) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << OP_SUB) | (1L << QNAME_TOKEN))) != 0) || ((((_la - 65)) & ~0x3f) == 0 && ((1L << (_la - 65)) & ((1L << (STRING_LITERAL - 65)) | (1L << (INTEGER_LITERAL - 65)) | (1L << (DECIMAL_LITERAL - 65)))) != 0)) {
 				{
-				setState(507); expr();
+				setState(507); expr_xp();
 				setState(512);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -3439,7 +3439,7 @@ public class XQueryParser extends Parser {
 					{
 					{
 					setState(508); match(COMMA);
-					setState(509); expr();
+					setState(509); expr_xp();
 					}
 					}
 					setState(514);

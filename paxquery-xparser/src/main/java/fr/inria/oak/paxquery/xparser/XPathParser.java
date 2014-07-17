@@ -36,21 +36,21 @@ public class XPathParser extends Parser {
 		"DECIMAL_LITERAL", "DIGITS", "WS"
 	};
 	public static final int
-		RULE_xpath = 0, RULE_expr = 1, RULE_orExpr_xp = 2, RULE_andExpr_xp = 3, 
+		RULE_xpath = 0, RULE_expr_xp = 1, RULE_orExpr_xp = 2, RULE_andExpr_xp = 3, 
 		RULE_equalityExpr_xp = 4, RULE_relationalExpr_xp = 5, RULE_additiveExpr_xp = 6, 
 		RULE_multiplicativeExpr_xp = 7, RULE_unaryExpr = 8, RULE_unionExpr = 9, 
 		RULE_valueExpr = 10, RULE_pathExpr = 11, RULE_relativePathExpr = 12, RULE_relativePathExpr2 = 13, 
 		RULE_stepExpr = 14, RULE_axisStep = 15, RULE_forwardStep = 16, RULE_abbrevForwardStep = 17, 
 		RULE_nodeTest = 18, RULE_kindTest = 19, RULE_nameTest = 20, RULE_filterExpr = 21, 
-		RULE_predicateList = 22, RULE_predicate = 23, RULE_primaryExpr = 24, RULE_literal = 25, 
-		RULE_numericLiteral = 26, RULE_parenthesizedExpr = 27, RULE_functionCall = 28, 
-		RULE_functionName = 29, RULE_textTest = 30, RULE_qName = 31;
+		RULE_predicateList_xp = 22, RULE_predicate_xp = 23, RULE_primaryExpr = 24, 
+		RULE_literal = 25, RULE_numericLiteral = 26, RULE_parenthesizedExpr = 27, 
+		RULE_functionCall = 28, RULE_functionName = 29, RULE_textTest = 30, RULE_qName = 31;
 	public static final String[] ruleNames = {
-		"xpath", "expr", "orExpr_xp", "andExpr_xp", "equalityExpr_xp", "relationalExpr_xp", 
+		"xpath", "expr_xp", "orExpr_xp", "andExpr_xp", "equalityExpr_xp", "relationalExpr_xp", 
 		"additiveExpr_xp", "multiplicativeExpr_xp", "unaryExpr", "unionExpr", 
 		"valueExpr", "pathExpr", "relativePathExpr", "relativePathExpr2", "stepExpr", 
 		"axisStep", "forwardStep", "abbrevForwardStep", "nodeTest", "kindTest", 
-		"nameTest", "filterExpr", "predicateList", "predicate", "primaryExpr", 
+		"nameTest", "filterExpr", "predicateList_xp", "predicate_xp", "primaryExpr", 
 		"literal", "numericLiteral", "parenthesizedExpr", "functionCall", "functionName", 
 		"textTest", "qName"
 	};
@@ -75,8 +75,8 @@ public class XPathParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class XpathContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
 		public XpathContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -98,7 +98,7 @@ public class XPathParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(64); expr();
+			setState(64); expr_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -112,27 +112,27 @@ public class XPathParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ExprContext extends ParserRuleContext {
+	public static class Expr_xpContext extends ParserRuleContext {
 		public OrExpr_xpContext orExpr_xp() {
 			return getRuleContext(OrExpr_xpContext.class,0);
 		}
-		public ExprContext(ParserRuleContext parent, int invokingState) {
+		public Expr_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expr; }
+		@Override public int getRuleIndex() { return RULE_expr_xp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterExpr_xp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitExpr(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitExpr_xp(this);
 		}
 	}
 
-	public final ExprContext expr() throws RecognitionException {
-		ExprContext _localctx = new ExprContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_expr);
+	public final Expr_xpContext expr_xp() throws RecognitionException {
+		Expr_xpContext _localctx = new Expr_xpContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_expr_xp);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -1023,8 +1023,8 @@ public class XPathParser extends Parser {
 	}
 
 	public static class AxisStepContext extends ParserRuleContext {
-		public PredicateListContext predicateList() {
-			return getRuleContext(PredicateListContext.class,0);
+		public PredicateList_xpContext predicateList_xp() {
+			return getRuleContext(PredicateList_xpContext.class,0);
 		}
 		public ForwardStepContext forwardStep() {
 			return getRuleContext(ForwardStepContext.class,0);
@@ -1050,7 +1050,7 @@ public class XPathParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(161); forwardStep();
-			setState(162); predicateList();
+			setState(162); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1301,11 +1301,11 @@ public class XPathParser extends Parser {
 	}
 
 	public static class FilterExprContext extends ParserRuleContext {
-		public PredicateListContext predicateList() {
-			return getRuleContext(PredicateListContext.class,0);
-		}
 		public PrimaryExprContext primaryExpr() {
 			return getRuleContext(PrimaryExprContext.class,0);
+		}
+		public PredicateList_xpContext predicateList_xp() {
+			return getRuleContext(PredicateList_xpContext.class,0);
 		}
 		public FilterExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1328,7 +1328,7 @@ public class XPathParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(182); primaryExpr();
-			setState(183); predicateList();
+			setState(183); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1342,30 +1342,30 @@ public class XPathParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PredicateListContext extends ParserRuleContext {
-		public PredicateContext predicate(int i) {
-			return getRuleContext(PredicateContext.class,i);
+	public static class PredicateList_xpContext extends ParserRuleContext {
+		public List<Predicate_xpContext> predicate_xp() {
+			return getRuleContexts(Predicate_xpContext.class);
 		}
-		public List<PredicateContext> predicate() {
-			return getRuleContexts(PredicateContext.class);
+		public Predicate_xpContext predicate_xp(int i) {
+			return getRuleContext(Predicate_xpContext.class,i);
 		}
-		public PredicateListContext(ParserRuleContext parent, int invokingState) {
+		public PredicateList_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_predicateList; }
+		@Override public int getRuleIndex() { return RULE_predicateList_xp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicateList(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicateList_xp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicateList(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicateList_xp(this);
 		}
 	}
 
-	public final PredicateListContext predicateList() throws RecognitionException {
-		PredicateListContext _localctx = new PredicateListContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_predicateList);
+	public final PredicateList_xpContext predicateList_xp() throws RecognitionException {
+		PredicateList_xpContext _localctx = new PredicateList_xpContext(_ctx, getState());
+		enterRule(_localctx, 44, RULE_predicateList_xp);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -1376,7 +1376,7 @@ public class XPathParser extends Parser {
 			while (_la==5) {
 				{
 				{
-				setState(185); predicate();
+				setState(185); predicate_xp();
 				}
 				}
 				setState(190);
@@ -1396,32 +1396,32 @@ public class XPathParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PredicateContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+	public static class Predicate_xpContext extends ParserRuleContext {
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
-		public PredicateContext(ParserRuleContext parent, int invokingState) {
+		public Predicate_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_predicate; }
+		@Override public int getRuleIndex() { return RULE_predicate_xp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicate(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterPredicate_xp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicate(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitPredicate_xp(this);
 		}
 	}
 
-	public final PredicateContext predicate() throws RecognitionException {
-		PredicateContext _localctx = new PredicateContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_predicate);
+	public final Predicate_xpContext predicate_xp() throws RecognitionException {
+		Predicate_xpContext _localctx = new Predicate_xpContext(_ctx, getState());
+		enterRule(_localctx, 46, RULE_predicate_xp);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(191); match(5);
-			setState(192); expr();
+			setState(192); expr_xp();
 			setState(193); match(8);
 			}
 		}
@@ -1615,8 +1615,8 @@ public class XPathParser extends Parser {
 	}
 
 	public static class ParenthesizedExprContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+		public Expr_xpContext expr_xp() {
+			return getRuleContext(Expr_xpContext.class,0);
 		}
 		public ParenthesizedExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1639,7 +1639,7 @@ public class XPathParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(209); match(11);
-			setState(210); expr();
+			setState(210); expr_xp();
 			setState(211); match(13);
 			}
 		}
@@ -1658,13 +1658,13 @@ public class XPathParser extends Parser {
 		public FunctionNameContext functionName() {
 			return getRuleContext(FunctionNameContext.class,0);
 		}
-		public List<ExprContext> expr() {
-			return getRuleContexts(ExprContext.class);
-		}
-		public ExprContext expr(int i) {
-			return getRuleContext(ExprContext.class,i);
+		public List<Expr_xpContext> expr_xp() {
+			return getRuleContexts(Expr_xpContext.class);
 		}
 		public List<TerminalNode> COMMA() { return getTokens(XPathParser.COMMA); }
+		public Expr_xpContext expr_xp(int i) {
+			return getRuleContext(Expr_xpContext.class,i);
+		}
 		public TerminalNode COMMA(int i) {
 			return getToken(XPathParser.COMMA, i);
 		}
@@ -1695,7 +1695,7 @@ public class XPathParser extends Parser {
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 4) | (1L << 7) | (1L << 9) | (1L << 10) | (1L << 11) | (1L << 12) | (1L << 14) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << OP_SUB) | (1L << QNAME_TOKEN) | (1L << STRING_LITERAL) | (1L << INTEGER_LITERAL) | (1L << DECIMAL_LITERAL))) != 0)) {
 				{
-				setState(215); expr();
+				setState(215); expr_xp();
 				setState(220);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -1703,7 +1703,7 @@ public class XPathParser extends Parser {
 					{
 					{
 					setState(216); match(COMMA);
-					setState(217); expr();
+					setState(217); expr_xp();
 					}
 					}
 					setState(222);

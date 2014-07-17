@@ -144,4 +144,5 @@ group by $seller, $buyer
 return &#60;res seller=&#34;{$seller}&#34; buyer=&#34;{$buyer}&#34;>{count($item)}&#60;/res>
 	"/>
 	<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) let $seller := $pc/seller[pepe + 6 > 10] return $seller"/>
+	<test value="let $pc := collection(&#34;XMarkDocs/XMarkPeople/file0.xml&#34;) let $seller := $pc/seller[pepe + 6 > 10][a='yeah and b&lt;-7'] return $seller"/>
 </tests>

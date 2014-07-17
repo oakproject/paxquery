@@ -9,6 +9,17 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface XPathListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link XPathParser#predicate_xp}.
+	 * @param ctx the parse tree
+	 */
+	void enterPredicate_xp(@NotNull XPathParser.Predicate_xpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#predicate_xp}.
+	 * @param ctx the parse tree
+	 */
+	void exitPredicate_xp(@NotNull XPathParser.Predicate_xpContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link XPathParser#qName}.
 	 * @param ctx the parse tree
 	 */
@@ -18,6 +29,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitQName(@NotNull XPathParser.QNameContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#predicateList_xp}.
+	 * @param ctx the parse tree
+	 */
+	void enterPredicateList_xp(@NotNull XPathParser.PredicateList_xpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#predicateList_xp}.
+	 * @param ctx the parse tree
+	 */
+	void exitPredicateList_xp(@NotNull XPathParser.PredicateList_xpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#relationalExpr_xp}.
@@ -108,17 +130,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitAbbrevForwardStep(@NotNull XPathParser.AbbrevForwardStepContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#predicate}.
-	 * @param ctx the parse tree
-	 */
-	void enterPredicate(@NotNull XPathParser.PredicateContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#predicate}.
-	 * @param ctx the parse tree
-	 */
-	void exitPredicate(@NotNull XPathParser.PredicateContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#xpath}.
 	 * @param ctx the parse tree
 	 */
@@ -152,17 +163,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitValueExpr(@NotNull XPathParser.ValueExprContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#predicateList}.
-	 * @param ctx the parse tree
-	 */
-	void enterPredicateList(@NotNull XPathParser.PredicateListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#predicateList}.
-	 * @param ctx the parse tree
-	 */
-	void exitPredicateList(@NotNull XPathParser.PredicateListContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#primaryExpr}.
 	 * @param ctx the parse tree
 	 */
@@ -194,17 +194,6 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRelativePathExpr2_slash(@NotNull XPathParser.RelativePathExpr2_slashContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link XPathParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpr(@NotNull XPathParser.ExprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpr(@NotNull XPathParser.ExprContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#pathExpr_slash}.
@@ -337,6 +326,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunctionCall(@NotNull XPathParser.FunctionCallContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#expr_xp}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpr_xp(@NotNull XPathParser.Expr_xpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#expr_xp}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpr_xp(@NotNull XPathParser.Expr_xpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#orExpr_xp}.

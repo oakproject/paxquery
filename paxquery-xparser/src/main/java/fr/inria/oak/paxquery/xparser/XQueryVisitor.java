@@ -68,25 +68,11 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitEmpty(@NotNull XQueryParser.EmptyContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#predicate}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPredicate(@NotNull XQueryParser.PredicateContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#eaName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitEaName(@NotNull XQueryParser.EaNameContext ctx);
-
-	/**
-	 * Visit a parse tree produced by {@link XQueryParser#predicateList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPredicateList(@NotNull XQueryParser.PredicateListContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#pred}.
@@ -236,11 +222,25 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitForwardStep(@NotNull XQueryParser.ForwardStepContext ctx);
 
 	/**
+	 * Visit a parse tree produced by {@link XQueryParser#predicate_xp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPredicate_xp(@NotNull XQueryParser.Predicate_xpContext ctx);
+
+	/**
 	 * Visit a parse tree produced by {@link XQueryParser#qName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitQName(@NotNull XQueryParser.QNameContext ctx);
+
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#predicateList_xp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPredicateList_xp(@NotNull XQueryParser.PredicateList_xpContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#pathExprInner_xq_VAR}.
@@ -362,13 +362,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitWhere(@NotNull XQueryParser.WhereContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpr(@NotNull XQueryParser.ExprContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#middle}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -444,6 +437,13 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTextTest(@NotNull XQueryParser.TextTestContext ctx);
+
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#expr_xp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpr_xp(@NotNull XQueryParser.Expr_xpContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#attInner}.
