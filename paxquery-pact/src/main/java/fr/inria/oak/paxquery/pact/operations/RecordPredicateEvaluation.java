@@ -77,17 +77,48 @@ public class RecordPredicateEvaluation {
 	
 	private static boolean evaluateSimplePredicate(NestedMetadata inputRecordSignature, Record record, SimplePredicate simplePred) {
 		try {
+			String numericPattern = "^-?\\d+([,\\.]\\d+)?([eE]-?\\d+)?$";
+			boolean isValue1Number, isValue2Number;
+			
 			double value1, value2;
 	
 			//We are evaluating a predicate over two columns!
 			if(simplePred.getStringConstant() == null && simplePred.getDoubleConstant() == -1) {
 				switch(simplePred.getPredCode()) {
 					case PREDICATE_EQUAL:
-						return record.getField(simplePred.getColumn1(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn1())))
-								.equals(record.getField(simplePred.getColumn2(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn2()))));
+						isValue1Number = Pattern.matches(numericPattern, record.getField(simplePred.getColumn1(), StringValue.class).getValue());
+						isValue2Number = Pattern.matches(numericPattern, record.getField(simplePred.getColumn2(), StringValue.class).getValue());
+						if(isValue1Number && isValue2Number) {
+							//both columns contain numbers
+							value1 = Double.parseDouble(record.getField(simplePred.getColumn1(), StringValue.class).getValue());
+							if(simplePred.getOperation1() != null)
+								value1 = simplePred.getOperation1().calculate(value1);
+							value2 = Double.parseDouble(record.getField(simplePred.getColumn2(), StringValue.class).getValue());
+							if(simplePred.getOperation2() != null)
+								value2 = simplePred.getOperation2().calculate(value2);
+							return value1 == value2;
+						}
+						else if(!isValue1Number && !isValue2Number)	//both columns contain non-number strings
+							return record.getField(simplePred.getColumn1(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn1())))
+									.equals(record.getField(simplePred.getColumn2(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn2()))));
+						else	//a number and a non-number, result must be false
+							return false;
 					case PREDICATE_NOTEQUAL:
-						return !record.getField(simplePred.getColumn1(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn1())))
-								.equals(record.getField(simplePred.getColumn2(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn2()))));
+						isValue1Number = Pattern.matches(numericPattern, record.getField(simplePred.getColumn1(), StringValue.class).getValue());
+						isValue2Number = Pattern.matches(numericPattern, record.getField(simplePred.getColumn2(), StringValue.class).getValue());
+						if(isValue1Number && isValue2Number) {
+							//both columns contain numbers
+							value1 = Double.parseDouble(record.getField(simplePred.getColumn1(), StringValue.class).getValue());
+							if(simplePred.getOperation1() != null)
+								value1 = simplePred.getOperation1().calculate(value1);
+							value2 = Double.parseDouble(record.getField(simplePred.getColumn2(), StringValue.class).getValue());
+							if(simplePred.getOperation2() != null)
+								value2 = simplePred.getOperation2().calculate(value2);
+							return value1 != value2;
+						}
+						else //at least one column contains a non-number, test for non-equality
+							return !record.getField(simplePred.getColumn1(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn1())))
+									.equals(record.getField(simplePred.getColumn2(), MetadataTypesMapping.getValueClass(inputRecordSignature.getType(simplePred.getColumn2()))));
 					case PREDICATE_SMALLEROREQUALTHAN:
 						value1 = Double.parseDouble(record.getField(simplePred.getColumn1(), StringValue.class).getValue());
 						if(simplePred.getOperation1() != null)
