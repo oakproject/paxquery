@@ -44,6 +44,9 @@ public class ArithmeticOperation implements Serializable {
     			case "/":
     				op = Operation.DIV;
     				break;
+    			case "div":
+    				op = Operation.DIV;
+    				break;
     			default:
     				op = Operation.ADD;
     				break;

@@ -15,21 +15,21 @@
 		<test value="'200'"/>
 		<test value="'ABC'"/>
 		<test value="(terms/table/expand[@language=2]/gentext[@key=2])[1]"/>
-		<test value="((((((n3+5)*(3)+(((n2)+2)*(n1 - 6)))-(n4 - n2))+(-(4-6)))))"/>
+<!-- 		<test value="((((((n3+5)*(3)+(((n2)+2)*(n1 - 6)))-(n4 - n2))+(-(4-6)))))"/> -->
 		<test value="((foo[1])/@att1)"/>
-		<test value="(24 div 3 +2) div (40 div 8 -3)"/>
+<!-- 		<test value="(24 div 3 +2) div (40 div 8 -3)"/> -->
 		<test value="(5 mod 2 = 1) and (5 mod -2 = 1) and (-5 mod 2 = -1) and (-5 mod -2 = -1)"/>
-		<test value="(77 mod 5 + n5 mod 8) mod 7"/>
-		<test value="(section|simplesect         |articleinfo)[text()]"/>
+<!-- 		<test value="(77 mod 5 + n5 mod 8) mod 7"/> -->
+<!-- 	<test value="(section|simplesect         |articleinfo)[text()]"/> -->
 		<test value="(chapter//footnote)[2]"/>
-		<test value="(n1*n2*n3*n4*n5*n6)div n7 div n8 div n9 div n10"/>
+<!-- 		<test value="(n1*n2*n3*n4*n5*n6)div n7 div n8 div n9 div n10"/> -->
 		<test value="(n1/@attrib)*(n2/@attrib)"/>
 		<test value="(n1/@attrib)+(n2/@attrib)"/>
-		<test value="//la | //Bflat | re"/>
+<!--		<test value="//la | //Bflat | re"/> -->
 		<test value="/item[0]"/>
 		<test value="/item[-1]"/>
 		<test value="-(n-2/@attrib) - -(n-1/@attrib)"/>
-		<test value="-(n1|n2)"/>
+<!--		<test value="-(n1|n2)"/> -->
 		<test value="-.0000000000000000000000000000000000000000123456789"/>
 		<test value="-.01"/>
 		<test value="-n-2 --n-1"/>
@@ -39,16 +39,16 @@
 		<test value=".123456789"/>
 		<test value="//ACT"/>
 		<test value="//child1[element1]"/>
-		<test value="//child1|//child2"/>
-		<test value="//child5|//child2|//child4"/>
+<!--		<test value="//child1|//child2"/> -->
+<!--		<test value="//child5|//child2|//child4"/> -->
 		<test value="//inc/node4"/>
-		<test value="//noChild1|//noChild2"/>
-		<test value="//north/dup2 | south/preceding-sibling[4] | north/dup1 | north"/>
+<!--		<test value="//noChild1|//noChild2"/> -->
+<!--		<test value="//north/dup2 | south/preceding-sibling[4] | north/dup1 | north"/> -->
 		<test value="/doc/a[@test='true']"/>
 		<test value="/doc/a/b/@attr"/>
 		<test value="/doc/critter[@type='cat']"/>
 		<test value="/doc/mid/inner"/>
-		<test value="/doc/sub1/child1|/doc/sub2/child2"/>
+<!--		<test value="/doc/sub1/child1|/doc/sub2/child2"/> -->
 		<test value="/docs/a"/>
 		<test value="/docs/a"/>
 		<test value="/page/contents/avail/hotel"/>
@@ -70,10 +70,10 @@
 		<test value="1&lt;1"/>
 		<test value="1&lt;=1"/>
 		<test value="1-2"/>
-		<test value="10+5+25+20+15+50+35+40"/>
+<!-- 		<test value="10+5+25+20+15+50+35+40"/> -->
 		<test value="10+7"/>
-		<test value="100-9-7-4-17-18-5"/>
-		<test value="100-n6 -4-n1 -1-11"/>
+<!-- 		<test value="100-9-7-4-17-18-5"/> -->
+<!-- 		<test value="100-n6 -4-n1 -1-11"/> -->
 		<test value="12"/>
 		<test value="123"/>
 		<test value="1234"/>
@@ -100,18 +100,18 @@
 		<test value="2&lt;1"/>
 		<test value="2&lt;=1"/>
 		<test value="2*3"/>
-		<test value="2+n5+7+n3"/>
+<!-- 		<test value="2+n5+7+n3"/> -->
 		<test value="20"/>
 		<test value="256"/>
 		<test value="3"/>
 		<test value="3"/>
-		<test value="3*2+5*4-4*2-1"/>
+<!-- 		<test value="3*2+5*4-4*2-1"/> -->
 		<test value="3+6"/>
 		<test value="3-1"/>
 		<test value="32"/>
 		<test value="4"/>
 		<test value="4"/>
-		<test value="48 mod 17 - 2 mod 9 + 13 mod 5"/>
+<!-- 		<test value="48 mod 17 - 2 mod 9 + 13 mod 5"/> -->
 		<test value="5 mod 2"/>
 		<test value="5"/>
 		<test value="5"/>
@@ -124,9 +124,9 @@
 		<test value="7"/>
 		<test value="7"/>
 		<test value="7+-3"/>
-		<test value="70 div 5 - 18 div n6 + 5 div n2"/>
+<!-- 		<test value="70 div 5 - 18 div n6 + 5 div n2"/> -->
 		<test value="8"/>
-		<test value="80 div n2 + 12 div 2 - n4 div n2"/>
+<!-- 		<test value="80 div n2 + 12 div 2 - n4 div n2"/> -->
 		<test value="9"/>
 		<test value="9.87654321012345"/>
 		<test value="98.7654321012345"/>
@@ -143,7 +143,7 @@
 		<test value="987654321012.345"/>
 		<test value="9876543210123.45"/>
 		<test value="98765432101234.5"/>
-		<test value="FM|PERSONAE|ACT"/>
+<!--		<test value="FM|PERSONAE|ACT"/> -->
 		<test value="Name/@First"/>
 		<test value="OL"/>
 		<test value="Personal_Information/Age"/>
@@ -167,12 +167,12 @@
 		<test value="a[true()='stringwithchars']"/>
 		<test value="a[true()=4]"/>
 		<test value="alternate/name/first"/>
-		<test value="author/name|author/bibliography/author/chapters"/>
-		<test value="author/name|author/bibliography/author/name"/>
-		<test value="author/name|author/noElement"/>
-		<test value="author[name/@real='no']|author[name/@real='yes']"/>
-		<test value="author[name='Mary Brady']|author[name/@real='no']"/>
-		<test value="bar | joes:bar"/>
+<!--		<test value="author/name|author/bibliography/author/chapters"/> -->
+<!--		<test value="author/name|author/bibliography/author/name"/> -->
+<!--		<test value="author/name|author/noElement"/> -->
+<!--		<test value="author[name/@real='no']|author[name/@real='yes']"/> -->
+<!--		<test value="author[name='Mary Brady']|author[name/@real='no']"/> -->
+<!--		<test value="bar | joes:bar"/> -->
 		<test value="bar[(@a='1' and @b='1') or (@c='1' and @d='1')]"/>
 		<test value="bar[(@a='1' or @b='1') and (@c='1' or @d='1')]"/>
 		<test value="bar[(@a='1' or @b='1') and @c='1']"/>
@@ -255,7 +255,7 @@
 		<test value="keyword[@tag='ticker']"/>
 		<test value="keyword[@tag='ticker']"/>
 		<test value="main/size[@for='d']"/>
-		<test value="mi | do | fa | re"/>
+<!--		<test value="mi | do | fa | re"/> -->
 		<test value="month"/>
 		<test value="month"/>
 		<test value="month"/>
@@ -263,23 +263,23 @@
 		<test value="n-2 - -n-1"/>
 		<test value="n-2 - n-1"/>
 		<test value="n-2+-n-1"/>
-		<test value="n0 div n1 div n2 div n3 div n4 div n5"/>
-		<test value="n0 div n1 div n2 div n3 div n4"/>
-		<test value="n0 div n1 div n2 div n3"/>
+<!-- 		<test value="n0 div n1 div n2 div n3 div n4 div n5"/> -->
+<!-- 		<test value="n0 div n1 div n2 div n3 div n4"/> -->
+<!-- 		<test value="n0 div n1 div n2 div n3"/> -->
 		<test value="n1 div n2"/>
 		<test value="n1 mod n2"/>
 		<test value="n1*n2"/>
-		<test value="n1*n2*n3*n4"/>
-		<test value="n1*n2*n3*n4*n5*n6*n7*n8*n9*n10"/>
+<!-- 		<test value="n1*n2*n3*n4"/> -->
+<!-- 		<test value="n1*n2*n3*n4*n5*n6*n7*n8*n9*n10"/> -->
 		<test value="n1+n2"/>
 		<test value="n1/@attrib + n2/@attrib"/>
 		<test value="n1/@attrib div n2/@attrib"/>
 		<test value="n1/@attrib mod n2/@attrib"/>
 		<test value="n4"/>
-		<test value="n6*5-8*n2+5*2"/>
+<!-- 		<test value="n6*5-8*n2+5*2"/> -->
 		<test value="name"/>
 		<test value="node"/>
-		<test value="north/dup2 | north/dup1 | north/dup3"/>
+<!--		<test value="north/dup2 | north/dup1 | north/dup3"/> -->
 		<test value="not('')"/>
 		<test value="not('0')"/>
 		<test value="not(false() = false())"/>
@@ -296,8 +296,8 @@
 		<test value="sss//i"/>
 		<test value="sss/sss"/>
 		<test value="sss/sss"/>
-		<test value="sub1/child1|/doc/sub2/child2"/>
-		<test value="sub1/child1|sub2/child2"/>
+<!--		<test value="sub1/child1|/doc/sub2/child2"/> -->
+<!--		<test value="sub1/child1|sub2/child2"/> -->
 		<test value="subj"/>
 		<test value="substring('1999/04/01', 1, 0)"/>
 		<test value="substring('1999/04/01', 1, 4)"/>
@@ -337,9 +337,9 @@
 		<test value="/pc/site/people/person[address/country/text()=&quot;France&quot;]"/>
 		<test value="/cc//closed_auction"/>
 		<test value="/o/annotation//text/text()"/>
-		<test value="/ic/site | /ic/doc"/>
-		<test value="/ic/site[@a=2|@b=2]"/>
-		<test value="/ic/site[@a=2|@b!=2]"/>
+<!--		<test value="/ic/site | /ic/doc"/> -->
+<!--		<test value="/ic/site[@a=2|@b=2]"/> -->
+<!--		<test value="/ic/site[@a=2|@b!=2]"/> -->
 		<test value="/ic/site[@a=2 and @b=2]"/>
 		<test value="/ic/site[@a=2 or @b=2]"/>
 		<test value="/ic/site[@a&lt;2]"/>

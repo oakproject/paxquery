@@ -42,17 +42,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitPredicateList_xp(@NotNull XPathParser.PredicateList_xpContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#relationalExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void enterRelationalExpr_xp(@NotNull XPathParser.RelationalExpr_xpContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#relationalExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void exitRelationalExpr_xp(@NotNull XPathParser.RelationalExpr_xpContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#nodeTest}.
 	 * @param ctx the parse tree
 	 */
@@ -86,17 +75,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitNameTest(@NotNull XPathParser.NameTestContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#equalityExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void enterEqualityExpr_xp(@NotNull XPathParser.EqualityExpr_xpContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#equalityExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void exitEqualityExpr_xp(@NotNull XPathParser.EqualityExpr_xpContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#andExpr_xp}.
 	 * @param ctx the parse tree
 	 */
@@ -106,6 +84,17 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAndExpr_xp(@NotNull XPathParser.AndExpr_xpContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link XPathParser#comparativeExpr_xp}.
+	 * @param ctx the parse tree
+	 */
+	void enterComparativeExpr_xp(@NotNull XPathParser.ComparativeExpr_xpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XPathParser#comparativeExpr_xp}.
+	 * @param ctx the parse tree
+	 */
+	void exitComparativeExpr_xp(@NotNull XPathParser.ComparativeExpr_xpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#literal}.
@@ -218,17 +207,6 @@ public interface XPathListener extends ParseTreeListener {
 	void exitNumericLiteral(@NotNull XPathParser.NumericLiteralContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#multiplicativeExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void enterMultiplicativeExpr_xp(@NotNull XPathParser.MultiplicativeExpr_xpContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#multiplicativeExpr_xp}.
-	 * @param ctx the parse tree
-	 */
-	void exitMultiplicativeExpr_xp(@NotNull XPathParser.MultiplicativeExpr_xpContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link XPathParser#functionName}.
 	 * @param ctx the parse tree
 	 */
@@ -249,17 +227,6 @@ public interface XPathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFilterExpr(@NotNull XPathParser.FilterExprContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link XPathParser#unionExpr}.
-	 * @param ctx the parse tree
-	 */
-	void enterUnionExpr(@NotNull XPathParser.UnionExprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link XPathParser#unionExpr}.
-	 * @param ctx the parse tree
-	 */
-	void exitUnionExpr(@NotNull XPathParser.UnionExprContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#axisStep}.
@@ -295,15 +262,15 @@ public interface XPathListener extends ParseTreeListener {
 	void exitRelativePathExpr(@NotNull XPathParser.RelativePathExprContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link XPathParser#additiveExpr_xp}.
+	 * Enter a parse tree produced by {@link XPathParser#arithmeticExpr_xp}.
 	 * @param ctx the parse tree
 	 */
-	void enterAdditiveExpr_xp(@NotNull XPathParser.AdditiveExpr_xpContext ctx);
+	void enterArithmeticExpr_xp(@NotNull XPathParser.ArithmeticExpr_xpContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link XPathParser#additiveExpr_xp}.
+	 * Exit a parse tree produced by {@link XPathParser#arithmeticExpr_xp}.
 	 * @param ctx the parse tree
 	 */
-	void exitAdditiveExpr_xp(@NotNull XPathParser.AdditiveExpr_xpContext ctx);
+	void exitArithmeticExpr_xp(@NotNull XPathParser.ArithmeticExpr_xpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link XPathParser#textTest}.

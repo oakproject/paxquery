@@ -13,6 +13,8 @@ import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
 
 public class XQueryUtils {
 	
+	private static int auxVarCounter = 0;
+	
 	/**
 	 * Populates the HashMap<Integer, String> varspos with patternNodes that match variables and their position 
 	 * within the tree. That is, containing pairs with the shape <patterNode_position_in_the_tree, var_name>
@@ -162,5 +164,41 @@ public class XQueryUtils {
 				return i;
 		}
 		return -1;
+	}
+	
+	/**
+	 * Returns a name for an auxiliar variable wich will point to a node within an XPath predicate
+	 * E.g:
+	 * let $mainVarName := whatever/lastNodeOutsideXPathPredicateName[lastNodeInsideXPathPredicateName = 'whatever']
+	 * Consecuently, the auxiliar variable with the returned name will point to the "lastNodeInsideXPathPredicateName" node.
+	 */
+	public static String buildAuxVariableName(String mainVarName, String lastNodeOutsideXPathPredicateName, String lastNodeInsideXPathPredicateName) {
+		return mainVarName + ":" + lastNodeOutsideXPathPredicateName + ":" + lastNodeInsideXPathPredicateName;
+	}
+	
+	/**
+	 * Returns a name for an auxiliar variable. The shape of the name is "auxVar"+auxVarCounter.
+	 * auxVarCounter is autoincremented after each call.
+	 */
+	public static String getNextAuxVariableName() {
+		return "auxVar"+auxVarCounter++;
+	}
+
+	/**
+	 * Removes first and last character, assuming they're simple (') or double quotes (")
+	 * @param inputString
+	 * @return
+	 */
+	public static String sanitizeStringLiteral(String inputString) {
+		if(inputString != null && inputString != "") {
+			if(inputString.charAt(0) == '"' && inputString.charAt(inputString.length()-1) == '"' 
+					|| inputString.charAt(0) == '\'' && inputString.charAt(inputString.length()-1) == '\'') {
+				if(inputString.length() > 2)
+					inputString = inputString.substring(1, inputString.length()-1);
+				else
+					inputString = "";
+			}
+		}
+		return inputString;
 	}
 }

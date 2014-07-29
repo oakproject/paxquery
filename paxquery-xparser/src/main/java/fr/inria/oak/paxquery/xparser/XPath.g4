@@ -6,13 +6,10 @@ import XLexer;
 xpath: expr_xp ;
 expr_xp : orExpr_xp ;
 orExpr_xp : andExpr_xp ( OR andExpr_xp )* ;
-andExpr_xp : equalityExpr_xp ( AND equalityExpr_xp )* ;
-equalityExpr_xp : relationalExpr_xp ( ( EQ_S | NE_S ) relationalExpr_xp )* ;
-relationalExpr_xp : additiveExpr_xp ( ( LT_S | GT_S | LE_S | GE_S ) additiveExpr_xp )* ;
-additiveExpr_xp : multiplicativeExpr_xp ( ( OP_ADD | OP_SUB ) multiplicativeExpr_xp )* ;
-multiplicativeExpr_xp : unaryExpr ( ( OP_MUL | 'div' | 'mod' ) unaryExpr )* ;
-unaryExpr : ( OP_SUB )* unionExpr ;
-unionExpr : valueExpr ( '|' valueExpr )* ;
+andExpr_xp : comparativeExpr_xp ( AND comparativeExpr_xp )* ;
+comparativeExpr_xp : arithmeticExpr_xp ( ( EQ_S | NE_S | LT_S | GT_S | LE_S | GE_S) arithmeticExpr_xp)? ;
+arithmeticExpr_xp : unaryExpr ( ( OP_ADD | OP_SUB | OP_MUL | 'div' | 'mod') unaryExpr )? ;
+unaryExpr : ( OP_SUB )* valueExpr ;
 valueExpr : filterExpr (pathExpr)? | pathExpr ;
 
 //Actually SLASH (relativePathExpr)? is the correct expression (so '/' is accepted as valid XPath), but we are using

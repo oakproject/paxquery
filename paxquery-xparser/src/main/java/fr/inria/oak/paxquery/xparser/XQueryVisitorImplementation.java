@@ -52,7 +52,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	private TreePattern lastTreePattern;
 	private PatternNode lastNode;
+	private PatternNode lastNodeInsideXPathPredicate;
 	private String lastVarLeftSide;
+	private String lastVarXPathPredicate;
 	private int lastSlashToken;
 	private boolean nextNodeIsAttribute;
 	private StringBuilder returnXMLTags;		//accumulates XML constant text from the return construction. This text is eventually inserted into XMLConstruct.apply.each
@@ -63,6 +65,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean specialEdgeFlag = false;	//set to true for edges VAR/whatever, so we can decided whether the edge is nested and optional or not
 	private Stack<BasePredicate> predicateStack;
 	private boolean insideXPathPredicate = false;	//for XPath predicate building
+	private int lastTreePatternInsideXPathPredicateIndex;
 	
 	
 	/**
@@ -170,6 +173,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * visitPathExpr_xq
 	 */
 	public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
+		System.out.println("visitPathExpr_xq: "+ctx.getText());
 		//by visiting the children we build the tree pattern and set up the XMLScan algop
 		visitChildren(ctx); 
 
@@ -200,6 +204,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * pathExprInner_xq_collection - enter
 	 * Creates a XMLScanOperator, an associated tree pattern and a root node for the tree
+	 * TODO: merge with visitPathExprInner_xq_doc
 	 */
 	public Void visitPathExprInner_xq_collection(XQueryParser.PathExprInner_xq_collectionContext ctx) {
 		//root node construction
@@ -215,7 +220,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		treePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
-		String pathDocuments = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
+		String pathDocuments = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
 		//add a new XMLScan object
 		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		treePatternVisited.add(false);
@@ -227,6 +232,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * pathExprInner_xq_doc
 	 * Creates a XMLScanOperator, an associated tree pattern and a root node for the tree
+	 * TODO: merge with visitPathExprInner_xq_doc
 	 */
 	public Void visitPathExprInner_xq_doc(XQueryParser.PathExprInner_xq_docContext ctx) { 
 		//root node construction
@@ -242,7 +248,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		treePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
-		String pathDocuments = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
+		String pathDocuments = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
 		//add a new XMLScan object
 		scans.add(new XMLScan(false, lastTreePattern, pathDocuments));
 		treePatternVisited.add(false);
@@ -310,6 +316,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * pathExprInner_xq_VAR
 	 * Retrieves the appropriate tree and node for further expansion in the following case: another_var := VAR/whatever
+	 * TODO: merge with visitPathExprInner_xq_doc and visitPathExprInner_xq_collection
 	 */
 	public Void visitPathExprInner_xq_VAR(XQueryParser.PathExprInner_xq_VARContext ctx) {
 		String var_to_expand = ctx.VAR().getText();
@@ -381,7 +388,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	
 	/**
 	 * pred
-	 * Builds a predicate
+	 * Builds an XQuery predicate
 	 */
 	public Void visitPred(XQueryParser.PredContext ctx) {
 		SimplePredicate predicate = null;
@@ -400,7 +407,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		if(ctx.arithmeticExpr_xq(0).numericLiteral()!=null) {
 			//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
 			String arithOp = ctx.arithmeticExpr_xq(0).children.get(1).getText();
-			String operand_string = ctx.arithmeticExpr_xq(0).OP_SUB()!=null ? ctx.arithmeticExpr_xq(0).OP_SUB().getText()+ctx.arithmeticExpr_xq(0).numericLiteral().getText() : ctx.arithmeticExpr_xq(0).numericLiteral().getText(); 
+			String operand_string = ctx.arithmeticExpr_xq(0).numericLiteral().getText();
 			arithOpLeft = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 		}
 		
@@ -408,14 +415,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {
 			rightExpr = ctx.arithmeticExpr_xq(1).VAR().getText();
 			patternTreeIndexRight = XQueryUtils.findVarInPatternTree(scans,  patternNodeMap, rightExpr);
-			if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexRight) == false)
+			if(patternTreeIndexRight != -1 && patternTreeIndexRight != patternTreeIndexLeft && treePatternVisited.get(patternTreeIndexRight) == false)
 				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndexRight).getNavigationTreePattern(), varsPos.size());
 		}
 		
 		//We build the predicate now, it can be...
 		// VAR ARITH_OP op string_literal,
 		if(ctx.STRING_LITERAL() != null) {
-			rightExpr = ctx.STRING_LITERAL().getText().substring(1, ctx.STRING_LITERAL().getText().length()-1);
+			rightExpr = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
 			predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, rightExpr, predType);
 			if(constructChild == null)
 				constructChild = scans.get(patternTreeIndexLeft);
@@ -438,7 +445,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		// VAR ARITH_OP op VAR ARITH_OP
 		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {   
-			//if needed, pile cartesian produts to include all variables in the algebraic tree
+			//if needed, pile cartesian products up to include all variables in the algebraic tree
 			if(patternTreeIndexRight != -1) {
 				if(patternTreeIndexRight == patternTreeIndexLeft) {
 					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, varsPos.get(rightExpr).positionInForest, predType);
@@ -447,6 +454,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
 						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
 					//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains both variables
+					treePatternVisited.set(patternTreeIndexLeft, true);
 				}
 				else {
 					if(constructChild == null) {
@@ -478,7 +486,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			if(ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
 				//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
 				String arithOp = ctx.arithmeticExpr_xq(1).children.get(1).getText();
-				String operand_string = ctx.arithmeticExpr_xq(1).OP_SUB()!=null ? ctx.arithmeticExpr_xq(1).OP_SUB().getText()+ctx.arithmeticExpr_xq(1).numericLiteral().getText() : ctx.arithmeticExpr_xq(1).numericLiteral().getText(); 
+				String operand_string = ctx.arithmeticExpr_xq(1).numericLiteral().getText();
 				arithOpRight = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 			}
 			
@@ -490,34 +498,190 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		return null;
 	}
+
 	
 	/**
 	 * predicate_xp
 	 * predicate_xp : '[' expr_xp ']' ;
 	 */
-	/*
 	public Void visitPredicate_xp(XQueryParser.Predicate_xpContext ctx) { 
 		insideXPathPredicate = true;
 		
+		lastVarXPathPredicate = "";
+		lastNodeInsideXPathPredicate = null;
+		
 		visitChildren(ctx); 
-		
-		insideXPathPredicate = false;
-		
+				
 		//we create a Selection object for every predicate ([expr_xp]) we find, even if there is more than one predicate for a given tree
-		//TODO: create Selection object and set it as parent of this xmlscan
+		if(predicateStack.empty() == false && predicateStack.peek() instanceof DisjunctivePredicate) {
+			if(constructChild != null)
+				constructChild = new Selection(constructChild, (DisjunctivePredicate)predicateStack.pop());
+			else
+				constructChild = new Selection(scans.get(lastTreePatternInsideXPathPredicateIndex), (DisjunctivePredicate)predicateStack.pop());
+		}
+		 
+		insideXPathPredicate = false;
 		
 		return null;
 	}
-	*/
+
 	/**
 	 * orExpr_xp
 	 * orExpr_xp : andExpr_xp (OR andExpr_xp)* ;
 	 */
-	/*
 	public Void visitOrExpr_xp(XQueryParser.OrExpr_xpContext ctx) { 
-		return visitChildren(ctx); 
+		visitChildren(ctx); 
+
+		//if we're inside an XPath predicate we build a DisjunctivePredicate with the ConjunctivePredicate objects in the predicate stack
+		if(insideXPathPredicate) {
+			ArrayList<ConjunctivePredicate> conjPreds = new ArrayList<ConjunctivePredicate>();
+			
+			//collect all pending ConjunctivePredicates
+			while(predicateStack.empty() == false && predicateStack.peek() instanceof ConjunctivePredicate)
+				conjPreds.add((ConjunctivePredicate) predicateStack.pop());
+			
+			if(conjPreds.size() > 0) {
+				DisjunctivePredicate disjPred = new DisjunctivePredicate(conjPreds);
+				predicateStack.push(disjPred);
+			}
+		}
+		
+		return null;
 	}
-	*/
+	
+	/**
+	 * andExpr_xp
+	 * andExpr_xp : equalityExpr_xp ( AND equalityExpr_xp )* ;
+	 */
+	public Void visitAndExpr_xp(XQueryParser.AndExpr_xpContext ctx) { 
+		visitChildren(ctx); 
+
+		//if we're inside an XPath predicate we build a ConjunctivePredicate with the SimplePredicate objects in the predicate stack
+		if(insideXPathPredicate) {
+			ArrayList<SimplePredicate> simplePreds = new ArrayList<SimplePredicate>();
+			
+			//collect all pending SimplePredicates
+			while(predicateStack.empty() == false && predicateStack.peek() instanceof SimplePredicate)
+				simplePreds.add((SimplePredicate) predicateStack.pop());
+			
+			if(simplePreds.size() > 0) {
+				ConjunctivePredicate conjPred = new ConjunctivePredicate(simplePreds);
+				predicateStack.push(conjPred);
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * comparativeExpr_xp
+	 * comparativeExpr_xp : arithmeticExpr_xp ( ( EQ_S | NE_S | LT_S | GT_S | LE_S | GE_S) arithmeticExpr_xp)* ;
+	 */
+	public Void visitComparativeExpr_xp(XQueryParser.ComparativeExpr_xpContext ctx) {
+		if(insideXPathPredicate == false) {
+			visitChildren(ctx); 
+		}
+		else {
+			//check the xpath predicate has a given form 
+			if(ctx.arithmeticExpr_xp().size() != 2 || 
+					ctx.arithmeticExpr_xp(0).unaryExpr(0).valueExpr().pathExpr() == null) {
+				System.out.println("This type of XPath predicate is not supported yet: "+ctx.getText());
+				System.exit(1);
+			}
+
+			SimplePredicate predicate = null;
+			PredicateType predType = PredicateType.parse(ctx.getChild(1).getText());
+			String leftExpr;
+			String rightExpr;
+			ArithmeticOperation arithOpLeft = null;
+			ArithmeticOperation arithOpRight = null;
+			Operation leftOp = null;
+			Operation rightOp = null;
+			double leftOperand = 0;
+			double rightOperand = 0;
+			Double rightDoubleLiteral = null;
+			String rightStringLiteral = null;
+			
+			//manually visit the left arithmetic expression (it should contain a valid xpath expression)
+			lastNodeInsideXPathPredicate = null;	//clear lastNodeInsideXPathPredicate
+			lastVarXPathPredicate = "";
+			visitChildren(ctx.arithmeticExpr_xp(0));
+			leftExpr = lastVarXPathPredicate;
+			//in case the left expression is a real arithmetic expression 
+			if(ctx.arithmeticExpr_xp(0).children.size() > 1) {
+				leftOp = Operation.parse(ctx.arithmeticExpr_xp(0).getChild(1).getText());
+				if(ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr() != null &&
+						ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal() != null &&	
+						ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null)  {
+					if(ctx.arithmeticExpr_xp(0).unaryExpr().size() > 1 && ctx.arithmeticExpr_xp(0).unaryExpr(1).OP_SUB().size() > 0)
+						leftOperand = Double.parseDouble("-"+ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					else
+						leftOperand = Double.parseDouble(ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					arithOpLeft = new ArithmeticOperation(leftOp, leftOperand);
+				}
+				else {
+					System.out.println("This type of XPath predicate is not supported yet.");
+					System.exit(1);
+				}
+			}
+			//now visit the right arithmetic expression (it may contain (1) xpath with arithmetic expression, (2) double literal, or (3) string literal
+			lastNodeInsideXPathPredicate = null;	//clear lastNodeInsideXPathPredicate
+			lastVarXPathPredicate = "";	//clear lastVarXPathPredicate
+			visitChildren(ctx.arithmeticExpr_xp(1));
+			rightExpr = lastVarXPathPredicate;
+			//in case the right expression is a real arithmetic expression
+			if(ctx.arithmeticExpr_xp(1).children.size() > 1) {
+				rightOp = Operation.parse(ctx.arithmeticExpr_xp(1).getChild(1).getText());
+				if(ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr() != null &&
+						ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal() != null &&
+								ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null) {
+					if(ctx.arithmeticExpr_xp(1).unaryExpr().size() > 1 && ctx.arithmeticExpr_xp(1).unaryExpr(1).OP_SUB().size() > 0)
+						rightOperand = Double.parseDouble("-"+ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					else
+						rightOperand = Double.parseDouble(ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					arithOpRight = new ArithmeticOperation(rightOp, rightOperand);
+				}
+			} 
+			else if (ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr() != null &&
+					ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal() != null) {
+				//double literal case
+				if(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null) {
+					if(ctx.arithmeticExpr_xp(1).unaryExpr(0).OP_SUB() == null)	//positive number
+						rightDoubleLiteral = Double.parseDouble(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					else	//negative number
+						rightDoubleLiteral = Double.parseDouble("-"+ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+				}
+				//string literal case
+				else if(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().STRING_LITERAL() != null) {
+					rightStringLiteral = XQueryUtils.sanitizeStringLiteral(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().STRING_LITERAL().getText());
+				}
+				
+			}
+
+			//build varspos for the tree pattern
+			int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans,  patternNodeMap,  leftExpr);
+			if(patternTreeIndexLeft != -1 && treePatternVisited.get(patternTreeIndexLeft) == false) 
+				XQueryUtils.buildVarsPos(varsPos,  scans.get(patternTreeIndexLeft).getNavigationTreePattern(),  varsPos.size());				
+			//now instantiate the predicate
+			if(leftExpr.compareTo("") != 0) {
+				if(rightExpr.compareTo("") != 0)
+					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, varsPos.get(rightExpr).positionInForest, arithOpRight, predType);
+				else if(rightStringLiteral != null) {
+					int varpos = varsPos.get(leftExpr).positionInForest;
+					System.out.println("varpos: "+varpos);
+					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, rightStringLiteral, predType);
+				}
+				else if(rightDoubleLiteral != null)
+					predicate = new SimplePredicate(varsPos.get(leftExpr).positionInForest, arithOpLeft, rightDoubleLiteral, predType);	
+				if(predicate != null)
+					predicateStack.push(predicate);
+				lastTreePatternInsideXPathPredicateIndex = patternTreeIndexLeft;
+				treePatternVisited.set(patternTreeIndexLeft, true);
+			}
+		}
+		
+		return null;
+	}
 	
 	
 	/**
@@ -579,38 +743,76 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		
 		int nodeCode = PatternNode.globalNodeCounter.getAndIncrement();
 		PatternNode node = new PatternNode("", tag, nodeCode, "", "", lastTreePattern);
-		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
-		//handle let-nesting
-//		if(specialEdgeFlag && currentStatement == StatementType.LET) {
-//			lastNode.addEdge(node, parent, true, true);
-//			specialEdgeFlag = false;
-//			mappedApplys.put(lastVarLeftSide, (new ApplyConstruct("", new String[] {""}, "", null, new ApplyConstruct[0])));	//the null fields must be filled after varsPos is built
-//		}
-//		else
-			lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
-
-		lastNode.removeMatchingVariables(lastVarLeftSide);
-		if(lastNode.checkAnyMatchingVariableStoresValue() == false)
-			lastNode.setStoresValue(false);
-		if(lastNode.checkAnyMatchingVariableStoresContent() == false)
-			lastNode.setStoresContent(false);
-		Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, node);
-		node.addMatchingVariables(newVar);
-		node.setStoresContent(true);
-		if(nextNodeIsAttribute) {
-			//attributes store values
-			newVar.dataType = Variable.VariableDataType.Value;
-			node.setAttribute(true);
-			node.setStoresValue(true);
-			node.setStoresContent(false);
-			nextNodeIsAttribute = false;
+	
+		if(insideXPathPredicate == false) {
+			boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+			//handle let-nesting
+	//		if(specialEdgeFlag && currentStatement == StatementType.LET) {
+	//			lastNode.addEdge(node, parent, true, true);
+	//			specialEdgeFlag = false;
+	//			mappedApplys.put(lastVarLeftSide, (new ApplyConstruct("", new String[] {""}, "", null, new ApplyConstruct[0])));	//the null fields must be filled after varsPos is built
+	//		}
+	//		else
+				lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+	
+			lastNode.removeMatchingVariables(lastVarLeftSide);
+			if(lastNode.checkAnyMatchingVariableStoresValue() == false)
+				lastNode.setStoresValue(false);
+			if(lastNode.checkAnyMatchingVariableStoresContent() == false)
+				lastNode.setStoresContent(false);
+			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, node);
+			node.addMatchingVariables(newVar);
+			node.setStoresContent(true);
+			if(nextNodeIsAttribute) {
+				//attributes store values
+				newVar.dataType = Variable.VariableDataType.Value;
+				node.setAttribute(true);
+				node.setStoresValue(true);
+				node.setStoresContent(false);
+				nextNodeIsAttribute = false;
+			}
+			//update the affected variable so it points to this node
+			patternNodeMap.put(lastVarLeftSide, node);
+			lastNode = node;	//for further expansion
 		}
-		//update the affected variable so it points to this node
-		patternNodeMap.put(lastVarLeftSide, node);
-		lastNode = node;	//for further expansion
-
+		else {
+			if(lastNodeInsideXPathPredicate == null) {
+				lastNode.addEdge(node, true, false, false);
+				if(lastVarXPathPredicate == "")
+					lastVarXPathPredicate = XQueryUtils.getNextAuxVariableName();
+			}
+			else {
+				//TODO: verify that lastSlashToken does not refer to the last slash (or slashslash) found before the xpath predicate 
+				boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+				lastNodeInsideXPathPredicate.addEdge(node, parent, false, false);
+				//remove the last variable from the last node inside the predicate
+				lastNodeInsideXPathPredicate.removeMatchingVariables(lastVarXPathPredicate);
+				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresValue() == false)
+					lastNodeInsideXPathPredicate.setStoresValue(false);
+				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresContent() == false)
+					lastNodeInsideXPathPredicate.setStoresContent(false);
+			}
+			//add a new aux variable to the appropriate node
+			Variable newVar = new Variable(lastVarXPathPredicate, Variable.VariableDataType.Content, node);
+			node.addMatchingVariables(newVar);
+			node.setStoresContent(true);
+			if(nextNodeIsAttribute) {
+				newVar.dataType = Variable.VariableDataType.Value;
+				node.setAttribute(true);
+				node.setStoresValue(true);
+				node.setStoresContent(false);
+				nextNodeIsAttribute = false;
+			}
+			//update the affected variable so it points to this node
+			patternNodeMap.put(lastVarXPathPredicate, node);
+			lastNodeInsideXPathPredicate = node;
+		}
+				
 		return null;
-	}
+	}	
+	
+	
+	
 
 
 	/**
@@ -620,20 +822,39 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * TODO: treat whatever/text() and whatever//text() differently (will need to consider grammar rules pathExpr and relativePathExpr2 too)
 	 */
 	public Void visitTextTest(XQueryParser.TextTestContext ctx) {
-		Variable matchingVar = lastNode.getMatchingVariable(lastVarLeftSide);
-	
-		if(matchingVar != null) {
-			matchingVar.dataType = Variable.VariableDataType.Value;
-			if(lastNode.checkAnyMatchingVariableStoresContent() == false)
-				lastNode.setStoresContent(false);	//no vars storing content anymore
-			lastNode.setStoresValue(true);
+		if(insideXPathPredicate == false) {
+			Variable matchingVar = lastNode.getMatchingVariable(lastVarLeftSide);
+		
+			if(matchingVar != null) {
+				matchingVar.dataType = Variable.VariableDataType.Value;
+				if(lastNode.checkAnyMatchingVariableStoresContent() == false)
+					lastNode.setStoresContent(false);	//no vars storing content anymore
+				lastNode.setStoresValue(true);
+			}
+			else {
+				//lastVarLeftSide does not exist in lastNode.matchingVariables
+				Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Value, lastNode);
+				lastNode.addMatchingVariables(newVar);
+				lastNode.setStoresValue(true);
+				patternNodeMap.put(lastVarLeftSide, lastNode);
+			}
 		}
 		else {
-			//lastVarLeftSide does not exist in lastNode.matchingVariables
-			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Value, lastNode);
-			lastNode.addMatchingVariables(newVar);
-			lastNode.setStoresValue(true);
-			patternNodeMap.put(lastVarLeftSide, lastNode);
+			Variable matchingVar = lastNodeInsideXPathPredicate.getMatchingVariable(lastVarXPathPredicate);
+			
+			if(matchingVar != null) {
+				matchingVar.dataType = Variable.VariableDataType.Value;
+				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresContent() == false)
+					lastNodeInsideXPathPredicate.setStoresContent(false);	//no vars storing content anymor
+				lastNodeInsideXPathPredicate.setStoresValue(true);
+			}
+			else {
+				//lastVarXPathPredicate does not exist in lastNodeInsideXPathPredicate.matchingVariables
+				Variable newVar = new Variable(lastVarXPathPredicate, Variable.VariableDataType.Value, lastNodeInsideXPathPredicate);
+				lastNodeInsideXPathPredicate.addMatchingVariables(newVar);
+				lastNodeInsideXPathPredicate.setStoresValue(true);
+				patternNodeMap.put(lastVarXPathPredicate, lastNodeInsideXPathPredicate);
+			}
 		}
 
 		return null;

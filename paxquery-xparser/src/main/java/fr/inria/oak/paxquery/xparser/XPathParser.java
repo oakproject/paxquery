@@ -15,44 +15,42 @@ public class XPathParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__13=1, T__12=2, T__11=3, T__10=4, T__9=5, T__8=6, T__7=7, T__6=8, T__5=9, 
-		T__4=10, T__3=11, T__2=12, T__1=13, T__0=14, AGGR_FUNCT=15, TEXTFUNCTION=16, 
-		SLASH=17, SLASHSLASH=18, OR=19, AND=20, NOT=21, EQ=22, EQ_S=23, NE=24, 
-		NE_S=25, LT=26, LT_S=27, LE=28, LE_S=29, GT=30, GT_S=31, GE=32, GE_S=33, 
-		OP_ADD=34, OP_SUB=35, OP_MUL=36, VAR=37, LEFTCURL=38, RIGHTCURL=39, OPEN_ATTR_VAR_DOUBLE=40, 
-		OPEN_ATTR_VAR_SINGLE=41, CLOSE_ATTR_VAR_DOUBLE=42, CLOSE_ATTR_VAR_SINGLE=43, 
-		OPEN_CLOSING_TAG=44, CLOSE_OPENING_TAG=45, QNAME_TOKEN=46, SINGLE_QUOTE=47, 
-		DOUBLE_QUOTE=48, COMMA=49, STRING_LITERAL=50, REFERENCE=51, ENTITY_REF=52, 
-		CHAR_REF=53, INTEGER_LITERAL=54, DECIMAL_LITERAL=55, DIGITS=56, WS=57;
+		T__12=1, T__11=2, T__10=3, T__9=4, T__8=5, T__7=6, T__6=7, T__5=8, T__4=9, 
+		T__3=10, T__2=11, T__1=12, T__0=13, AGGR_FUNCT=14, TEXTFUNCTION=15, SLASH=16, 
+		SLASHSLASH=17, OR=18, AND=19, NOT=20, EQ=21, EQ_S=22, NE=23, NE_S=24, 
+		LT=25, LT_S=26, LE=27, LE_S=28, GT=29, GT_S=30, GE=31, GE_S=32, OP_ADD=33, 
+		OP_SUB=34, OP_MUL=35, VAR=36, LEFTCURL=37, RIGHTCURL=38, OPEN_ATTR_VAR_DOUBLE=39, 
+		OPEN_ATTR_VAR_SINGLE=40, CLOSE_ATTR_VAR_DOUBLE=41, CLOSE_ATTR_VAR_SINGLE=42, 
+		OPEN_CLOSING_TAG=43, CLOSE_OPENING_TAG=44, QNAME_TOKEN=45, SINGLE_QUOTE=46, 
+		DOUBLE_QUOTE=47, COMMA=48, STRING_LITERAL=49, REFERENCE=50, ENTITY_REF=51, 
+		CHAR_REF=52, INTEGER_LITERAL=53, DECIMAL_LITERAL=54, DIGITS=55, WS=56;
 	public static final String[] tokenNames = {
-		"<INVALID>", "'substring'", "'true'", "'ceiling'", "'mod'", "'['", "'|'", 
-		"'concat'", "']'", "'@'", "'div'", "'('", "'floor'", "')'", "'false'", 
-		"AGGR_FUNCT", "'text()'", "'/'", "'//'", "'or'", "'and'", "'not'", "'eq'", 
-		"'='", "'ne'", "'!='", "'lt'", "'<'", "'le'", "'<='", "'gt'", "'>'", "'ge'", 
-		"'>='", "'+'", "'-'", "'*'", "VAR", "'{'", "'}'", "OPEN_ATTR_VAR_DOUBLE", 
-		"OPEN_ATTR_VAR_SINGLE", "CLOSE_ATTR_VAR_DOUBLE", "CLOSE_ATTR_VAR_SINGLE", 
-		"OPEN_CLOSING_TAG", "CLOSE_OPENING_TAG", "QNAME_TOKEN", "'''", "'\"'", 
-		"','", "STRING_LITERAL", "REFERENCE", "ENTITY_REF", "CHAR_REF", "INTEGER_LITERAL", 
-		"DECIMAL_LITERAL", "DIGITS", "WS"
+		"<INVALID>", "'substring'", "'true'", "'ceiling'", "'mod'", "'['", "'concat'", 
+		"']'", "'@'", "'div'", "'('", "'floor'", "')'", "'false'", "AGGR_FUNCT", 
+		"'text()'", "'/'", "'//'", "'or'", "'and'", "'not'", "'eq'", "'='", "'ne'", 
+		"'!='", "'lt'", "'<'", "'le'", "'<='", "'gt'", "'>'", "'ge'", "'>='", 
+		"'+'", "'-'", "'*'", "VAR", "'{'", "'}'", "OPEN_ATTR_VAR_DOUBLE", "OPEN_ATTR_VAR_SINGLE", 
+		"CLOSE_ATTR_VAR_DOUBLE", "CLOSE_ATTR_VAR_SINGLE", "OPEN_CLOSING_TAG", 
+		"CLOSE_OPENING_TAG", "QNAME_TOKEN", "'''", "'\"'", "','", "STRING_LITERAL", 
+		"REFERENCE", "ENTITY_REF", "CHAR_REF", "INTEGER_LITERAL", "DECIMAL_LITERAL", 
+		"DIGITS", "WS"
 	};
 	public static final int
 		RULE_xpath = 0, RULE_expr_xp = 1, RULE_orExpr_xp = 2, RULE_andExpr_xp = 3, 
-		RULE_equalityExpr_xp = 4, RULE_relationalExpr_xp = 5, RULE_additiveExpr_xp = 6, 
-		RULE_multiplicativeExpr_xp = 7, RULE_unaryExpr = 8, RULE_unionExpr = 9, 
-		RULE_valueExpr = 10, RULE_pathExpr = 11, RULE_relativePathExpr = 12, RULE_relativePathExpr2 = 13, 
-		RULE_stepExpr = 14, RULE_axisStep = 15, RULE_forwardStep = 16, RULE_abbrevForwardStep = 17, 
-		RULE_nodeTest = 18, RULE_kindTest = 19, RULE_nameTest = 20, RULE_filterExpr = 21, 
-		RULE_predicateList_xp = 22, RULE_predicate_xp = 23, RULE_primaryExpr = 24, 
-		RULE_literal = 25, RULE_numericLiteral = 26, RULE_parenthesizedExpr = 27, 
-		RULE_functionCall = 28, RULE_functionName = 29, RULE_textTest = 30, RULE_qName = 31;
+		RULE_comparativeExpr_xp = 4, RULE_arithmeticExpr_xp = 5, RULE_unaryExpr = 6, 
+		RULE_valueExpr = 7, RULE_pathExpr = 8, RULE_relativePathExpr = 9, RULE_relativePathExpr2 = 10, 
+		RULE_stepExpr = 11, RULE_axisStep = 12, RULE_forwardStep = 13, RULE_abbrevForwardStep = 14, 
+		RULE_nodeTest = 15, RULE_kindTest = 16, RULE_nameTest = 17, RULE_filterExpr = 18, 
+		RULE_predicateList_xp = 19, RULE_predicate_xp = 20, RULE_primaryExpr = 21, 
+		RULE_literal = 22, RULE_numericLiteral = 23, RULE_parenthesizedExpr = 24, 
+		RULE_functionCall = 25, RULE_functionName = 26, RULE_textTest = 27, RULE_qName = 28;
 	public static final String[] ruleNames = {
-		"xpath", "expr_xp", "orExpr_xp", "andExpr_xp", "equalityExpr_xp", "relationalExpr_xp", 
-		"additiveExpr_xp", "multiplicativeExpr_xp", "unaryExpr", "unionExpr", 
-		"valueExpr", "pathExpr", "relativePathExpr", "relativePathExpr2", "stepExpr", 
-		"axisStep", "forwardStep", "abbrevForwardStep", "nodeTest", "kindTest", 
-		"nameTest", "filterExpr", "predicateList_xp", "predicate_xp", "primaryExpr", 
-		"literal", "numericLiteral", "parenthesizedExpr", "functionCall", "functionName", 
-		"textTest", "qName"
+		"xpath", "expr_xp", "orExpr_xp", "andExpr_xp", "comparativeExpr_xp", "arithmeticExpr_xp", 
+		"unaryExpr", "valueExpr", "pathExpr", "relativePathExpr", "relativePathExpr2", 
+		"stepExpr", "axisStep", "forwardStep", "abbrevForwardStep", "nodeTest", 
+		"kindTest", "nameTest", "filterExpr", "predicateList_xp", "predicate_xp", 
+		"primaryExpr", "literal", "numericLiteral", "parenthesizedExpr", "functionCall", 
+		"functionName", "textTest", "qName"
 	};
 
 	@Override
@@ -98,7 +96,7 @@ public class XPathParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(64); expr_xp();
+			setState(58); expr_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -136,7 +134,7 @@ public class XPathParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(66); orExpr_xp();
+			setState(60); orExpr_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -182,18 +180,18 @@ public class XPathParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(68); andExpr_xp();
-			setState(73);
+			setState(62); andExpr_xp();
+			setState(67);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==OR) {
 				{
 				{
-				setState(69); match(OR);
-				setState(70); andExpr_xp();
+				setState(63); match(OR);
+				setState(64); andExpr_xp();
 				}
 				}
-				setState(75);
+				setState(69);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -211,16 +209,16 @@ public class XPathParser extends Parser {
 	}
 
 	public static class AndExpr_xpContext extends ParserRuleContext {
-		public List<EqualityExpr_xpContext> equalityExpr_xp() {
-			return getRuleContexts(EqualityExpr_xpContext.class);
+		public ComparativeExpr_xpContext comparativeExpr_xp(int i) {
+			return getRuleContext(ComparativeExpr_xpContext.class,i);
 		}
 		public TerminalNode AND(int i) {
 			return getToken(XPathParser.AND, i);
 		}
-		public List<TerminalNode> AND() { return getTokens(XPathParser.AND); }
-		public EqualityExpr_xpContext equalityExpr_xp(int i) {
-			return getRuleContext(EqualityExpr_xpContext.class,i);
+		public List<ComparativeExpr_xpContext> comparativeExpr_xp() {
+			return getRuleContexts(ComparativeExpr_xpContext.class);
 		}
+		public List<TerminalNode> AND() { return getTokens(XPathParser.AND); }
 		public AndExpr_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -242,18 +240,18 @@ public class XPathParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(76); equalityExpr_xp();
-			setState(81);
+			setState(70); comparativeExpr_xp();
+			setState(75);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==AND) {
 				{
 				{
-				setState(77); match(AND);
-				setState(78); equalityExpr_xp();
+				setState(71); match(AND);
+				setState(72); comparativeExpr_xp();
 				}
 				}
-				setState(83);
+				setState(77);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -270,62 +268,55 @@ public class XPathParser extends Parser {
 		return _localctx;
 	}
 
-	public static class EqualityExpr_xpContext extends ParserRuleContext {
-		public List<RelationalExpr_xpContext> relationalExpr_xp() {
-			return getRuleContexts(RelationalExpr_xpContext.class);
+	public static class ComparativeExpr_xpContext extends ParserRuleContext {
+		public TerminalNode NE_S() { return getToken(XPathParser.NE_S, 0); }
+		public ArithmeticExpr_xpContext arithmeticExpr_xp(int i) {
+			return getRuleContext(ArithmeticExpr_xpContext.class,i);
 		}
-		public RelationalExpr_xpContext relationalExpr_xp(int i) {
-			return getRuleContext(RelationalExpr_xpContext.class,i);
+		public List<ArithmeticExpr_xpContext> arithmeticExpr_xp() {
+			return getRuleContexts(ArithmeticExpr_xpContext.class);
 		}
-		public List<TerminalNode> NE_S() { return getTokens(XPathParser.NE_S); }
-		public TerminalNode NE_S(int i) {
-			return getToken(XPathParser.NE_S, i);
-		}
-		public TerminalNode EQ_S(int i) {
-			return getToken(XPathParser.EQ_S, i);
-		}
-		public List<TerminalNode> EQ_S() { return getTokens(XPathParser.EQ_S); }
-		public EqualityExpr_xpContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode LE_S() { return getToken(XPathParser.LE_S, 0); }
+		public TerminalNode EQ_S() { return getToken(XPathParser.EQ_S, 0); }
+		public TerminalNode GT_S() { return getToken(XPathParser.GT_S, 0); }
+		public TerminalNode GE_S() { return getToken(XPathParser.GE_S, 0); }
+		public TerminalNode LT_S() { return getToken(XPathParser.LT_S, 0); }
+		public ComparativeExpr_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_equalityExpr_xp; }
+		@Override public int getRuleIndex() { return RULE_comparativeExpr_xp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterEqualityExpr_xp(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterComparativeExpr_xp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitEqualityExpr_xp(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitComparativeExpr_xp(this);
 		}
 	}
 
-	public final EqualityExpr_xpContext equalityExpr_xp() throws RecognitionException {
-		EqualityExpr_xpContext _localctx = new EqualityExpr_xpContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_equalityExpr_xp);
+	public final ComparativeExpr_xpContext comparativeExpr_xp() throws RecognitionException {
+		ComparativeExpr_xpContext _localctx = new ComparativeExpr_xpContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_comparativeExpr_xp);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(84); relationalExpr_xp();
-			setState(89);
-			_errHandler.sync(this);
+			setState(78); arithmeticExpr_xp();
+			setState(81);
 			_la = _input.LA(1);
-			while (_la==EQ_S || _la==NE_S) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ_S) | (1L << NE_S) | (1L << LT_S) | (1L << LE_S) | (1L << GT_S) | (1L << GE_S))) != 0)) {
 				{
-				{
-				setState(85);
+				setState(79);
 				_la = _input.LA(1);
-				if ( !(_la==EQ_S || _la==NE_S) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ_S) | (1L << NE_S) | (1L << LT_S) | (1L << LE_S) | (1L << GT_S) | (1L << GE_S))) != 0)) ) {
 				_errHandler.recoverInline(this);
 				}
 				consume();
-				setState(86); relationalExpr_xp();
+				setState(80); arithmeticExpr_xp();
 				}
-				}
-				setState(91);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
 			}
+
 			}
 		}
 		catch (RecognitionException re) {
@@ -339,204 +330,52 @@ public class XPathParser extends Parser {
 		return _localctx;
 	}
 
-	public static class RelationalExpr_xpContext extends ParserRuleContext {
-		public List<AdditiveExpr_xpContext> additiveExpr_xp() {
-			return getRuleContexts(AdditiveExpr_xpContext.class);
-		}
-		public AdditiveExpr_xpContext additiveExpr_xp(int i) {
-			return getRuleContext(AdditiveExpr_xpContext.class,i);
-		}
-		public List<TerminalNode> LE_S() { return getTokens(XPathParser.LE_S); }
-		public TerminalNode LT_S(int i) {
-			return getToken(XPathParser.LT_S, i);
-		}
-		public TerminalNode GT_S(int i) {
-			return getToken(XPathParser.GT_S, i);
-		}
-		public List<TerminalNode> GT_S() { return getTokens(XPathParser.GT_S); }
-		public TerminalNode LE_S(int i) {
-			return getToken(XPathParser.LE_S, i);
-		}
-		public TerminalNode GE_S(int i) {
-			return getToken(XPathParser.GE_S, i);
-		}
-		public List<TerminalNode> GE_S() { return getTokens(XPathParser.GE_S); }
-		public List<TerminalNode> LT_S() { return getTokens(XPathParser.LT_S); }
-		public RelationalExpr_xpContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_relationalExpr_xp; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterRelationalExpr_xp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitRelationalExpr_xp(this);
-		}
-	}
-
-	public final RelationalExpr_xpContext relationalExpr_xp() throws RecognitionException {
-		RelationalExpr_xpContext _localctx = new RelationalExpr_xpContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_relationalExpr_xp);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(92); additiveExpr_xp();
-			setState(97);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LT_S) | (1L << LE_S) | (1L << GT_S) | (1L << GE_S))) != 0)) {
-				{
-				{
-				setState(93);
-				_la = _input.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LT_S) | (1L << LE_S) | (1L << GT_S) | (1L << GE_S))) != 0)) ) {
-				_errHandler.recoverInline(this);
-				}
-				consume();
-				setState(94); additiveExpr_xp();
-				}
-				}
-				setState(99);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class AdditiveExpr_xpContext extends ParserRuleContext {
-		public TerminalNode OP_ADD(int i) {
-			return getToken(XPathParser.OP_ADD, i);
-		}
-		public List<MultiplicativeExpr_xpContext> multiplicativeExpr_xp() {
-			return getRuleContexts(MultiplicativeExpr_xpContext.class);
-		}
-		public List<TerminalNode> OP_ADD() { return getTokens(XPathParser.OP_ADD); }
-		public TerminalNode OP_SUB(int i) {
-			return getToken(XPathParser.OP_SUB, i);
-		}
-		public MultiplicativeExpr_xpContext multiplicativeExpr_xp(int i) {
-			return getRuleContext(MultiplicativeExpr_xpContext.class,i);
-		}
-		public List<TerminalNode> OP_SUB() { return getTokens(XPathParser.OP_SUB); }
-		public AdditiveExpr_xpContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_additiveExpr_xp; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterAdditiveExpr_xp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitAdditiveExpr_xp(this);
-		}
-	}
-
-	public final AdditiveExpr_xpContext additiveExpr_xp() throws RecognitionException {
-		AdditiveExpr_xpContext _localctx = new AdditiveExpr_xpContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_additiveExpr_xp);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(100); multiplicativeExpr_xp();
-			setState(105);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==OP_ADD || _la==OP_SUB) {
-				{
-				{
-				setState(101);
-				_la = _input.LA(1);
-				if ( !(_la==OP_ADD || _la==OP_SUB) ) {
-				_errHandler.recoverInline(this);
-				}
-				consume();
-				setState(102); multiplicativeExpr_xp();
-				}
-				}
-				setState(107);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class MultiplicativeExpr_xpContext extends ParserRuleContext {
+	public static class ArithmeticExpr_xpContext extends ParserRuleContext {
 		public List<UnaryExprContext> unaryExpr() {
 			return getRuleContexts(UnaryExprContext.class);
 		}
 		public UnaryExprContext unaryExpr(int i) {
 			return getRuleContext(UnaryExprContext.class,i);
 		}
-		public List<TerminalNode> OP_MUL() { return getTokens(XPathParser.OP_MUL); }
-		public TerminalNode OP_MUL(int i) {
-			return getToken(XPathParser.OP_MUL, i);
-		}
-		public MultiplicativeExpr_xpContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode OP_ADD() { return getToken(XPathParser.OP_ADD, 0); }
+		public TerminalNode OP_SUB() { return getToken(XPathParser.OP_SUB, 0); }
+		public TerminalNode OP_MUL() { return getToken(XPathParser.OP_MUL, 0); }
+		public ArithmeticExpr_xpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_multiplicativeExpr_xp; }
+		@Override public int getRuleIndex() { return RULE_arithmeticExpr_xp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterMultiplicativeExpr_xp(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterArithmeticExpr_xp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitMultiplicativeExpr_xp(this);
+			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitArithmeticExpr_xp(this);
 		}
 	}
 
-	public final MultiplicativeExpr_xpContext multiplicativeExpr_xp() throws RecognitionException {
-		MultiplicativeExpr_xpContext _localctx = new MultiplicativeExpr_xpContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_multiplicativeExpr_xp);
+	public final ArithmeticExpr_xpContext arithmeticExpr_xp() throws RecognitionException {
+		ArithmeticExpr_xpContext _localctx = new ArithmeticExpr_xpContext(_ctx, getState());
+		enterRule(_localctx, 10, RULE_arithmeticExpr_xp);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(108); unaryExpr();
-			setState(113);
-			_errHandler.sync(this);
+			setState(83); unaryExpr();
+			setState(86);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 4) | (1L << 10) | (1L << OP_MUL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 4) | (1L << 9) | (1L << OP_ADD) | (1L << OP_SUB) | (1L << OP_MUL))) != 0)) {
 				{
-				{
-				setState(109);
+				setState(84);
 				_la = _input.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 4) | (1L << 10) | (1L << OP_MUL))) != 0)) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 4) | (1L << 9) | (1L << OP_ADD) | (1L << OP_SUB) | (1L << OP_MUL))) != 0)) ) {
 				_errHandler.recoverInline(this);
 				}
 				consume();
-				setState(110); unaryExpr();
+				setState(85); unaryExpr();
 				}
-				}
-				setState(115);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
 			}
+
 			}
 		}
 		catch (RecognitionException re) {
@@ -551,8 +390,8 @@ public class XPathParser extends Parser {
 	}
 
 	public static class UnaryExprContext extends ParserRuleContext {
-		public UnionExprContext unionExpr() {
-			return getRuleContext(UnionExprContext.class,0);
+		public ValueExprContext valueExpr() {
+			return getRuleContext(ValueExprContext.class,0);
 		}
 		public TerminalNode OP_SUB(int i) {
 			return getToken(XPathParser.OP_SUB, i);
@@ -574,83 +413,27 @@ public class XPathParser extends Parser {
 
 	public final UnaryExprContext unaryExpr() throws RecognitionException {
 		UnaryExprContext _localctx = new UnaryExprContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_unaryExpr);
+		enterRule(_localctx, 12, RULE_unaryExpr);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(119);
+			setState(91);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			while ( _alt!=2 && _alt!=-1 ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(116); match(OP_SUB);
+					setState(88); match(OP_SUB);
 					}
 					} 
 				}
-				setState(121);
+				setState(93);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			}
-			setState(122); unionExpr();
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class UnionExprContext extends ParserRuleContext {
-		public List<ValueExprContext> valueExpr() {
-			return getRuleContexts(ValueExprContext.class);
-		}
-		public ValueExprContext valueExpr(int i) {
-			return getRuleContext(ValueExprContext.class,i);
-		}
-		public UnionExprContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_unionExpr; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).enterUnionExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof XPathListener ) ((XPathListener)listener).exitUnionExpr(this);
-		}
-	}
-
-	public final UnionExprContext unionExpr() throws RecognitionException {
-		UnionExprContext _localctx = new UnionExprContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_unionExpr);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(124); valueExpr();
-			setState(129);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==6) {
-				{
-				{
-				setState(125); match(6);
-				setState(126); valueExpr();
-				}
-				}
-				setState(131);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
+			setState(94); valueExpr();
 			}
 		}
 		catch (RecognitionException re) {
@@ -687,17 +470,17 @@ public class XPathParser extends Parser {
 
 	public final ValueExprContext valueExpr() throws RecognitionException {
 		ValueExprContext _localctx = new ValueExprContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_valueExpr);
+		enterRule(_localctx, 14, RULE_valueExpr);
 		try {
-			setState(137);
+			setState(101);
 			switch (_input.LA(1)) {
 			case 1:
 			case 2:
 			case 3:
-			case 7:
+			case 6:
+			case 10:
 			case 11:
-			case 12:
-			case 14:
+			case 13:
 			case NOT:
 			case OP_SUB:
 			case STRING_LITERAL:
@@ -705,27 +488,27 @@ public class XPathParser extends Parser {
 			case DECIMAL_LITERAL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(132); filterExpr();
-				setState(134);
-				switch ( getInterpreter().adaptivePredict(_input,8,_ctx) ) {
+				setState(96); filterExpr();
+				setState(98);
+				switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
 				case 1:
 					{
-					setState(133); pathExpr();
+					setState(97); pathExpr();
 					}
 					break;
 				}
 				}
 				break;
 			case 4:
+			case 8:
 			case 9:
-			case 10:
 			case TEXTFUNCTION:
 			case SLASH:
 			case SLASHSLASH:
 			case QNAME_TOKEN:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(136); pathExpr();
+				setState(100); pathExpr();
 				}
 				break;
 			default:
@@ -801,35 +584,35 @@ public class XPathParser extends Parser {
 
 	public final PathExprContext pathExpr() throws RecognitionException {
 		PathExprContext _localctx = new PathExprContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_pathExpr);
+		enterRule(_localctx, 16, RULE_pathExpr);
 		try {
-			setState(144);
+			setState(108);
 			switch (_input.LA(1)) {
 			case SLASH:
 				_localctx = new PathExpr_slashContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(139); match(SLASH);
-				setState(140); relativePathExpr();
+				setState(103); match(SLASH);
+				setState(104); relativePathExpr();
 				}
 				break;
 			case SLASHSLASH:
 				_localctx = new PathExpr_slashslashContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(141); match(SLASHSLASH);
-				setState(142); relativePathExpr();
+				setState(105); match(SLASHSLASH);
+				setState(106); relativePathExpr();
 				}
 				break;
 			case 4:
+			case 8:
 			case 9:
-			case 10:
 			case TEXTFUNCTION:
 			case QNAME_TOKEN:
 				_localctx = new PathExpr_relativePathExprContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(143); relativePathExpr();
+				setState(107); relativePathExpr();
 				}
 				break;
 			default:
@@ -873,22 +656,22 @@ public class XPathParser extends Parser {
 
 	public final RelativePathExprContext relativePathExpr() throws RecognitionException {
 		RelativePathExprContext _localctx = new RelativePathExprContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_relativePathExpr);
+		enterRule(_localctx, 18, RULE_relativePathExpr);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(146); stepExpr();
-			setState(150);
+			setState(110); stepExpr();
+			setState(114);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==SLASH || _la==SLASHSLASH) {
 				{
 				{
-				setState(147); relativePathExpr2();
+				setState(111); relativePathExpr2();
 				}
 				}
-				setState(152);
+				setState(116);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -949,24 +732,24 @@ public class XPathParser extends Parser {
 
 	public final RelativePathExpr2Context relativePathExpr2() throws RecognitionException {
 		RelativePathExpr2Context _localctx = new RelativePathExpr2Context(_ctx, getState());
-		enterRule(_localctx, 26, RULE_relativePathExpr2);
+		enterRule(_localctx, 20, RULE_relativePathExpr2);
 		try {
-			setState(157);
+			setState(121);
 			switch (_input.LA(1)) {
 			case SLASH:
 				_localctx = new RelativePathExpr2_slashContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(153); match(SLASH);
-				setState(154); stepExpr();
+				setState(117); match(SLASH);
+				setState(118); stepExpr();
 				}
 				break;
 			case SLASHSLASH:
 				_localctx = new RelativePathExpr2_slashslashContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(155); match(SLASHSLASH);
-				setState(156); stepExpr();
+				setState(119); match(SLASHSLASH);
+				setState(120); stepExpr();
 				}
 				break;
 			default:
@@ -1004,11 +787,11 @@ public class XPathParser extends Parser {
 
 	public final StepExprContext stepExpr() throws RecognitionException {
 		StepExprContext _localctx = new StepExprContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_stepExpr);
+		enterRule(_localctx, 22, RULE_stepExpr);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(159); axisStep();
+			setState(123); axisStep();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1045,12 +828,12 @@ public class XPathParser extends Parser {
 
 	public final AxisStepContext axisStep() throws RecognitionException {
 		AxisStepContext _localctx = new AxisStepContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_axisStep);
+		enterRule(_localctx, 24, RULE_axisStep);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(161); forwardStep();
-			setState(162); predicateList_xp();
+			setState(125); forwardStep();
+			setState(126); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1084,11 +867,11 @@ public class XPathParser extends Parser {
 
 	public final ForwardStepContext forwardStep() throws RecognitionException {
 		ForwardStepContext _localctx = new ForwardStepContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_forwardStep);
+		enterRule(_localctx, 26, RULE_forwardStep);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(164); abbrevForwardStep();
+			setState(128); abbrevForwardStep();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1122,20 +905,20 @@ public class XPathParser extends Parser {
 
 	public final AbbrevForwardStepContext abbrevForwardStep() throws RecognitionException {
 		AbbrevForwardStepContext _localctx = new AbbrevForwardStepContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_abbrevForwardStep);
+		enterRule(_localctx, 28, RULE_abbrevForwardStep);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(167);
+			setState(131);
 			_la = _input.LA(1);
-			if (_la==9) {
+			if (_la==8) {
 				{
-				setState(166); match(9);
+				setState(130); match(8);
 				}
 			}
 
-			setState(169); nodeTest();
+			setState(133); nodeTest();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1172,22 +955,22 @@ public class XPathParser extends Parser {
 
 	public final NodeTestContext nodeTest() throws RecognitionException {
 		NodeTestContext _localctx = new NodeTestContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_nodeTest);
+		enterRule(_localctx, 30, RULE_nodeTest);
 		try {
-			setState(173);
+			setState(137);
 			switch (_input.LA(1)) {
 			case TEXTFUNCTION:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(171); kindTest();
+				setState(135); kindTest();
 				}
 				break;
 			case 4:
-			case 10:
+			case 9:
 			case QNAME_TOKEN:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(172); nameTest();
+				setState(136); nameTest();
 				}
 				break;
 			default:
@@ -1225,11 +1008,11 @@ public class XPathParser extends Parser {
 
 	public final KindTestContext kindTest() throws RecognitionException {
 		KindTestContext _localctx = new KindTestContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_kindTest);
+		enterRule(_localctx, 32, RULE_kindTest);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(175); textTest();
+			setState(139); textTest();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1263,26 +1046,26 @@ public class XPathParser extends Parser {
 
 	public final NameTestContext nameTest() throws RecognitionException {
 		NameTestContext _localctx = new NameTestContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_nameTest);
+		enterRule(_localctx, 34, RULE_nameTest);
 		try {
-			setState(180);
+			setState(144);
 			switch (_input.LA(1)) {
-			case 10:
+			case 9:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(177); match(10);
+				setState(141); match(9);
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(178); match(4);
+				setState(142); match(4);
 				}
 				break;
 			case QNAME_TOKEN:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(179); qName();
+				setState(143); qName();
 				}
 				break;
 			default:
@@ -1323,12 +1106,12 @@ public class XPathParser extends Parser {
 
 	public final FilterExprContext filterExpr() throws RecognitionException {
 		FilterExprContext _localctx = new FilterExprContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_filterExpr);
+		enterRule(_localctx, 36, RULE_filterExpr);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(182); primaryExpr();
-			setState(183); predicateList_xp();
+			setState(146); primaryExpr();
+			setState(147); predicateList_xp();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1365,21 +1148,21 @@ public class XPathParser extends Parser {
 
 	public final PredicateList_xpContext predicateList_xp() throws RecognitionException {
 		PredicateList_xpContext _localctx = new PredicateList_xpContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_predicateList_xp);
+		enterRule(_localctx, 38, RULE_predicateList_xp);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(188);
+			setState(152);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==5) {
 				{
 				{
-				setState(185); predicate_xp();
+				setState(149); predicate_xp();
 				}
 				}
-				setState(190);
+				setState(154);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1416,13 +1199,13 @@ public class XPathParser extends Parser {
 
 	public final Predicate_xpContext predicate_xp() throws RecognitionException {
 		Predicate_xpContext _localctx = new Predicate_xpContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_predicate_xp);
+		enterRule(_localctx, 40, RULE_predicate_xp);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(191); match(5);
-			setState(192); expr_xp();
-			setState(193); match(8);
+			setState(155); match(5);
+			setState(156); expr_xp();
+			setState(157); match(7);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1462,9 +1245,9 @@ public class XPathParser extends Parser {
 
 	public final PrimaryExprContext primaryExpr() throws RecognitionException {
 		PrimaryExprContext _localctx = new PrimaryExprContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_primaryExpr);
+		enterRule(_localctx, 42, RULE_primaryExpr);
 		try {
-			setState(198);
+			setState(162);
 			switch (_input.LA(1)) {
 			case OP_SUB:
 			case STRING_LITERAL:
@@ -1472,25 +1255,25 @@ public class XPathParser extends Parser {
 			case DECIMAL_LITERAL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(195); literal();
+				setState(159); literal();
 				}
 				break;
-			case 11:
+			case 10:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(196); parenthesizedExpr();
+				setState(160); parenthesizedExpr();
 				}
 				break;
 			case 1:
 			case 2:
 			case 3:
-			case 7:
-			case 12:
-			case 14:
+			case 6:
+			case 11:
+			case 13:
 			case NOT:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(197); functionCall();
+				setState(161); functionCall();
 				}
 				break;
 			default:
@@ -1529,22 +1312,22 @@ public class XPathParser extends Parser {
 
 	public final LiteralContext literal() throws RecognitionException {
 		LiteralContext _localctx = new LiteralContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_literal);
+		enterRule(_localctx, 44, RULE_literal);
 		try {
-			setState(202);
+			setState(166);
 			switch (_input.LA(1)) {
 			case OP_SUB:
 			case INTEGER_LITERAL:
 			case DECIMAL_LITERAL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(200); numericLiteral();
+				setState(164); numericLiteral();
 				}
 				break;
 			case STRING_LITERAL:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(201); match(STRING_LITERAL);
+				setState(165); match(STRING_LITERAL);
 				}
 				break;
 			default:
@@ -1582,20 +1365,20 @@ public class XPathParser extends Parser {
 
 	public final NumericLiteralContext numericLiteral() throws RecognitionException {
 		NumericLiteralContext _localctx = new NumericLiteralContext(_ctx, getState());
-		enterRule(_localctx, 52, RULE_numericLiteral);
+		enterRule(_localctx, 46, RULE_numericLiteral);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(205);
+			setState(169);
 			_la = _input.LA(1);
 			if (_la==OP_SUB) {
 				{
-				setState(204); match(OP_SUB);
+				setState(168); match(OP_SUB);
 				}
 			}
 
-			setState(207);
+			setState(171);
 			_la = _input.LA(1);
 			if ( !(_la==INTEGER_LITERAL || _la==DECIMAL_LITERAL) ) {
 			_errHandler.recoverInline(this);
@@ -1634,13 +1417,13 @@ public class XPathParser extends Parser {
 
 	public final ParenthesizedExprContext parenthesizedExpr() throws RecognitionException {
 		ParenthesizedExprContext _localctx = new ParenthesizedExprContext(_ctx, getState());
-		enterRule(_localctx, 54, RULE_parenthesizedExpr);
+		enterRule(_localctx, 48, RULE_parenthesizedExpr);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(209); match(11);
-			setState(210); expr_xp();
-			setState(211); match(13);
+			setState(173); match(10);
+			setState(174); expr_xp();
+			setState(175); match(12);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1684,36 +1467,36 @@ public class XPathParser extends Parser {
 
 	public final FunctionCallContext functionCall() throws RecognitionException {
 		FunctionCallContext _localctx = new FunctionCallContext(_ctx, getState());
-		enterRule(_localctx, 56, RULE_functionCall);
+		enterRule(_localctx, 50, RULE_functionCall);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(213); functionName();
-			setState(214); match(11);
-			setState(223);
+			setState(177); functionName();
+			setState(178); match(10);
+			setState(187);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 4) | (1L << 7) | (1L << 9) | (1L << 10) | (1L << 11) | (1L << 12) | (1L << 14) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << OP_SUB) | (1L << QNAME_TOKEN) | (1L << STRING_LITERAL) | (1L << INTEGER_LITERAL) | (1L << DECIMAL_LITERAL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 4) | (1L << 6) | (1L << 8) | (1L << 9) | (1L << 10) | (1L << 11) | (1L << 13) | (1L << TEXTFUNCTION) | (1L << SLASH) | (1L << SLASHSLASH) | (1L << NOT) | (1L << OP_SUB) | (1L << QNAME_TOKEN) | (1L << STRING_LITERAL) | (1L << INTEGER_LITERAL) | (1L << DECIMAL_LITERAL))) != 0)) {
 				{
-				setState(215); expr_xp();
-				setState(220);
+				setState(179); expr_xp();
+				setState(184);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(216); match(COMMA);
-					setState(217); expr_xp();
+					setState(180); match(COMMA);
+					setState(181); expr_xp();
 					}
 					}
-					setState(222);
+					setState(186);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
 				}
 			}
 
-			setState(225); match(13);
+			setState(189); match(12);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1745,14 +1528,14 @@ public class XPathParser extends Parser {
 
 	public final FunctionNameContext functionName() throws RecognitionException {
 		FunctionNameContext _localctx = new FunctionNameContext(_ctx, getState());
-		enterRule(_localctx, 58, RULE_functionName);
+		enterRule(_localctx, 52, RULE_functionName);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(227);
+			setState(191);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 7) | (1L << 12) | (1L << 14) | (1L << NOT))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 3) | (1L << 6) | (1L << 11) | (1L << 13) | (1L << NOT))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			consume();
@@ -1786,11 +1569,11 @@ public class XPathParser extends Parser {
 
 	public final TextTestContext textTest() throws RecognitionException {
 		TextTestContext _localctx = new TextTestContext(_ctx, getState());
-		enterRule(_localctx, 60, RULE_textTest);
+		enterRule(_localctx, 54, RULE_textTest);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(229); match(TEXTFUNCTION);
+			setState(193); match(TEXTFUNCTION);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1822,11 +1605,11 @@ public class XPathParser extends Parser {
 
 	public final QNameContext qName() throws RecognitionException {
 		QNameContext _localctx = new QNameContext(_ctx, getState());
-		enterRule(_localctx, 62, RULE_qName);
+		enterRule(_localctx, 56, RULE_qName);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(231); match(QNAME_TOKEN);
+			setState(195); match(QNAME_TOKEN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1841,80 +1624,65 @@ public class XPathParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3;\u00ec\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3:\u00c8\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
-		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
-		"\t!\3\2\3\2\3\3\3\3\3\4\3\4\3\4\7\4J\n\4\f\4\16\4M\13\4\3\5\3\5\3\5\7"+
-		"\5R\n\5\f\5\16\5U\13\5\3\6\3\6\3\6\7\6Z\n\6\f\6\16\6]\13\6\3\7\3\7\3\7"+
-		"\7\7b\n\7\f\7\16\7e\13\7\3\b\3\b\3\b\7\bj\n\b\f\b\16\bm\13\b\3\t\3\t\3"+
-		"\t\7\tr\n\t\f\t\16\tu\13\t\3\n\7\nx\n\n\f\n\16\n{\13\n\3\n\3\n\3\13\3"+
-		"\13\3\13\7\13\u0082\n\13\f\13\16\13\u0085\13\13\3\f\3\f\5\f\u0089\n\f"+
-		"\3\f\5\f\u008c\n\f\3\r\3\r\3\r\3\r\3\r\5\r\u0093\n\r\3\16\3\16\7\16\u0097"+
-		"\n\16\f\16\16\16\u009a\13\16\3\17\3\17\3\17\3\17\5\17\u00a0\n\17\3\20"+
-		"\3\20\3\21\3\21\3\21\3\22\3\22\3\23\5\23\u00aa\n\23\3\23\3\23\3\24\3\24"+
-		"\5\24\u00b0\n\24\3\25\3\25\3\26\3\26\3\26\5\26\u00b7\n\26\3\27\3\27\3"+
-		"\27\3\30\7\30\u00bd\n\30\f\30\16\30\u00c0\13\30\3\31\3\31\3\31\3\31\3"+
-		"\32\3\32\3\32\5\32\u00c9\n\32\3\33\3\33\5\33\u00cd\n\33\3\34\5\34\u00d0"+
-		"\n\34\3\34\3\34\3\35\3\35\3\35\3\35\3\36\3\36\3\36\3\36\3\36\7\36\u00dd"+
-		"\n\36\f\36\16\36\u00e0\13\36\5\36\u00e2\n\36\3\36\3\36\3\37\3\37\3 \3"+
-		" \3!\3!\3!\2\2\"\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
-		"\64\668:<>@\2\b\4\2\31\31\33\33\6\2\35\35\37\37!!##\3\2$%\5\2\6\6\f\f"+
-		"&&\3\289\7\2\3\5\t\t\16\16\20\20\27\27\u00e4\2B\3\2\2\2\4D\3\2\2\2\6F"+
-		"\3\2\2\2\bN\3\2\2\2\nV\3\2\2\2\f^\3\2\2\2\16f\3\2\2\2\20n\3\2\2\2\22y"+
-		"\3\2\2\2\24~\3\2\2\2\26\u008b\3\2\2\2\30\u0092\3\2\2\2\32\u0094\3\2\2"+
-		"\2\34\u009f\3\2\2\2\36\u00a1\3\2\2\2 \u00a3\3\2\2\2\"\u00a6\3\2\2\2$\u00a9"+
-		"\3\2\2\2&\u00af\3\2\2\2(\u00b1\3\2\2\2*\u00b6\3\2\2\2,\u00b8\3\2\2\2."+
-		"\u00be\3\2\2\2\60\u00c1\3\2\2\2\62\u00c8\3\2\2\2\64\u00cc\3\2\2\2\66\u00cf"+
-		"\3\2\2\28\u00d3\3\2\2\2:\u00d7\3\2\2\2<\u00e5\3\2\2\2>\u00e7\3\2\2\2@"+
-		"\u00e9\3\2\2\2BC\5\4\3\2C\3\3\2\2\2DE\5\6\4\2E\5\3\2\2\2FK\5\b\5\2GH\7"+
-		"\25\2\2HJ\5\b\5\2IG\3\2\2\2JM\3\2\2\2KI\3\2\2\2KL\3\2\2\2L\7\3\2\2\2M"+
-		"K\3\2\2\2NS\5\n\6\2OP\7\26\2\2PR\5\n\6\2QO\3\2\2\2RU\3\2\2\2SQ\3\2\2\2"+
-		"ST\3\2\2\2T\t\3\2\2\2US\3\2\2\2V[\5\f\7\2WX\t\2\2\2XZ\5\f\7\2YW\3\2\2"+
-		"\2Z]\3\2\2\2[Y\3\2\2\2[\\\3\2\2\2\\\13\3\2\2\2][\3\2\2\2^c\5\16\b\2_`"+
-		"\t\3\2\2`b\5\16\b\2a_\3\2\2\2be\3\2\2\2ca\3\2\2\2cd\3\2\2\2d\r\3\2\2\2"+
-		"ec\3\2\2\2fk\5\20\t\2gh\t\4\2\2hj\5\20\t\2ig\3\2\2\2jm\3\2\2\2ki\3\2\2"+
-		"\2kl\3\2\2\2l\17\3\2\2\2mk\3\2\2\2ns\5\22\n\2op\t\5\2\2pr\5\22\n\2qo\3"+
-		"\2\2\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2t\21\3\2\2\2us\3\2\2\2vx\7%\2\2wv"+
-		"\3\2\2\2x{\3\2\2\2yw\3\2\2\2yz\3\2\2\2z|\3\2\2\2{y\3\2\2\2|}\5\24\13\2"+
-		"}\23\3\2\2\2~\u0083\5\26\f\2\177\u0080\7\b\2\2\u0080\u0082\5\26\f\2\u0081"+
-		"\177\3\2\2\2\u0082\u0085\3\2\2\2\u0083\u0081\3\2\2\2\u0083\u0084\3\2\2"+
-		"\2\u0084\25\3\2\2\2\u0085\u0083\3\2\2\2\u0086\u0088\5,\27\2\u0087\u0089"+
-		"\5\30\r\2\u0088\u0087\3\2\2\2\u0088\u0089\3\2\2\2\u0089\u008c\3\2\2\2"+
-		"\u008a\u008c\5\30\r\2\u008b\u0086\3\2\2\2\u008b\u008a\3\2\2\2\u008c\27"+
-		"\3\2\2\2\u008d\u008e\7\23\2\2\u008e\u0093\5\32\16\2\u008f\u0090\7\24\2"+
-		"\2\u0090\u0093\5\32\16\2\u0091\u0093\5\32\16\2\u0092\u008d\3\2\2\2\u0092"+
-		"\u008f\3\2\2\2\u0092\u0091\3\2\2\2\u0093\31\3\2\2\2\u0094\u0098\5\36\20"+
-		"\2\u0095\u0097\5\34\17\2\u0096\u0095\3\2\2\2\u0097\u009a\3\2\2\2\u0098"+
-		"\u0096\3\2\2\2\u0098\u0099\3\2\2\2\u0099\33\3\2\2\2\u009a\u0098\3\2\2"+
-		"\2\u009b\u009c\7\23\2\2\u009c\u00a0\5\36\20\2\u009d\u009e\7\24\2\2\u009e"+
-		"\u00a0\5\36\20\2\u009f\u009b\3\2\2\2\u009f\u009d\3\2\2\2\u00a0\35\3\2"+
-		"\2\2\u00a1\u00a2\5 \21\2\u00a2\37\3\2\2\2\u00a3\u00a4\5\"\22\2\u00a4\u00a5"+
-		"\5.\30\2\u00a5!\3\2\2\2\u00a6\u00a7\5$\23\2\u00a7#\3\2\2\2\u00a8\u00aa"+
-		"\7\13\2\2\u00a9\u00a8\3\2\2\2\u00a9\u00aa\3\2\2\2\u00aa\u00ab\3\2\2\2"+
-		"\u00ab\u00ac\5&\24\2\u00ac%\3\2\2\2\u00ad\u00b0\5(\25\2\u00ae\u00b0\5"+
-		"*\26\2\u00af\u00ad\3\2\2\2\u00af\u00ae\3\2\2\2\u00b0\'\3\2\2\2\u00b1\u00b2"+
-		"\5> \2\u00b2)\3\2\2\2\u00b3\u00b7\7\f\2\2\u00b4\u00b7\7\6\2\2\u00b5\u00b7"+
-		"\5@!\2\u00b6\u00b3\3\2\2\2\u00b6\u00b4\3\2\2\2\u00b6\u00b5\3\2\2\2\u00b7"+
-		"+\3\2\2\2\u00b8\u00b9\5\62\32\2\u00b9\u00ba\5.\30\2\u00ba-\3\2\2\2\u00bb"+
-		"\u00bd\5\60\31\2\u00bc\u00bb\3\2\2\2\u00bd\u00c0\3\2\2\2\u00be\u00bc\3"+
-		"\2\2\2\u00be\u00bf\3\2\2\2\u00bf/\3\2\2\2\u00c0\u00be\3\2\2\2\u00c1\u00c2"+
-		"\7\7\2\2\u00c2\u00c3\5\4\3\2\u00c3\u00c4\7\n\2\2\u00c4\61\3\2\2\2\u00c5"+
-		"\u00c9\5\64\33\2\u00c6\u00c9\58\35\2\u00c7\u00c9\5:\36\2\u00c8\u00c5\3"+
-		"\2\2\2\u00c8\u00c6\3\2\2\2\u00c8\u00c7\3\2\2\2\u00c9\63\3\2\2\2\u00ca"+
-		"\u00cd\5\66\34\2\u00cb\u00cd\7\64\2\2\u00cc\u00ca\3\2\2\2\u00cc\u00cb"+
-		"\3\2\2\2\u00cd\65\3\2\2\2\u00ce\u00d0\7%\2\2\u00cf\u00ce\3\2\2\2\u00cf"+
-		"\u00d0\3\2\2\2\u00d0\u00d1\3\2\2\2\u00d1\u00d2\t\6\2\2\u00d2\67\3\2\2"+
-		"\2\u00d3\u00d4\7\r\2\2\u00d4\u00d5\5\4\3\2\u00d5\u00d6\7\17\2\2\u00d6"+
-		"9\3\2\2\2\u00d7\u00d8\5<\37\2\u00d8\u00e1\7\r\2\2\u00d9\u00de\5\4\3\2"+
-		"\u00da\u00db\7\63\2\2\u00db\u00dd\5\4\3\2\u00dc\u00da\3\2\2\2\u00dd\u00e0"+
-		"\3\2\2\2\u00de\u00dc\3\2\2\2\u00de\u00df\3\2\2\2\u00df\u00e2\3\2\2\2\u00e0"+
-		"\u00de\3\2\2\2\u00e1\u00d9\3\2\2\2\u00e1\u00e2\3\2\2\2\u00e2\u00e3\3\2"+
-		"\2\2\u00e3\u00e4\7\17\2\2\u00e4;\3\2\2\2\u00e5\u00e6\t\7\2\2\u00e6=\3"+
-		"\2\2\2\u00e7\u00e8\7\22\2\2\u00e8?\3\2\2\2\u00e9\u00ea\7\60\2\2\u00ea"+
-		"A\3\2\2\2\30KS[cksy\u0083\u0088\u008b\u0092\u0098\u009f\u00a9\u00af\u00b6"+
-		"\u00be\u00c8\u00cc\u00cf\u00de\u00e1";
+		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\3\2\3\2\3\3\3\3\3\4"+
+		"\3\4\3\4\7\4D\n\4\f\4\16\4G\13\4\3\5\3\5\3\5\7\5L\n\5\f\5\16\5O\13\5\3"+
+		"\6\3\6\3\6\5\6T\n\6\3\7\3\7\3\7\5\7Y\n\7\3\b\7\b\\\n\b\f\b\16\b_\13\b"+
+		"\3\b\3\b\3\t\3\t\5\te\n\t\3\t\5\th\n\t\3\n\3\n\3\n\3\n\3\n\5\no\n\n\3"+
+		"\13\3\13\7\13s\n\13\f\13\16\13v\13\13\3\f\3\f\3\f\3\f\5\f|\n\f\3\r\3\r"+
+		"\3\16\3\16\3\16\3\17\3\17\3\20\5\20\u0086\n\20\3\20\3\20\3\21\3\21\5\21"+
+		"\u008c\n\21\3\22\3\22\3\23\3\23\3\23\5\23\u0093\n\23\3\24\3\24\3\24\3"+
+		"\25\7\25\u0099\n\25\f\25\16\25\u009c\13\25\3\26\3\26\3\26\3\26\3\27\3"+
+		"\27\3\27\5\27\u00a5\n\27\3\30\3\30\5\30\u00a9\n\30\3\31\5\31\u00ac\n\31"+
+		"\3\31\3\31\3\32\3\32\3\32\3\32\3\33\3\33\3\33\3\33\3\33\7\33\u00b9\n\33"+
+		"\f\33\16\33\u00bc\13\33\5\33\u00be\n\33\3\33\3\33\3\34\3\34\3\35\3\35"+
+		"\3\36\3\36\3\36\2\2\37\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,"+
+		".\60\62\64\668:\2\6\b\2\30\30\32\32\34\34\36\36  \"\"\5\2\6\6\13\13#%"+
+		"\3\2\678\7\2\3\5\b\b\r\r\17\17\26\26\u00c0\2<\3\2\2\2\4>\3\2\2\2\6@\3"+
+		"\2\2\2\bH\3\2\2\2\nP\3\2\2\2\fU\3\2\2\2\16]\3\2\2\2\20g\3\2\2\2\22n\3"+
+		"\2\2\2\24p\3\2\2\2\26{\3\2\2\2\30}\3\2\2\2\32\177\3\2\2\2\34\u0082\3\2"+
+		"\2\2\36\u0085\3\2\2\2 \u008b\3\2\2\2\"\u008d\3\2\2\2$\u0092\3\2\2\2&\u0094"+
+		"\3\2\2\2(\u009a\3\2\2\2*\u009d\3\2\2\2,\u00a4\3\2\2\2.\u00a8\3\2\2\2\60"+
+		"\u00ab\3\2\2\2\62\u00af\3\2\2\2\64\u00b3\3\2\2\2\66\u00c1\3\2\2\28\u00c3"+
+		"\3\2\2\2:\u00c5\3\2\2\2<=\5\4\3\2=\3\3\2\2\2>?\5\6\4\2?\5\3\2\2\2@E\5"+
+		"\b\5\2AB\7\24\2\2BD\5\b\5\2CA\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2\2\2F\7"+
+		"\3\2\2\2GE\3\2\2\2HM\5\n\6\2IJ\7\25\2\2JL\5\n\6\2KI\3\2\2\2LO\3\2\2\2"+
+		"MK\3\2\2\2MN\3\2\2\2N\t\3\2\2\2OM\3\2\2\2PS\5\f\7\2QR\t\2\2\2RT\5\f\7"+
+		"\2SQ\3\2\2\2ST\3\2\2\2T\13\3\2\2\2UX\5\16\b\2VW\t\3\2\2WY\5\16\b\2XV\3"+
+		"\2\2\2XY\3\2\2\2Y\r\3\2\2\2Z\\\7$\2\2[Z\3\2\2\2\\_\3\2\2\2][\3\2\2\2]"+
+		"^\3\2\2\2^`\3\2\2\2_]\3\2\2\2`a\5\20\t\2a\17\3\2\2\2bd\5&\24\2ce\5\22"+
+		"\n\2dc\3\2\2\2de\3\2\2\2eh\3\2\2\2fh\5\22\n\2gb\3\2\2\2gf\3\2\2\2h\21"+
+		"\3\2\2\2ij\7\22\2\2jo\5\24\13\2kl\7\23\2\2lo\5\24\13\2mo\5\24\13\2ni\3"+
+		"\2\2\2nk\3\2\2\2nm\3\2\2\2o\23\3\2\2\2pt\5\30\r\2qs\5\26\f\2rq\3\2\2\2"+
+		"sv\3\2\2\2tr\3\2\2\2tu\3\2\2\2u\25\3\2\2\2vt\3\2\2\2wx\7\22\2\2x|\5\30"+
+		"\r\2yz\7\23\2\2z|\5\30\r\2{w\3\2\2\2{y\3\2\2\2|\27\3\2\2\2}~\5\32\16\2"+
+		"~\31\3\2\2\2\177\u0080\5\34\17\2\u0080\u0081\5(\25\2\u0081\33\3\2\2\2"+
+		"\u0082\u0083\5\36\20\2\u0083\35\3\2\2\2\u0084\u0086\7\n\2\2\u0085\u0084"+
+		"\3\2\2\2\u0085\u0086\3\2\2\2\u0086\u0087\3\2\2\2\u0087\u0088\5 \21\2\u0088"+
+		"\37\3\2\2\2\u0089\u008c\5\"\22\2\u008a\u008c\5$\23\2\u008b\u0089\3\2\2"+
+		"\2\u008b\u008a\3\2\2\2\u008c!\3\2\2\2\u008d\u008e\58\35\2\u008e#\3\2\2"+
+		"\2\u008f\u0093\7\13\2\2\u0090\u0093\7\6\2\2\u0091\u0093\5:\36\2\u0092"+
+		"\u008f\3\2\2\2\u0092\u0090\3\2\2\2\u0092\u0091\3\2\2\2\u0093%\3\2\2\2"+
+		"\u0094\u0095\5,\27\2\u0095\u0096\5(\25\2\u0096\'\3\2\2\2\u0097\u0099\5"+
+		"*\26\2\u0098\u0097\3\2\2\2\u0099\u009c\3\2\2\2\u009a\u0098\3\2\2\2\u009a"+
+		"\u009b\3\2\2\2\u009b)\3\2\2\2\u009c\u009a\3\2\2\2\u009d\u009e\7\7\2\2"+
+		"\u009e\u009f\5\4\3\2\u009f\u00a0\7\t\2\2\u00a0+\3\2\2\2\u00a1\u00a5\5"+
+		".\30\2\u00a2\u00a5\5\62\32\2\u00a3\u00a5\5\64\33\2\u00a4\u00a1\3\2\2\2"+
+		"\u00a4\u00a2\3\2\2\2\u00a4\u00a3\3\2\2\2\u00a5-\3\2\2\2\u00a6\u00a9\5"+
+		"\60\31\2\u00a7\u00a9\7\63\2\2\u00a8\u00a6\3\2\2\2\u00a8\u00a7\3\2\2\2"+
+		"\u00a9/\3\2\2\2\u00aa\u00ac\7$\2\2\u00ab\u00aa\3\2\2\2\u00ab\u00ac\3\2"+
+		"\2\2\u00ac\u00ad\3\2\2\2\u00ad\u00ae\t\4\2\2\u00ae\61\3\2\2\2\u00af\u00b0"+
+		"\7\f\2\2\u00b0\u00b1\5\4\3\2\u00b1\u00b2\7\16\2\2\u00b2\63\3\2\2\2\u00b3"+
+		"\u00b4\5\66\34\2\u00b4\u00bd\7\f\2\2\u00b5\u00ba\5\4\3\2\u00b6\u00b7\7"+
+		"\62\2\2\u00b7\u00b9\5\4\3\2\u00b8\u00b6\3\2\2\2\u00b9\u00bc\3\2\2\2\u00ba"+
+		"\u00b8\3\2\2\2\u00ba\u00bb\3\2\2\2\u00bb\u00be\3\2\2\2\u00bc\u00ba\3\2"+
+		"\2\2\u00bd\u00b5\3\2\2\2\u00bd\u00be\3\2\2\2\u00be\u00bf\3\2\2\2\u00bf"+
+		"\u00c0\7\16\2\2\u00c0\65\3\2\2\2\u00c1\u00c2\t\5\2\2\u00c2\67\3\2\2\2"+
+		"\u00c3\u00c4\7\21\2\2\u00c49\3\2\2\2\u00c5\u00c6\7/\2\2\u00c6;\3\2\2\2"+
+		"\25EMSX]dgnt{\u0085\u008b\u0092\u009a\u00a4\u00a8\u00ab\u00ba\u00bd";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

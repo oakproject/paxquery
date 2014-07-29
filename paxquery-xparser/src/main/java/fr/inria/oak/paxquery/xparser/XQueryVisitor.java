@@ -19,13 +19,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitAttInner2(@NotNull XQueryParser.AttInner2Context ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#relationalExpr_xp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelationalExpr_xp(@NotNull XQueryParser.RelationalExpr_xpContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#orExpr_xq}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -138,13 +131,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitLetBinding(@NotNull XQueryParser.LetBindingContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#multiplicativeExpr_xp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMultiplicativeExpr_xp(@NotNull XQueryParser.MultiplicativeExpr_xpContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#vcmp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -171,13 +157,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitForStat(@NotNull XQueryParser.ForStatContext ctx);
-
-	/**
-	 * Visit a parse tree produced by {@link XQueryParser#additiveExpr_xp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAdditiveExpr_xp(@NotNull XQueryParser.AdditiveExpr_xpContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#contains}.
@@ -285,18 +264,18 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitGroupBy(@NotNull XQueryParser.GroupByContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#equalityExpr_xp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualityExpr_xp(@NotNull XQueryParser.EqualityExpr_xpContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#andExpr_xp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAndExpr_xp(@NotNull XQueryParser.AndExpr_xpContext ctx);
+
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#comparativeExpr_xp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitComparativeExpr_xp(@NotNull XQueryParser.ComparativeExpr_xpContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#literal}.
@@ -404,13 +383,6 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitFilterExpr(@NotNull XQueryParser.FilterExprContext ctx);
 
 	/**
-	 * Visit a parse tree produced by {@link XQueryParser#unionExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUnionExpr(@NotNull XQueryParser.UnionExprContext ctx);
-
-	/**
 	 * Visit a parse tree produced by {@link XQueryParser#axisStep}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -423,6 +395,13 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitRelativePathExpr(@NotNull XQueryParser.RelativePathExprContext ctx);
+
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#arithmeticExpr_xp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArithmeticExpr_xp(@NotNull XQueryParser.ArithmeticExpr_xpContext ctx);
 
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#arithmeticExpr_xq}.
