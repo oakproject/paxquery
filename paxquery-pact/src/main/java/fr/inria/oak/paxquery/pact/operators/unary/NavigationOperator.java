@@ -31,8 +31,8 @@ import eu.stratosphere.types.Record;
 import eu.stratosphere.types.StringValue;
 import eu.stratosphere.util.Collector;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtractor;
@@ -50,7 +50,7 @@ public class NavigationOperator extends BaseMapOperator {
 
 	private int column;
 	
-	private TreePattern navigationTreePattern;
+	private NavigationTreePattern navigationTreePattern;
 	
 
 	@Override
@@ -60,7 +60,7 @@ public class NavigationOperator extends BaseMapOperator {
 		final int column = parameters.getInteger(PACTOperatorsConfiguration.NAVIGATION_COLUMN_INT.toString(), -1);
 		this.column = column;
 		
-		final TreePattern ntp = TreePatternUtils.getTreePatternFromString(
+		final NavigationTreePattern ntp = NavigationTreePatternUtils.getTreePatternFromString(
 				parameters.getString(PACTOperatorsConfiguration.NTP_STRING.toString(), null),
 				"queryTest");
 		this.navigationTreePattern = ntp;
@@ -77,7 +77,7 @@ public class NavigationOperator extends BaseMapOperator {
 	 * @param treePattern
 	 * @param collector
 	 */
-	public static void navigation(NestedMetadata inputRecordSignature, Record record, int column, TreePattern navigationTreePattern, Collector<Record> collector) {
+	public static void navigation(NestedMetadata inputRecordSignature, Record record, int column, NavigationTreePattern navigationTreePattern, Collector<Record> collector) {
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 
 		try {

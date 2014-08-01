@@ -25,6 +25,7 @@ import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
  * XML results construction logical operator.
  *
  */
+@Deprecated
 public class XMLConstruct extends BaseUnaryOperator {
 	
 	private final String outputPath;
@@ -43,7 +44,7 @@ public class XMLConstruct extends BaseUnaryOperator {
 
 	@Override
 	public void buildNRSMD() {
-		for(BaseLogicalOperator op : children)
+		for(BaseLogicalOperator op : this.children)
 			op.buildNRSMD();
 		this.nestedMetadata = this.getChild().getNRSMD();
 	}

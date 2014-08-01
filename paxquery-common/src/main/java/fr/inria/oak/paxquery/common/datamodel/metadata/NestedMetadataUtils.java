@@ -25,13 +25,13 @@ import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.common.exception.PAXQueryException;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternEdge;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.CompactDynamicDeweyScheme;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeIDScheme;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeIDSchemeAssignator;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.OrderedIntegerIDScheme;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.PrePostDepthIDScheme;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternEdge;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
 
 
 /**
@@ -186,7 +186,7 @@ public class NestedMetadataUtils {
 	 *         XMLStratosphereExecutionException
 	 * @throws XMLStratosphereException
 	 */
-	public static NestedMetadata getStrictNRSMD(PatternNode node) throws PAXQueryExecutionException, PAXQueryException {
+	public static NestedMetadata getStrictNRSMD(NavigationTreePatternNode node) throws PAXQueryExecutionException, PAXQueryException {
 		//System.out.println("Making strict node RSMD for " + node.tag);
 		ArrayList<MetadataTypes> nTypes = new ArrayList<MetadataTypes>();
 		MetadataTypes[] types;
@@ -250,12 +250,12 @@ public class NestedMetadataUtils {
 	 * @throws XMLStratosphereExecutionException
 	 */
 
-	public static NestedMetadata getNRSMD(PatternNode node, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings)
+	public static NestedMetadata getNRSMD(NavigationTreePatternNode node, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings)
 		throws PAXQueryExecutionException {
 		return getNRSMD(node, mappings, new ArrayList<Integer>(), false);
 	}
 
-	public static NestedMetadata getNRSMD(PatternNode node, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings,
+	public static NestedMetadata getNRSMD(NavigationTreePatternNode node, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings,
 		ArrayList<Integer> address, boolean nestedInParent) throws PAXQueryExecutionException {
 		
 		ArrayList<MetadataTypes> nTypes = new ArrayList<MetadataTypes>();
@@ -296,7 +296,7 @@ public class NestedMetadataUtils {
 	 * @throws XMLStratosphereException
 	 * @throws XMLStratosphereExecutionException
 	 */
-	private static void enrichNRSMD(PatternNode node, ArrayList<MetadataTypes> nTypes, ArrayList nNested, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings,
+	private static void enrichNRSMD(NavigationTreePatternNode node, ArrayList<MetadataTypes> nTypes, ArrayList nNested, HashMap<Integer, HashMap<String, ArrayList<Integer>>> mappings,
 		ArrayList<Integer> currentAddress, boolean nestedInParent) throws PAXQueryExecutionException {
 
 		HashMap thisNodesAttributes = new HashMap();
@@ -385,7 +385,7 @@ public class NestedMetadataUtils {
 		int k = 0;
 		Iterator it = node.getEdges().iterator();
 		while (it.hasNext()) {
-			PatternEdge pe = (PatternEdge) it.next();
+			NavigationTreePatternEdge pe = (NavigationTreePatternEdge) it.next();
 
 			if (pe.isNested()) {
 
@@ -414,7 +414,7 @@ public class NestedMetadataUtils {
 	 * @param node
 	 * @return
 	 */
-	private static int flatAttributeNumber(PatternNode node) {
+	private static int flatAttributeNumber(NavigationTreePatternNode node) {
 		int n = 0;
 		if (node.storesID()) {
 			n++;
@@ -430,7 +430,7 @@ public class NestedMetadataUtils {
 		}
 		Iterator it = node.getEdges().iterator();
 		while (it.hasNext()) {
-			PatternEdge e2 = (PatternEdge) it.next();
+			NavigationTreePatternEdge e2 = (NavigationTreePatternEdge) it.next();
 			if (!e2.isNested()) {
 				int k = flatAttributeNumber(e2.n2);
 				n += k;
@@ -441,7 +441,7 @@ public class NestedMetadataUtils {
 		return n;
 	}
 
-	public static NestedMetadata makeRequiredNRSMD(PatternNode pn)
+	public static NestedMetadata makeRequiredNRSMD(NavigationTreePatternNode pn)
 		throws PAXQueryExecutionException {
 		nodeCount = new AtomicInteger(0);
 		return requiredNRSMD(pn);
@@ -456,7 +456,7 @@ public class NestedMetadataUtils {
 	 * @return @throws
 	 *         XMLStratosphereExecutionException
 	 */
-	private static NestedMetadata requiredNRSMD(PatternNode pn)
+	private static NestedMetadata requiredNRSMD(NavigationTreePatternNode pn)
 		throws PAXQueryExecutionException {
 		//System.out.println("\nMaking required RSMD for " + pn.tag);
 
@@ -562,8 +562,8 @@ public class NestedMetadataUtils {
 		//System.out.println("Looking at children of " + pn.tag);
 		Iterator ie = pn.getEdges().iterator();
 		while (ie.hasNext()) {
-			PatternEdge pe = (PatternEdge) ie.next();
-			PatternNode n2 = pe.n2;
+			NavigationTreePatternEdge pe = (NavigationTreePatternEdge) ie.next();
+			NavigationTreePatternNode n2 = pe.n2;
 			if (n2.requiresSomething()) {
 				//System.out.println(
 				//	"Gathering required metadata from "

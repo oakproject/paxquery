@@ -22,7 +22,7 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 
 /**
@@ -37,7 +37,7 @@ public class XMLScan extends BaseLeafOperator {
 	
 	private String[] documentNames;
 	
-	private TreePattern navigationTreePattern;
+	private NavigationTreePattern navigationTreePattern;
 	
 	private final boolean attachDocumentID;
 	
@@ -54,7 +54,7 @@ public class XMLScan extends BaseLeafOperator {
 		this.documentNames = documentNames;
 	}
 	
-	public XMLScan(boolean attachDocumentID, TreePattern navigationTreePattern, String pathDocuments) {
+	public XMLScan(boolean attachDocumentID, NavigationTreePattern navigationTreePattern, String pathDocuments) {
 		this.ownName = "XMLCollectionNav";
 		this.ownDetails = navigationTreePattern.getName();
 		this.attachDocumentID = attachDocumentID;
@@ -63,7 +63,7 @@ public class XMLScan extends BaseLeafOperator {
 		this.visible = true;
 	}
 	
-	public XMLScan(boolean attachDocumentID, TreePattern navigationTreePattern, String pathDocuments, String... documentNames) {
+	public XMLScan(boolean attachDocumentID, NavigationTreePattern navigationTreePattern, String pathDocuments, String... documentNames) {
 		this(attachDocumentID, navigationTreePattern, pathDocuments);
 		this.documentNames = documentNames;
 	}
@@ -76,7 +76,7 @@ public class XMLScan extends BaseLeafOperator {
 		return this.documentNames;
 	}
 	
-	public TreePattern getNavigationTreePattern() {
+	public NavigationTreePattern getNavigationTreePattern() {
 		return this.navigationTreePattern;
 	}
 	

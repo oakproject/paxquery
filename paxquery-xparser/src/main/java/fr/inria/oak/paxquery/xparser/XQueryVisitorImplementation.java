@@ -14,7 +14,10 @@ import fr.inria.oak.paxquery.algebra.operators.binary.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.*;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
+import fr.inria.oak.paxquery.common.xml.navigation.core.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +43,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * Data structures
 	 */
 	public HashMap<String, Variable> varsPos;	//for use when creating the XMLConstruct operator in return clause
-	public HashMap<String, PatternNode> patternNodeMap;	//each tuple <String, PatternNode> stores the name of a variable and the PatternNode it addresses
-	public ArrayList<TreePattern> treePatterns;	//the list of all TreePattern objects built for a given query
+	public HashMap<String, NavigationTreePatternNode> patternNodeMap;	//each tuple <String, PatternNode> stores the name of a variable and the PatternNode it addresses
+	public ArrayList<NavigationTreePattern> navigationTreePatterns;	//the list of all TreePattern objects built for a given query
 	public ArrayList<String> applyEach;			//holds a String array for ApplyConstruct.each
 	public ArrayList<Integer> applyFields;		//holds a Integer array for ApplyConstruct.fields
 	public HashMap<String, ApplyConstruct> mappedApplys;	//stores all ApplyConstruct objects instantiated during query processing (lets and nested sub-queries). The mapping is <variable_name, associated_applyconstruc>
@@ -50,9 +53,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * State variables for parsing
 	 */
-	private TreePattern lastTreePattern;
-	private PatternNode lastNode;
-	private PatternNode lastNodeInsideXPathPredicate;
+	private NavigationTreePattern lastTreePattern;
+	private NavigationTreePatternNode lastNode;
+	private NavigationTreePatternNode lastNodeInsideXPathPredicate;
 	private String lastVarLeftSide;
 	private String lastVarXPathPredicate;
 	private int lastSlashToken;
@@ -75,8 +78,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
 	public XQueryVisitorImplementation(String outputPath) {
 		this.outputPath = outputPath;
-		patternNodeMap = new HashMap<String, PatternNode>();
-		treePatterns = new ArrayList<TreePattern>();
+		patternNodeMap = new HashMap<String, NavigationTreePatternNode>();
+		navigationTreePatterns = new ArrayList<NavigationTreePattern>();
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
 		insideReturn = false;
@@ -209,15 +212,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitPathExprInner_xq_collection(XQueryParser.PathExprInner_xq_collectionContext ctx) {
 		//root node construction
 		String rootTag = "";
-		lastTreePattern = new TreePattern();
-		int rootCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "", lastTreePattern);
+		lastTreePattern = new NavigationTreePattern();
+		int rootCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+		NavigationTreePatternNode rootNode = new NavigationTreePatternNode("", rootTag, rootCode, "", "", lastTreePattern);
 		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content, rootNode));
 		lastNode = rootNode;
 		patternNodeMap.put(lastVarLeftSide, rootNode);		
 		//tree pattern construction
 		lastTreePattern.setRoot(rootNode);
-		treePatterns.add(lastTreePattern);
+		navigationTreePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
 		String pathDocuments = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
@@ -237,15 +240,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitPathExprInner_xq_doc(XQueryParser.PathExprInner_xq_docContext ctx) { 
 		//root node construction
 		String rootTag = "";
-		lastTreePattern = new TreePattern();
-		int rootCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode rootNode = new PatternNode("", rootTag, rootCode, "", "", lastTreePattern);
+		lastTreePattern = new NavigationTreePattern();
+		int rootCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+		NavigationTreePatternNode rootNode = new NavigationTreePatternNode("", rootTag, rootCode, "", "", lastTreePattern);
 		rootNode.addMatchingVariables(new Variable(lastVarLeftSide, Variable.VariableDataType.Content, rootNode));
 		lastNode = rootNode;
 		patternNodeMap.put(lastVarLeftSide, rootNode);
 		//tree pattern construction
 		lastTreePattern.setRoot(rootNode);
-		treePatterns.add(lastTreePattern);
+		navigationTreePatterns.add(lastTreePattern);
 		
 		//XMLScan operator construction
 		String pathDocuments = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
@@ -741,8 +744,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		else if(ctx.getChild(0).getText().compareTo("mod") == 0)
 			tag = "mod";
 		
-		int nodeCode = PatternNode.globalNodeCounter.getAndIncrement();
-		PatternNode node = new PatternNode("", tag, nodeCode, "", "", lastTreePattern);
+		int nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+		NavigationTreePatternNode node = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
 	
 		if(insideXPathPredicate == false) {
 			boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
@@ -1074,7 +1077,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				String varName = child.getText();
 				
 				//Test for illegal user of attributes
-				PatternNode node = patternNodeMap.get(varName);
+				NavigationTreePatternNode node = patternNodeMap.get(varName);
 				if(node != null && node.isAttribute())
 				{
 					System.out.println("It is illegal to use an attribute as an XML value");

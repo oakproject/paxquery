@@ -30,10 +30,10 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryException;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternEdge;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeIDScheme;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternEdge;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
 import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 
@@ -47,9 +47,9 @@ public class RecordBuilder {
 	private static final Log logger = LogFactory.getLog(RecordBuilder.class);
 	
 
-	public HashMap<PatternNode, ExtractorMatchStack> stacksByNodes;
+	public HashMap<NavigationTreePatternNode, ExtractorMatchStack> stacksByNodes;
 
-	public HashMap<PatternNode, NodeIDScheme> schemesByNodes;
+	public HashMap<NavigationTreePatternNode, NodeIDScheme> schemesByNodes;
 
 	boolean thisIsFirstAttribute;
 
@@ -89,20 +89,20 @@ public class RecordBuilder {
 		}
 	}
 
-	public void setStacksByNodes(HashMap<PatternNode, ExtractorMatchStack> hm) {
+	public void setStacksByNodes(HashMap<NavigationTreePatternNode, ExtractorMatchStack> hm) {
 		this.stacksByNodes = hm;
 	}
 
-	public void setSchemesByNodes(HashMap<PatternNode, NodeIDScheme> hm) {
+	public void setSchemesByNodes(HashMap<NavigationTreePatternNode, NodeIDScheme> hm) {
 		this.schemesByNodes = hm;
 	}
 	
-	public void produceTuples(ExtractorMatch em, PatternNode pn,
-			List<Record> v, TreePattern p, int i) {
+	public void produceTuples(ExtractorMatch em, NavigationTreePatternNode pn,
+			List<Record> v, NavigationTreePattern p, int i) {
 		logger.error("Method produceTuples for multiple documents not implemented yet!");
 	}
 	
-	public final void produceTuples(ExtractorMatch em, PatternNode pn, List<Record> v, TreePattern x) {
+	public final void produceTuples(ExtractorMatch em, NavigationTreePatternNode pn, List<Record> v, NavigationTreePattern x) {
 		this.thisIsFirstAttribute = true;
 
 		try {
@@ -127,7 +127,7 @@ public class RecordBuilder {
 	 * @param pn
 	 * @return
 	 */
-	private final List<Record> build(ExtractorMatch em, PatternNode pn) throws PAXQueryException, PAXQueryExecutionException {
+	private final List<Record> build(ExtractorMatch em, NavigationTreePatternNode pn) throws PAXQueryException, PAXQueryExecutionException {
 		List<Record> res = new ArrayList<Record>();
 		Record rootTuple = new Record();
 
@@ -166,12 +166,12 @@ public class RecordBuilder {
 		}
 
 		
-		Iterator<PatternEdge> it = pn.getEdges().iterator();
+		Iterator<NavigationTreePatternEdge> it = pn.getEdges().iterator();
 		while (it.hasNext() ) {
 			iChild++;
-			PatternEdge pe = it.next();
+			NavigationTreePatternEdge pe = it.next();
 
-			PatternNode child = pe.n2;
+			NavigationTreePatternNode child = pe.n2;
 
 			if (pe.isNested()) {
 				nesteds[iChild] = true;
@@ -331,7 +331,7 @@ public class RecordBuilder {
 		return v;
 	}
 
-	private final List<Record> backtrack(ExtractorMatch em, PatternNode pn)
+	private final List<Record> backtrack(ExtractorMatch em, NavigationTreePatternNode pn)
 		throws PAXQueryException, PAXQueryExecutionException {
 		return build(em, pn);
 	}
@@ -373,7 +373,7 @@ public class RecordBuilder {
 	private final List<Record> addAtomicAttributes(
 		Record tuple,
 		ExtractorMatch em,
-		PatternNode pn) {
+		NavigationTreePatternNode pn) {
 		
 		List<Record> v = new ArrayList<Record>();
 		

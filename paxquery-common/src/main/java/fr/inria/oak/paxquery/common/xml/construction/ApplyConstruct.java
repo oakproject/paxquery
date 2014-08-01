@@ -22,6 +22,7 @@ import java.io.Serializable;
  * Contruction pattern.
  *
  */
+@Deprecated
 public class ApplyConstruct implements Serializable {
 	
 	private final String before; // Tag to apply before each group of tuples/records

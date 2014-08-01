@@ -3,7 +3,7 @@ package fr.inria.oak.paxquery.xparser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PrintingLevel;
+import fr.inria.oak.paxquery.common.xml.navigation.PrintingLevel;
 
 public class XQueryMain {
 	public static void main(String args[]) {
@@ -26,9 +26,9 @@ public class XQueryMain {
 			loader.visit(tree);
 			
 			System.out.println(tree.toStringTree(parser));
-			for(int i = 0; i < loader.treePatterns.size(); i++) {
+			for(int i = 0; i < loader.navigationTreePatterns.size(); i++) {
 				System.out.println("PatternTree ("+i+"): ");
-				System.out.println(loader.treePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
+				System.out.println(loader.navigationTreePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
 			}
 			System.out.println("HashMap:");
 			System.out.println(loader.patternNodeMap.toString());
@@ -92,10 +92,10 @@ public class XQueryMain {
 			
 			//Print out normalized results
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < loader.treePatterns.size(); i++) {
+			for(int i = 0; i < loader.navigationTreePatterns.size(); i++) {
 				sb.append("PT"+i+":");	//Pattern Tree
-				sb.append(loader.treePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
-				if(i < loader.treePatterns.size()-1)
+				sb.append(loader.navigationTreePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
+				if(i < loader.navigationTreePatterns.size()-1)
 					sb.append(",");
 			}
 			sb.append("---");

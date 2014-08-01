@@ -31,12 +31,12 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.stratosphere.types.Record;
 import fr.inria.oak.paxquery.common.configuration.GlobalConfiguration;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternEdge;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeID;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeIDScheme;
 import fr.inria.oak.paxquery.common.xml.nodeidentifier.NodeIDSchemeAssignator;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternEdge;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
 
 
 /**
@@ -57,7 +57,7 @@ public class SingleDocumentExtractor {
 	/**
 	 * The xam we currently try to match
 	 */
-	TreePattern currentQP;
+	NavigationTreePattern currentQP;
 	// when the xam extractor is used in a multi-xam context,
 	// it serves to know one's own position
 	int myPosition;
@@ -71,12 +71,12 @@ public class SingleDocumentExtractor {
 	/**
 	 * For each query xam node, the associated match stack.
 	 */
-	HashMap<PatternNode, ExtractorMatchStack> stacksByNodes;
+	HashMap<NavigationTreePatternNode, ExtractorMatchStack> stacksByNodes;
 
 	/**
 	 * For each match stack, the associated query xam node.
 	 */
-	HashMap<ExtractorMatchStack, PatternNode> nodesByStacks;
+	HashMap<ExtractorMatchStack, NavigationTreePatternNode> nodesByStacks;
 
 	/**
 	 * For each tag, a ArrayList of stacks associated with this tag. If the tag is
@@ -101,7 +101,7 @@ public class SingleDocumentExtractor {
 	 */
 	NodeIDScheme[] schemes;
 	boolean[] usefulSchemes;
-	HashMap<PatternNode, NodeIDScheme> schemesByNode;
+	HashMap<NavigationTreePatternNode, NodeIDScheme> schemesByNode;
 
 	StringBuilder sb;
 
@@ -161,8 +161,8 @@ public class SingleDocumentExtractor {
 	 */
 	StringBuilder characterSB;
 
-	HashMap<PatternNode, ArrayList<String>> childrenContexts;
-	HashMap<PatternNode, ArrayList<String>> currentContexts;
+	HashMap<NavigationTreePatternNode, ArrayList<String>> childrenContexts;
+	HashMap<NavigationTreePatternNode, ArrayList<String>> currentContexts;
 	
 	
 	
@@ -181,7 +181,7 @@ public class SingleDocumentExtractor {
 	 * @param DG_XML
 	 * @throws SummaryException
 	 */
-	public SingleDocumentExtractor(TreePattern qp, XMLStreamReader xmlReader) {
+	public SingleDocumentExtractor(NavigationTreePattern qp, XMLStreamReader xmlReader) {
 		this.currentQP = qp;
 		this.streamReader = xmlReader;
 		this.builder = new RecordBuilder();
@@ -189,14 +189,14 @@ public class SingleDocumentExtractor {
 		this.sb = new StringBuilder();
 		this.characterSB = new StringBuilder();
 
-		this.stacksByNodes = new HashMap<PatternNode, ExtractorMatchStack>();
-		this.nodesByStacks = new HashMap<ExtractorMatchStack, PatternNode>();
+		this.stacksByNodes = new HashMap<NavigationTreePatternNode, ExtractorMatchStack>();
+		this.nodesByStacks = new HashMap<ExtractorMatchStack, NavigationTreePatternNode>();
 		this.currentNodes = new Stack<Integer>();
 		this.stacksByTag = new HashMap<String, ArrayList<ExtractorMatchStack>>();
-		this.schemesByNode = new HashMap<PatternNode, NodeIDScheme>();
+		this.schemesByNode = new HashMap<NavigationTreePatternNode, NodeIDScheme>();
 
-		this.childrenContexts = new HashMap<PatternNode, ArrayList<String>>();
-		this.currentContexts = new HashMap<PatternNode, ArrayList<String>>();
+		this.childrenContexts = new HashMap<NavigationTreePatternNode, ArrayList<String>>();
+		this.currentContexts = new HashMap<NavigationTreePatternNode, ArrayList<String>>();
 		
 		this.vTuples = new ArrayList<Record>();
 
@@ -207,7 +207,7 @@ public class SingleDocumentExtractor {
 		this.stacksNeedingValue = new ExtractorMatchStack[qp.getNodesNo()];
 		this.numberOfStacksNeedingValue = 0;
 
-		PatternNode root = qp.getRoot();
+		NavigationTreePatternNode root = qp.getRoot();
 		createStacks(root);
 		this.currentContexts.put(root, this.childrenContexts.get(root));
 		this.setSchemes(qp.getRoot());
@@ -302,7 +302,7 @@ public class SingleDocumentExtractor {
 			}
 	
 			// the query xam node for this stack (and match)
-			PatternNode nodeForThisMatch = nodesByStacks.get(s);
+			NavigationTreePatternNode nodeForThisMatch = nodesByStacks.get(s);
 	
 			//Parameters.logger.debug("\nLooking at stack "+ s.hashCode()+ " "+ s.tag+ " for "+ localName+ " "+ currentPathNo);
 	
@@ -340,12 +340,12 @@ public class SingleDocumentExtractor {
 					// first, find the edge connecting the current query node
 					// to its parent.
 					// n1 is parent of the current query node:
-					PatternNode n1 = nodesByStacks.get(sPar);
+					NavigationTreePatternNode n1 = nodesByStacks.get(sPar);
 					// check for the edge uniting it with the node for this
 					// match
-					Iterator<PatternEdge> itEdge = n1.getEdges().iterator();
+					Iterator<NavigationTreePatternEdge> itEdge = n1.getEdges().iterator();
 					boolean foundEdge = false;
-					PatternEdge theEdge = null;
+					NavigationTreePatternEdge theEdge = null;
 					while (itEdge.hasNext() && !foundEdge) {
 						theEdge = itEdge.next();
 						if (theEdge.n2 == nodeForThisMatch) {
@@ -383,8 +383,8 @@ public class SingleDocumentExtractor {
 				// sPar == null: this element should not have a parent
 				// so, we must only check the ancestor-desc or parent-child
 				// story
-				PatternNode theRoot = currentQP.getRoot();
-				PatternEdge theEdge = theRoot.getEdges().get(0);
+				NavigationTreePatternNode theRoot = currentQP.getRoot();
+				NavigationTreePatternEdge theEdge = theRoot.getEdges().get(0);
 				if (theEdge.isParent()) 
 				{
 					// check if the current node appears at depth 1, as
@@ -485,7 +485,7 @@ public class SingleDocumentExtractor {
 			}
 	
 			// the query xam node for this stack (and match)
-			PatternNode nodeForThisMatch = nodesByStacks.get(s);
+			NavigationTreePatternNode nodeForThisMatch = nodesByStacks.get(s);
 		
 			// for each of these stacks, we may produce a match,
 			// with a link to its parent match,
@@ -511,12 +511,12 @@ public class SingleDocumentExtractor {
 					// first, find the edge connecting the current query node
 					// to its parent.
 					// n1 is parent of the current query node:
-					PatternNode n1 = nodesByStacks.get(sPar);
+					NavigationTreePatternNode n1 = nodesByStacks.get(sPar);
 					// check for the edge uniting it with the node for this
 					// match
-					Iterator<PatternEdge> itEdge = n1.getEdges().iterator();
+					Iterator<NavigationTreePatternEdge> itEdge = n1.getEdges().iterator();
 					boolean foundEdge = false;
-					PatternEdge theEdge = null;
+					NavigationTreePatternEdge theEdge = null;
 					while (itEdge.hasNext() && !foundEdge) {
 						theEdge = itEdge.next();
 						if (theEdge.n2 == nodeForThisMatch) {
@@ -544,8 +544,8 @@ public class SingleDocumentExtractor {
 				// sPar == null: this element should not have a parent
 				// so, we must only check the ancestor-desc or parent-child
 				// story
-				PatternNode theRoot = currentQP.getRoot();
-				PatternEdge theEdge = theRoot.getEdges().get(0);
+				NavigationTreePatternNode theRoot = currentQP.getRoot();
+				NavigationTreePatternEdge theEdge = theRoot.getEdges().get(0);
 				if (theEdge.isParent()) {
 					// check if the current node appears at depth 1, as
 					// required
@@ -697,7 +697,7 @@ public class SingleDocumentExtractor {
 	
 			// getting the ElementID for this element
 			NodeID currentElementID = null;
-			PatternNode pn = this.nodesByStacks.get(s);
+			NavigationTreePatternNode pn = this.nodesByStacks.get(s);
 	
 			if (pn.storesID()) {
 				NodeIDScheme sch = this.schemesByNode.get(this.nodesByStacks.get(s));
@@ -713,7 +713,7 @@ public class SingleDocumentExtractor {
 					
 					checkPruneAndFillIn(s, endingNode);
 					
-					PatternNode realPatternRoot = ( (PatternEdge) (this.currentQP.getRoot().getEdges().get(0))).n2;
+					NavigationTreePatternNode realPatternRoot = ( (NavigationTreePatternEdge) (this.currentQP.getRoot().getEdges().get(0))).n2;
 
 					if (this.stacksByNodes.get(realPatternRoot) == s) {
 						if(logger.isDebugEnabled())
@@ -789,7 +789,7 @@ public class SingleDocumentExtractor {
 			}
 			checkPruneAndFillIn(s, endingNode);
 	
-			PatternNode realPatternRoot = this.currentQP.getRoot().getEdges().get(0).n2;
+			NavigationTreePatternNode realPatternRoot = this.currentQP.getRoot().getEdges().get(0).n2;
 			if (this.stacksByNodes.get(realPatternRoot) == s) {
 				if (!em.erased) {
 					if (myPosition >=0){
@@ -826,7 +826,7 @@ public class SingleDocumentExtractor {
 		ExtractorMatch se = s.findEntry(endingNode);
 	
 		if (se != null) {
-			PatternNode pns = this.nodesByStacks.get(s);
+			NavigationTreePatternNode pns = this.nodesByStacks.get(s);
 	
 			// this means all required children have been matched
 			boolean childrenPresent = true;
@@ -905,13 +905,13 @@ public class SingleDocumentExtractor {
 			}
 
 			if (correctValue) {
-				Iterator<PatternEdge> iChildren = pns.getEdges().iterator();
+				Iterator<NavigationTreePatternEdge> iChildren = pns.getEdges().iterator();
 				while (iChildren.hasNext()) {
-					PatternEdge thisEdge = iChildren.next();
+					NavigationTreePatternEdge thisEdge = iChildren.next();
 	
 					// Only if it is not optional
 					if (!thisEdge.isOptional()) {
-						PatternNode nChild = thisEdge.n2;
+						NavigationTreePatternNode nChild = thisEdge.n2;
 						// stack for this child
 						ExtractorMatchStack sChild = stacksByNodes.get(nChild);
 		
@@ -984,16 +984,16 @@ public class SingleDocumentExtractor {
 							while (it4.hasNext()) {
 								ExtractorMatch sChild = it4.next();
 								ExtractorMatchStack theChildsStack = sChild.theStack;					
-								PatternNode sesNode = this.nodesByStacks.get(se.theStack);								
-								PatternNode sChildsNode = this.nodesByStacks.get(theChildsStack);
+								NavigationTreePatternNode sesNode = this.nodesByStacks.get(se.theStack);								
+								NavigationTreePatternNode sChildsNode = this.nodesByStacks.get(theChildsStack);
 							
 								// learn if this matches for the child node were supposed to be direct
 								// descendants of their parent:
 								boolean wasParentEdge = false;
 								if (sesNode.getEdges() != null){
-									Iterator<PatternEdge> itEdges = sesNode.getEdges().iterator();
+									Iterator<NavigationTreePatternEdge> itEdges = sesNode.getEdges().iterator();
 									while (itEdges.hasNext()){
-										PatternEdge pe = itEdges.next();
+										NavigationTreePatternEdge pe = itEdges.next();
 										if (pe.n2 == sChildsNode){
 											if (pe.isParent()){
 												wasParentEdge = true;
@@ -1023,7 +1023,7 @@ public class SingleDocumentExtractor {
 	 * @param pn
 	 *            the root node of the XAM.
 	 */
-	final void setSchemes(PatternNode pn) {
+	final void setSchemes(NavigationTreePatternNode pn) {
 		schemes = new NodeIDScheme[2];
 		usefulSchemes = new boolean[2];
 		for (int i = 0; i < 2; i++) {
@@ -1034,7 +1034,7 @@ public class SingleDocumentExtractor {
 		recSetSchemes(pn);
 	}
 
-	private final void recSetSchemes(PatternNode pn) {
+	private final void recSetSchemes(NavigationTreePatternNode pn) {
 		if (pn.storesID()) {
 			if(pn.isStructIDType()) {
 				schemesByNode.put(pn, schemes[0]);
@@ -1045,9 +1045,9 @@ public class SingleDocumentExtractor {
 				usefulSchemes[1] = true;
 			}
 		}
-		Iterator<PatternEdge> it = pn.getEdges().iterator();
+		Iterator<NavigationTreePatternEdge> it = pn.getEdges().iterator();
 		while (it.hasNext()) {
-			PatternNode pChild = it.next().n2;
+			NavigationTreePatternNode pChild = it.next().n2;
 			recSetSchemes(pChild);
 		}
 	}
@@ -1086,12 +1086,12 @@ public class SingleDocumentExtractor {
 	 * 
 	 * @param pn
 	 */
-	final void createStacks(PatternNode pn) {
-		Iterator<PatternEdge> it = pn.getEdges().iterator();
+	final void createStacks(NavigationTreePatternNode pn) {
+		Iterator<NavigationTreePatternEdge> it = pn.getEdges().iterator();
 		ArrayList<String> rootContext = new ArrayList<String>();
 		while (it.hasNext()) {
-			PatternEdge e = it.next();
-			PatternNode onlyChild = e.getN2();
+			NavigationTreePatternEdge e = it.next();
+			NavigationTreePatternNode onlyChild = e.getN2();
 			rootContext.add(START_NAMESPACE_DELIMITER + onlyChild.getNamespace() + END_NAMESPACE_DELIMITER + onlyChild.getTag());
 			recCreateStacks(onlyChild, null);
 		}
@@ -1104,7 +1104,7 @@ public class SingleDocumentExtractor {
 	 * @param pn
 	 * @param sParent
 	 */
-	private final void recCreateStacks(PatternNode pn, ExtractorMatchStack sParent) {		
+	private final void recCreateStacks(NavigationTreePatternNode pn, ExtractorMatchStack sParent) {		
 		ExtractorMatchStack s1 = new ExtractorMatchStack(START_NAMESPACE_DELIMITER + pn.getNamespace() + END_NAMESPACE_DELIMITER + pn.getTag(), pn.isAttribute(), sParent);
 	
 		stacksByNodes.put(pn, s1);
@@ -1131,10 +1131,10 @@ public class SingleDocumentExtractor {
 			stacks.add(s1);
 		}
 	
-		Iterator<PatternEdge> it = pn.getEdges().iterator();
+		Iterator<NavigationTreePatternEdge> it = pn.getEdges().iterator();
 		while (it.hasNext()) {
-			PatternEdge pe = it.next();
-			PatternNode n2 = pe.n2;
+			NavigationTreePatternEdge pe = it.next();
+			NavigationTreePatternNode n2 = pe.n2;
 			childrenContext.add(START_NAMESPACE_DELIMITER + n2.getNamespace() + END_NAMESPACE_DELIMITER + n2.getTag());
 			recCreateStacks(n2, s1);
 		}
@@ -1361,35 +1361,35 @@ public class SingleDocumentExtractor {
 		}
 	}
 
-	private final String displayMatches(TreePattern qp) {
+	private final String displayMatches(NavigationTreePattern qp) {
 		return this.displayMatches(qp.getRoot());
 	}
 
-	private final void displayMatchesAsStrings(TreePattern qp) {
+	private final void displayMatchesAsStrings(NavigationTreePattern qp) {
 		displayMatchesAsStrings(qp.getRoot());
 	}
 
-	private final void displayMatchesAsStrings(PatternNode n) {
+	private final void displayMatchesAsStrings(NavigationTreePatternNode n) {
 		if(logger.isInfoEnabled()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(START_NAMESPACE_DELIMITER + n.getNamespace() + END_NAMESPACE_DELIMITER + n.getTag());
 			logger.info(sb.toString());
-			Iterator<PatternEdge> it2 = n.getEdges().iterator();
+			Iterator<NavigationTreePatternEdge> it2 = n.getEdges().iterator();
 			while (it2.hasNext()) {
-				PatternNode e2 = it2.next().getN2();
+				NavigationTreePatternNode e2 = it2.next().getN2();
 				displayMatchesAsStrings(e2);
 			}
 		}
 	}
 
 	//so far query node has been matched by number 3
-	private final String displayMatches(PatternNode n) {
+	private final String displayMatches(NavigationTreePatternNode n) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(START_NAMESPACE_DELIMITER + n.getNamespace() + END_NAMESPACE_DELIMITER + n.getTag());
 		logger.info(sb.toString());
-		Iterator<PatternEdge> it2 = n.getEdges().iterator();
+		Iterator<NavigationTreePatternEdge> it2 = n.getEdges().iterator();
 		while (it2.hasNext()) {
-			PatternNode e2 = it2.next().n2;
+			NavigationTreePatternNode e2 = it2.next().n2;
 			sb.append(displayMatches(e2));
 		}
 		return sb.toString();

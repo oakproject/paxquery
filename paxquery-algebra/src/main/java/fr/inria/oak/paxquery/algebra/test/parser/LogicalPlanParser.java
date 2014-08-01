@@ -36,8 +36,8 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 
 
 
@@ -260,7 +260,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
       string = jj_consume_token(TREEPATTERNSTRING);
       jj_consume_token(RPAREN);
                         try {
-                                TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+                                NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
                                 string.toString().replace("|","").replace("|",""),
                         "ntp");
                                 returnLogOp = new Navigation(tempChildLogOp, column, pat);
@@ -390,7 +390,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     jj_consume_token(RPAREN);
                         try {
                                 if(string != null && listDocs != null) {
-                                        TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+                                        NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
                                         string.toString().replace("|","").replace("|",""),
                                 name.toString());
                                         returnLogOp = new XMLScan(
@@ -400,7 +400,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
                                                         listDocs);
                                 }
                                 else if(string != null) {
-                                        TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+                                        NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
                                         string.toString().replace("|","").replace("|",""),
                                 name.toString());
                                         returnLogOp = new XMLScan(

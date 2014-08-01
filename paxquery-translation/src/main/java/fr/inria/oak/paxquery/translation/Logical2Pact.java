@@ -61,7 +61,7 @@ import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.metadata.MetadataTypesMapping;
 import fr.inria.oak.paxquery.pact.io.XmlNavInputFormat;
@@ -233,7 +233,7 @@ public class Logical2Pact {
 		navigation.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD);
 		navigation.setParameter(PACTOperatorsConfiguration.NAVIGATION_COLUMN_INT.toString(), nav.pos);
 		navigation.setParameter(PACTOperatorsConfiguration.NTP_STRING.toString(),
-				TreePatternUtils.getParsableStringFromTreePattern(nav.navigationTreePattern));
+				NavigationTreePatternUtils.getParsableStringFromTreePattern(nav.navigationTreePattern));
 		
 		return new Operator[]{navigation};
 	}

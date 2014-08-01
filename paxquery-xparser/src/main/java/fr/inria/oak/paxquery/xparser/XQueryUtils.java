@@ -7,9 +7,9 @@ import java.util.List;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 public class XQueryUtils {
 	
@@ -22,9 +22,9 @@ public class XQueryUtils {
 	 * @param varspos the data structure to populate
 	 * @param startingPosInTree an initial offset for the position of variables
 	 */
-	public static void buildVarsPos(HashMap<String, Variable> varspos, TreePattern treePattern, int startingPosInTree) {
+	public static void buildVarsPos(HashMap<String, Variable> varspos, NavigationTreePattern navigationTreePattern, int startingPosInTree) {
 		//HashMap<String, Variable> varspos = new HashMap<String, Variable>();
-		traverseTreePatternDFS(treePattern.getRoot(), varspos, startingPosInTree);		
+		traverseTreePatternDFS(navigationTreePattern.getRoot(), varspos, startingPosInTree);		
 	}
 	
 	/**
@@ -36,12 +36,12 @@ public class XQueryUtils {
 	 * @param posInTree position of variables in the tree
 	 * @return posInTree
 	 */
-	private static int traverseTreePatternDFS(PatternNode root, HashMap<String, Variable> varspos, int posInTree) {
+	private static int traverseTreePatternDFS(NavigationTreePatternNode root, HashMap<String, Variable> varspos, int posInTree) {
 		//visit this node
 		posInTree = visitNodeInTreePattern(root, varspos, posInTree);
-		ArrayList<PatternNode> children = root.getChildrenList();
+		ArrayList<NavigationTreePatternNode> children = root.getChildrenList();
 		//recursive call for descendant sub-trees, recursivite ends when children.size()==0
-		for(PatternNode node : children)
+		for(NavigationTreePatternNode node : children)
 			posInTree = traverseTreePatternDFS(node, varspos, posInTree);	
 		return posInTree;
 	}
@@ -53,7 +53,7 @@ public class XQueryUtils {
 	 * @param posInTree position of variables in the tree
 	 * @return posInTree
 	 */
-	private static int visitNodeInTreePattern(PatternNode node, HashMap<String, Variable> varspos, int posInTree) {
+	private static int visitNodeInTreePattern(NavigationTreePatternNode node, HashMap<String, Variable> varspos, int posInTree) {
 		ArrayList<Variable> matchingVariables = node.getMatchingVariables();
 
 		//save a position for the ID
@@ -150,12 +150,12 @@ public class XQueryUtils {
 	}	
 
 	
-	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, PatternNode> patternNodeMap, String varName) {
-		PatternNode node = patternNodeMap.get(varName);
+	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, NavigationTreePatternNode> patternNodeMap, String varName) {
+		NavigationTreePatternNode node = patternNodeMap.get(varName);
 		if(node == null)
 			return -1;
 		
-		TreePattern tp = node.getTreePattern();
+		NavigationTreePattern tp = node.getTreePattern();
 		if(tp == null)
 			return -1;
 		

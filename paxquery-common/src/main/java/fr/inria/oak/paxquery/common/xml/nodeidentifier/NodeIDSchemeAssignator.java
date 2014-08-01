@@ -15,7 +15,7 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.common.xml.nodeidentifier;
 
-import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 
 /**
  * Factory class that creates and returns the ID scheme specified.
@@ -29,7 +29,7 @@ public class NodeIDSchemeAssignator{
 	 * @param pn the pattern node that we will use for getting the ID scheme
 	 * @return the ID scheme
 	 */
-	public static NodeIDScheme getIDScheme(PatternNode pn){
+	public static NodeIDScheme getIDScheme(NavigationTreePatternNode pn){
 		if (pn.storesID()){
 			if (pn.isStructIDType()){
 				return getStructuralScheme();

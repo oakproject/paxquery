@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 
 /**
@@ -36,12 +36,12 @@ public class Navigation extends BaseUnaryOperator {
 	private static final Log logger = LogFactory.getLog(Navigation.class);
 
 
-	public TreePattern navigationTreePattern;
+	public NavigationTreePattern navigationTreePattern;
 	
 	public int pos;
 
 	
-	public Navigation(BaseLogicalOperator op, int pos, TreePattern navigationTreePattern) {
+	public Navigation(BaseLogicalOperator op, int pos, NavigationTreePattern navigationTreePattern) {
 		super(op);
 		
 		this.navigationTreePattern = navigationTreePattern;

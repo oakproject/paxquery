@@ -33,8 +33,8 @@ import eu.stratosphere.configuration.Configuration;
 import eu.stratosphere.core.fs.FileInputSplit;
 import eu.stratosphere.types.Record;
 import eu.stratosphere.types.StringValue;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtractor;
@@ -54,7 +54,7 @@ public class XmlNavInputFormat extends FileInputFormat {
 	
 	private boolean reachedEnd;
 	
-	private TreePattern navigationTreePattern;
+	private NavigationTreePattern navigationTreePattern;
 	
 	private XMLStreamReader streamReader;
 		
@@ -72,7 +72,7 @@ public class XmlNavInputFormat extends FileInputFormat {
 		this.init();
 		
 		// read your own parameters
-		final TreePattern ntp = TreePatternUtils.getTreePatternFromString(
+		final NavigationTreePattern ntp = NavigationTreePatternUtils.getTreePatternFromString(
 				parameters.getString(PACTOperatorsConfiguration.NTP_STRING.toString(), null),
 				"NavigationTreePattern");
 		this.navigationTreePattern = ntp;
@@ -270,9 +270,9 @@ public class XmlNavInputFormat extends FileInputFormat {
 		
 		// --------------------------------------------------------------------
 		
-		public T setNavigationTreePattern(TreePattern ntp) {
+		public T setNavigationTreePattern(NavigationTreePattern ntp) {
 			this.config.setString(PACTOperatorsConfiguration.NTP_STRING.toString(),
-					TreePatternUtils.getParsableStringFromTreePattern(ntp));
+					NavigationTreePatternUtils.getParsableStringFromTreePattern(ntp));
 			@SuppressWarnings("unchecked")
 			T ret = (T) this;
 			return ret;
