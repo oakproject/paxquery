@@ -118,5 +118,7 @@ public abstract class BaseLogicalOperator {
 	public ArrayList<BaseLogicalOperator> getChildren() {
 		return this.children;
 	}
+	
+	public void buildOwnDetails() {}
 }
 

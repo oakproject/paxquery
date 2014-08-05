@@ -29,10 +29,9 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 	
 	private static final Log logger = LogFactory.getLog(SimplePredicate.class);
 
-
-	private final int column1;
+	private int column1;
 	private final ArithmeticOperation operation1;
-	private final int column2;
+	private int column2;
 	private final ArithmeticOperation operation2;	
 	private final String stringConstant;
 	private final double doubleConstant;
@@ -103,12 +102,20 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		return this.column1;
 	}
 	
+	public void setColumn1(int column1) {
+		this.column1 = column1;
+	}
+	
 	public ArithmeticOperation getOperation1() {
 		return this.operation1;
 	}
 
 	public int getColumn2() {
 		return this.column2;
+	}
+	
+	public void setColumn2(int column2) {
+		this.column2 = column2;
 	}
 	
 	public ArithmeticOperation getOperation2() {

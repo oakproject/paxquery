@@ -32,18 +32,9 @@ public class DuplicateElimination extends BaseUnaryOperator {
 		super(child);
 
 		this.ownName = "DupElim";
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		for (int i = 0; i < columns.length; i ++){
-			if (i > 0){
-				sb.append(",");
-			}
-			sb.append(columns[i]);
-		}
-		sb.append("]");
-		this.ownDetails = new String(sb);
 		this.columns = columns;
 		this.visible = true;
+		buildOwnDetails();
 	}
 	
 	@Override
@@ -51,5 +42,19 @@ public class DuplicateElimination extends BaseUnaryOperator {
 		for(BaseLogicalOperator op : children)
 			op.buildNRSMD();
 		this.nestedMetadata = this.getChild().getNRSMD();
+	}
+	
+	@Override
+	public void buildOwnDetails() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		for (int i = 0; i < this.columns.length; i ++){
+			if (i > 0){
+				sb.append(",");
+			}
+			sb.append(this.columns[i]);
+		}
+		sb.append("]");
+		this.ownDetails = new String(sb);
 	}
 }

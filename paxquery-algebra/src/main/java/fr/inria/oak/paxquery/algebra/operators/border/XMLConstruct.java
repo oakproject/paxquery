@@ -30,7 +30,7 @@ public class XMLConstruct extends BaseUnaryOperator {
 	
 	private final String outputPath;
 	
-	private final ApplyConstruct apply;
+	private ApplyConstruct apply;
 
 
 	public XMLConstruct(BaseLogicalOperator child, ApplyConstruct apply, String outputPath) throws PAXQueryExecutionException {

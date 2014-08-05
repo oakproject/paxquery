@@ -53,4 +53,8 @@ public class Selection extends BaseUnaryOperator {
 		this.pred = pred;
 	}
 	
+	@Override
+	public void buildOwnDetails() {
+		this.ownDetails = pred.toString();
+	}
 }
