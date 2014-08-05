@@ -97,27 +97,21 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 		try {
 			for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 				Object child = node.jjtGetChild(i);
-				Class c = child.getClass();
 				
-				if (c.getName().equals(
-						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNSPEC")) {
+				if (child instanceof ASTNSPEC) {
 					//add all xam nodes to the in-memory tree structure x
 					nodes = (LinkedList<NavigationTreePatternNode>) visit(((ASTNSPEC) child), data, nodes);
-				} else if (c.getName().equals(
-						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTROOT")) {
+				} else if (child instanceof ASTROOT) {
 					// the first node is the root
 					fromRoot=true;
-				} else if (c.getName().equals(
-						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTDefaultNamespace")) {
+				} else if (child instanceof ASTDefaultNamespace) {
 					ASTDefaultNamespace defaultNamespaceNode = (ASTDefaultNamespace) child;
 					ASTContent defaultNamespace = (ASTContent) defaultNamespaceNode.jjtGetChild(0);
 					this.defaultNamespace = removeQuotes(defaultNamespace.getInfo());
-				} else if (c.getName().equals(
-						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTXamOrdered")) {
+				} else if (child instanceof ASTOrdered) {
 					// the first node is the root
 					p.setOrdered(true);
-				} else if (c.getName().equals(
-						"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTEdgeSpec")) {
+				} else if (child instanceof ASTEdgeSpec) {
 					//add all xam edges to the in-memory tree structure x
 					nodes = (LinkedList<NavigationTreePatternNode>) visit(((ASTEdgeSpec) child), data, nodes);
 				} else
@@ -216,12 +210,10 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 		else if(restrPredCode.getInfo().equals("<"))
 			predCode = PredicateType.PREDICATE_SMALLERTHAN;		
 		SimpleNode child = (SimpleNode) astNode.jjtGetChild(1);
-		if (child.getClass().getName().equals(
-				"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTContent")) {
+		if (child instanceof ASTContent) {
 			ASTContent restrValue = (ASTContent) child;
 			navigationTreePatternNode.setSelectOnValue(true,predCode,StringEscapeUtils.unescapeJava(removeQuotes(restrValue.getInfo())));
-		} else if (child.getClass().getName().equals(
-				"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTMyID")) {
+		} else if (child instanceof ASTMyID) {
 			ASTMyID restrValue = (ASTMyID) child;
 			double constant = restrValue.getID();
 			navigationTreePatternNode.setSelectOnValue(true,predCode,constant);
@@ -294,42 +286,23 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 				for (int j = 1; j < child1.jjtGetNumChildren(); j++) {
 					//child2 is an IDSpec TagRestriction Val ValRestriction....
 					SimpleNode child2 = (SimpleNode) child1.jjtGetChild(j);
-					if (child2.getClass().getName().equals(
-							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTIDSpec")) {
+					if (child2 instanceof ASTIDSpec) {
 						getIDSpec((ASTIDSpec) child2, ne);
-					} else if (child2
-							.getClass()
-							.getName()
-							.equals(
-									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTagRestriction")) {
+					} else if (child2 instanceof ASTTagRestriction) {
 						getTagRestrictionSpec((ASTTagRestriction) child2, ne);
-					} else if (child2
-							.getClass()
-							.getName()
-							.equals(
-									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTValRestriction")) {
+					} else if (child2 instanceof ASTValRestriction) {
 						getValRestrictionSpec((ASTValRestriction) child2, ne);
-					}else if (child2
-							.getClass()
-							.getName()
-							.equals(
-									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTagFull")) {						
+					}else if (child2 instanceof ASTTagFull) {						
 						ne.setStoresTag(true); //Update, although actually we are not entering here
 						if(((SimpleNode)child2).jjtGetNumChildren()>0)
 							ne.setRequiresTag(true);
-					}else if (child2
-							.getClass()
-							.getName()
-							.equals(
-									"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTValFull")) {
+					}else if (child2 instanceof ASTValFull) {
 						ne.setStoresValue(true);
 						if(((SimpleNode)child2).jjtGetNumChildren()>0)
 							ne.setRequiresVal(true);
-					}else if (child2.getClass().getName().equals(
-							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTTag")) {
+					}else if (child2 instanceof ASTTag) {
 						getTagSpec((ASTTag) child2, ne);
-					} else if (child2.getClass().getName().equals(
-							"fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTCSpec")) {
+					} else if (child2 instanceof ASTCSpec) {
 						//getSerializedContentSpec((ASTCSpec)child2,ne);
 						ne.setStoresContent(true);
 					} else {//ASTVal
@@ -459,14 +432,12 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 		to=patternNodeMap.get(toNode.getID());
 		
 		try {
-			if ((descendantTypeNode.getClass()).equals(Class
-					.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTChild")))
+			if (descendantTypeNode instanceof ASTChild)
 				parent=true;				//xe.setParent(true);
 			
 			SimpleNode nestingTypeNode = (SimpleNode) node.jjtGetChild(3);
 			SimpleNode joinTypeNode = null;
-			if ((nestingTypeNode.getClass()).equals(Class
-					.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNested"))) {
+			if (nestingTypeNode instanceof ASTNested) {
 				//xe.setNested(true);
 				nested=true;
 				joinTypeNode = (SimpleNode) node.jjtGetChild(4);
