@@ -271,8 +271,7 @@ public class TreePatternParserVisitorImplementation implements TreePatternParser
 				SimpleNode child1 = (SimpleNode) node.jjtGetChild(i);
 
 				//if NA set "attribute" attribute to true
-				if ((child1.getClass()).equals(Class
-						.forName("fr.inria.oak.paxquery.common.xml.treepattern.test.parser.ASTNE")))
+				if (child1 instanceof ASTNE)
 					ne.setAttribute(false);
 				else
 					ne.setAttribute(true);
