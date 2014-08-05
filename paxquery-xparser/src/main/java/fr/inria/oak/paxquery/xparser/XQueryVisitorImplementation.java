@@ -44,7 +44,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public LogicalPlan logicalPlan;				//stores the tree of logical operators
 	public VarMap varMap;						//stores info about the variables and their relation to pattern nodes
-	public HashMap<String, Variable> varsPos;	//for use when creating the XMLConstruct operator in return clause
 	public HashMap<String, NavigationTreePatternNode> patternNodeMap;	//each tuple <String, PatternNode> stores the name of a variable and the PatternNode it addresses
 	public ArrayList<NavigationTreePattern> navigationTreePatterns;	//the list of all TreePattern objects built for a given query
 	public ArrayList<String> applyEach;			//holds a String array for ApplyConstruct.each
@@ -86,7 +85,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		nextNodeIsAttribute = false;
 		insideReturn = false;
 		scans = new ArrayList<XMLScan>();
-		varsPos = new HashMap<String, Variable>();
 		applyEach = new ArrayList<String>();
 		applyFields = new ArrayList<Integer>();
 		mappedApplys = new HashMap<String, ApplyConstruct>();

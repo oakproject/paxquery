@@ -102,9 +102,6 @@ public class XQueryMain {
 			sb.append("HM:");	//Hash Map
 			sb.append(loader.patternNodeMap.toString());
 			sb.append("---");
-			sb.append("VP:");	//Vars Pos
-			sb.append(XQueryUtils.varsPosToString(loader.varsPos));
-			sb.append("---");
 			sb.append("AT:");	//Algebraic Tree
 			sb.append(XQueryUtils.algebraicTreeToString(loader.construct));
 						
