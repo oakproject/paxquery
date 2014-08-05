@@ -16,6 +16,7 @@
 package fr.inria.oak.paxquery.common.xml.construction;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -23,5 +24,62 @@ import java.io.Serializable;
  * 
  */
 public final class ConstructionTreePatternNode implements Serializable {
+	
+	private ConstructionTreePattern ctp;
+	
+	private List<Integer> varPath; 	// Path with variable positions
+	private String tag;				// Tag
+	private boolean attribute;		// Is it an XML attribute?
+	private boolean optional;		// Is it an optional node?
+	
+	
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, String tag, boolean attribute, boolean optional) {
+		this(ctp, null, tag, attribute, optional);
+	}
+	
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, List<Integer> varPath, boolean optional) {
+		this(ctp, varPath, null, false, optional);
+	}
+	
+	public ConstructionTreePatternNode(String tag, boolean attribute, boolean optional) {
+		this(null, null, tag, attribute, optional);
+	}
+	
+	public ConstructionTreePatternNode(List<Integer> varPath, boolean optional) {
+		this(null, varPath, null, false, optional);
+	}
+	
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, List<Integer> varPath, String tag, boolean attribute, boolean optional) {
+		this.ctp = ctp;
+		this.varPath = varPath;
+		this.tag = tag;
+		this.attribute = attribute;
+		this.optional = optional;
+	}
+	
+	
+	public ConstructionTreePattern getConstructionTreePattern() {
+		return this.ctp;
+	}
 
+	public void setConstructionTreePattern(ConstructionTreePattern ctp) {
+		this.ctp = ctp;
+	}
+
+	public List<Integer> getVarPath() {
+		return this.varPath;
+	}
+	
+	public String getTag() {
+		return this.tag;
+	}
+	
+	public boolean isAttribute() {
+		return this.attribute;
+	}
+	
+	public boolean isOptional() {
+		return this.optional;
+	}
+	
 }

@@ -22,5 +22,24 @@ import java.io.Serializable;
  * 
  */
 public final class ConstructionTreePatternEdge implements Serializable {
+		
+	private ConstructionTreePatternNode parent;
+	private ConstructionTreePatternNode child;
+		
+	
+	public ConstructionTreePatternEdge(ConstructionTreePatternNode parent, ConstructionTreePatternNode child) {
+		this.parent = parent;
+		this.child = child;
+	}
+	
+
+	public ConstructionTreePatternNode getParent() {
+		return this.parent;
+	}
+
+	public ConstructionTreePatternNode getChild() {
+		return this.child;
+	}
+	
 	
 }

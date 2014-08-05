@@ -24,10 +24,10 @@ options {
 }
 
 PARSER_BEGIN(TreePatternParser)
-package fr.inria.oak.paxquery.common.xml.treepattern.test.parser;
+package fr.inria.oak.paxquery.common.xml.navigation.parser;
 
 import java.io.*;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 public class TreePatternParser {
 
