@@ -3,3 +3,5 @@
 .settings
 bin
 target
+paxquery-dist
+.DS_Store
