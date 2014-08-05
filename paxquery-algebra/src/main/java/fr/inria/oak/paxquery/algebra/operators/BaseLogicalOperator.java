@@ -44,6 +44,8 @@ public abstract class BaseLogicalOperator {
 
 	protected ArrayList<BaseLogicalOperator> children;
 	
+	protected BaseLogicalOperator parent;
+	
 	protected int[] modifiedFields;
 
 
@@ -117,6 +119,10 @@ public abstract class BaseLogicalOperator {
 
 	public ArrayList<BaseLogicalOperator> getChildren() {
 		return this.children;
+	}
+	
+	public BaseLogicalOperator getParent() {
+		return this.parent;
 	}
 	
 	public void buildOwnDetails() {}
