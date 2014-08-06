@@ -70,9 +70,10 @@ public class LogicalPlanRemapper {
 		}
 	}
 
-	//The DuplicateElimination operator is a special case: we always use the column 0 and don't translate,
-	//since the DuplicateElimination is directly pluged on top of a XMLScan and there is only one column 
-	private static void remapLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { }
+	private static void remapLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 
+		for(int i = 0; i < dupElim.columns.length; i++)
+			dupElim.columns[i] = varMap.translateTemporaryPositionToFinalPosition(dupElim.columns[i]);
+	}
 	
 	private static void remapLogicalOperator(Selection selection, VarMap varMap) {
 		for(ConjunctivePredicate conjPred : ((DisjunctivePredicate) selection.getPred()).getConjunctivePreds()) {

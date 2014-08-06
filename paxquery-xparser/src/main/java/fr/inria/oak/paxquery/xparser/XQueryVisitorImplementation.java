@@ -174,17 +174,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, lastVarLeftSide);
 			if(constructChild == null) {
 				constructChild = scans.get(patternTreeIndex);
-				//The DuplicateElimination operator is a special case: we always use the column 0 and don't translate,
-				//since the DuplicateElimination is directly pluged on top of a XMLScan and there is only one column 
-				//constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
-				constructChild = new DuplicateElimination(constructChild, new int[] {0});
+				constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
 				treePatternVisited.set(patternTreeIndex, true);
 			}
 			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false) {
-				//The DuplicateElimination operator is a special case: we always use the column 0 and don't translate,
-				//since the DuplicateElimination is directly pluged on top of a XMLScan and there is only one column 
-				//DuplicateElimination dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
-				DuplicateElimination dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {0});
+				DuplicateElimination dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
 				constructChild = new CartesianProduct(constructChild, dupel);
 				treePatternVisited.set(patternTreeIndex, true);
 			}
