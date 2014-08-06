@@ -73,6 +73,19 @@ public abstract class BaseBinaryOperator extends BaseLogicalOperator{
 		this.children.set(1, op);
 	}
 	
+	/**
+	 * Checks whether oldChild is either the left or the right descendant of this operator.
+	 * In that case then replaces oldChild for newChild. Otherwise nothing is done.
+	 * @param oldChild child to be replaced
+	 * @param newChild new child to replace oldchild
+	 */
+	public void replaceChild(BaseLogicalOperator oldChild, BaseLogicalOperator newChild) {
+		if(getLeft() == oldChild)
+			setLeft(newChild);
+		else if(getRight() == oldChild)
+			setRight(newChild);
+	}
+	
 	@Override
 	public String getName(){
 		StringBuffer sb = new StringBuffer();
