@@ -3,6 +3,7 @@ package fr.inria.oak.paxquery.xparser;
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.*;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
+import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation;
 import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation.Operation;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
@@ -166,7 +167,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * visitPathExpr_xq
 	 */
 	public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
-		System.out.println("visitPathExpr_xq: "+ctx.getText());
 		//by visiting the children we build the tree pattern and set up the XMLScan algop
 		visitChildren(ctx); 
 
@@ -575,14 +575,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		else {
 			//check the xpath predicate has a given form 
-			if(ctx.arithmeticExpr_xp().size() != 2 || 
-					ctx.arithmeticExpr_xp(0).unaryExpr(0).valueExpr().pathExpr() == null) {
-				System.out.println("This type of XPath predicate is not supported yet: "+ctx.getText());
-				System.exit(1);
-			}
+			if(ctx.arithmeticExpr_xp().size() != 2 || ctx.arithmeticExpr_xp(0).unaryExpr(0).valueExpr().pathExpr() == null)
+				throw new PAXQueryExecutionException("This type of XPath predicate is not supported yet: "+ctx.getText());
 			
-			System.out.println("CompExpr: "+ctx.getText());
-
 			SimplePredicate predicate = null;
 			PredicateType predType = PredicateType.parse(ctx.getChild(1).getText());
 			String leftExpr;
@@ -613,10 +608,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						leftOperand = Double.parseDouble(ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
 					arithOpLeft = new ArithmeticOperation(leftOp, leftOperand);
 				}
-				else {
-					System.out.println("This type of XPath predicate is not supported yet.");
-					System.exit(1);
-				}
+				else
+					throw new PAXQueryExecutionException("This type of XPath predicate is not supported yet: "+ctx.getText());
 			}
 			//now visit the right arithmetic expression (it may contain (1) xpath with arithmetic expression, (2) double literal, or (3) string literal
 			lastNodeInsideXPathPredicate = null;	//clear lastNodeInsideXPathPredicate
@@ -640,8 +633,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal() != null) {
 				//double literal case
 				if(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null) {
-					System.out.println("UnaryExpr: "+ctx.arithmeticExpr_xp(1).unaryExpr(0).getText());
-					System.out.println("op_sub: "+ctx.arithmeticExpr_xp(1).unaryExpr(0).OP_SUB());
 					if(ctx.arithmeticExpr_xp(1).unaryExpr(0).OP_SUB().size() == 0)	//positive number
 						rightDoubleLiteral = Double.parseDouble(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
 					else //negative number
@@ -864,19 +855,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		insideReturn = true;
 		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
-		if(ctx.eleConst()!=null) {
-			try {
-				visitEleConst(ctx.eleConst());
-			}
-			catch(Exception e) {
-				System.out.println("Exception: "+e.getMessage());
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
+		if(ctx.eleConst()!=null)
+			visit(ctx.eleConst());
 		//either it is an aggrExpr rule
 		else if(ctx.aggrExpr() != null)
-			visitAggrExpr(ctx.aggrExpr());
+			visit(ctx.aggrExpr());
 		//or a VAR
 		else if(ctx.getChild(1).getText().startsWith("$")) {
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
@@ -1062,13 +1045,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			if(child instanceof TerminalNode && child.getText().startsWith("$")) {
 				String varName = child.getText();
 				
-				//Test for illegal user of attributes
+				//Test for illegal use of attributes
 				NavigationTreePatternNode node = patternNodeMap.get(varName);
 				if(node != null && node.isAttribute())
-				{
-					System.out.println("It is illegal to use an attribute as an XML value");
-					System.exit(-1);
-				}
+					throw new PAXQueryExecutionException("Illegal to use an attribute as an XML value in the return statement: variable "+varName+".");
 				
 				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
 				if(constructChild == null) {
