@@ -53,7 +53,7 @@ public class LogicalPlan {
 	 * @param referenceOperator the operator that will become the descendant
 	 * @param newOperator the operator that will become the direct ancestor
 	 */
-	public void insertOnTop(BaseLogicalOperator referenceOperator, BaseUnaryOperator newOperator) {
+	public static void insertOnTop(BaseLogicalOperator referenceOperator, BaseUnaryOperator newOperator) {
 		//create link from referenceOperator's ancestor to newOperator
 		if(referenceOperator != null)
 			replaceChild(referenceOperator.getParent(), referenceOperator, newOperator);
@@ -68,7 +68,7 @@ public class LogicalPlan {
 	 * @param referenceOperator the operator that will become the descendant
 	 * @param newOperator the operator that will become the direct ancestor
 	 */
-	public void insertOnTopLeft(BaseLogicalOperator referenceOperator, BaseBinaryOperator newOperator) {
+	public static void insertOnTopLeft(BaseLogicalOperator referenceOperator, BaseBinaryOperator newOperator) {
 		//create link from referenceOperator's ancestor to newOperator
 		if(referenceOperator != null)
 			replaceChild(referenceOperator.getParent(), referenceOperator, newOperator);
@@ -83,7 +83,7 @@ public class LogicalPlan {
 	 * @param referenceOperator the operator that will become the descendant
 	 * @param newOperator the operator that will become the direct ancestor
 	 */
-	public void insertOnTopRight(BaseLogicalOperator referenceOperator, BaseBinaryOperator newOperator) {
+	public static void insertOnTopRight(BaseLogicalOperator referenceOperator, BaseBinaryOperator newOperator) {
 		//create link from referenceOperator's ancestor to newOperator
 		if(referenceOperator != null)
 			replaceChild(referenceOperator.getParent(), referenceOperator, newOperator);
@@ -98,7 +98,7 @@ public class LogicalPlan {
 	 * @param oldChild the old of operator to be replaced
 	 * @param newChild the new child to be put in the place of oldChild
 	 */
-	private void replaceChild(BaseLogicalOperator operator, BaseLogicalOperator oldChild, BaseLogicalOperator newChild) {
+	private static void replaceChild(BaseLogicalOperator operator, BaseLogicalOperator oldChild, BaseLogicalOperator newChild) {
 		if(operator != null) {
 			if(operator instanceof BaseUnaryOperator && ((BaseUnaryOperator) operator).getChild() == oldChild)
 				((BaseUnaryOperator) operator).setChild(newChild);
