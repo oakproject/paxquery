@@ -30,10 +30,15 @@ public class LogicalPlanRemapper {
 	public static void remapLogicalPlan(LogicalPlan logicalPlan, VarMap varMap) {
 		traverseLogicalPlanDFS(logicalPlan.getRoot(), varMap);		
 	}
-	
+
+	/**
+	 * Goes through a logical plan and updates the positions of the columns used as data inputs.
+	 * @param logicalPlan the plan to go through
+	 * @param varMap a VarMap object containing the variables remapping information
+	 */
 	private static void traverseLogicalPlanDFS(BaseLogicalOperator operator, VarMap varMap) {
 		//visit this node
-		remapLogicalOperator(operator, varMap);
+		visitLogicalOperator(operator, varMap);
 		ArrayList<BaseLogicalOperator> children = operator.getChildren();
 		if(children != null) {
 			//recursive call for descendant sub-trees, recursion ends when children.size()==0
@@ -43,45 +48,83 @@ public class LogicalPlanRemapper {
 	}
 	
 	/**
-	 * Change the temporary positions of variables used in operator to the final temporary positions
+	 * Change the temporary positions of variables used in operator to their final temporary positions according to varMap
 	 * @param operator the logical operator
-	 * @param varMap a VarMap object containing the variables remapping information
+	 * @param varMap a VarMap object containing the temporary positions of variables
 	 */
-	private static void remapLogicalOperator(BaseLogicalOperator operator, VarMap varMap) {
+	private static void visitLogicalOperator(BaseLogicalOperator operator, VarMap varMap) {
 		if(operator instanceof XMLConstruct)
-			remapLogicalOperator((XMLConstruct) operator, varMap);
+			visitLogicalOperator((XMLConstruct) operator, varMap);
 		else if(operator instanceof DuplicateElimination)
-			remapLogicalOperator((DuplicateElimination) operator, varMap);
+			visitLogicalOperator((DuplicateElimination) operator, varMap);
 		else if(operator instanceof Selection)
-			remapLogicalOperator((Selection) operator, varMap);
+			visitLogicalOperator((Selection) operator, varMap);
 		//nothing is done for XMLScan, CartesianProduct
 		else if(!(operator instanceof XMLScan) && !(operator instanceof CartesianProduct))
 			throw new PAXQueryExecutionException("Variable remapping not implemented for operator " + operator.getName());
 	}
 	
-	private static void remapLogicalOperator(XMLConstruct construct, VarMap varMap) {
+	private static void visitLogicalOperator(XMLConstruct construct, VarMap varMap) {
+		//first find the XMLScan operators that hang from construct
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(construct, scans);
+		//then calculate the positions of the variables in those XMLScans relative to dupElim
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//now substitute
 		int[] fields = construct.getApply().getFields();
-		construct.getApply().setFields(varMap.translateTemporaryPositionToFinalPosition(fields));
-		
+		construct.getApply().setFields(equivalences.getEquivalence(fields));
+
 		ApplyConstruct[] nested = construct.getApply().getNested();
 		if(nested != null) {
 			for(int i = 0; i < nested.length; i++)
-				nested[i].setFields(varMap.translateTemporaryPositionToFinalPosition(nested[i].getFields()));
+				nested[i].setFields(equivalences.getEquivalence(nested[i].getFields()));
 		}
 	}
 
-	private static void remapLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 
+	private static void visitLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 
+		//first find the XMLScan operators that hang from dupElim
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(dupElim, scans);
+		//then calculate the positions of the variables in those XMLScans relative to dupElim
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//now substitute
 		for(int i = 0; i < dupElim.columns.length; i++)
-			dupElim.columns[i] = varMap.translateTemporaryPositionToFinalPosition(dupElim.columns[i]);
+			dupElim.columns[i] = equivalences.getEquivalence(dupElim.columns[i]);
+		dupElim.buildOwnDetails();
 	}
 	
-	private static void remapLogicalOperator(Selection selection, VarMap varMap) {
+	private static void visitLogicalOperator(Selection selection, VarMap varMap) {
+		//first find the XMLScan operators that hang from selection
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(selection, scans);
+		//them calculate the positions of the variables in those XMLScans relative to selection
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//now substitute
 		for(ConjunctivePredicate conjPred : ((DisjunctivePredicate) selection.getPred()).getConjunctivePreds()) {
 			for(SimplePredicate simplePred : conjPred.getSimplePreds()) {
-				simplePred.setColumn1(varMap.translateTemporaryPositionToFinalPosition(simplePred.getColumn1()));
-				simplePred.setColumn2(varMap.translateTemporaryPositionToFinalPosition(simplePred.getColumn2()));
+				if(simplePred.getColumn1() != -1)
+					simplePred.setColumn1(equivalences.getEquivalence(simplePred.getColumn1()));
+				if(simplePred.getColumn2() != -1)
+				simplePred.setColumn2(equivalences.getEquivalence(simplePred.getColumn2()));
 			}
-		}
+		}		
 		selection.buildOwnDetails();
+	}
+	
+	/**
+	 * Fills the scansList input list with pointers to all XMLScan objects that are descendants of operator. Recursive method. 
+	 * @param operator the root of the subtree whose leaves are XMLScan operators
+	 * @param scansList an ArrayList containing pointers to those XMLScan objects contained in the subtree whose root is operator
+	 */
+	private static void findXMLScanDescendants(BaseLogicalOperator operator, ArrayList<XMLScan> scansList) {
+		if(scansList == null)
+			scansList = new ArrayList<XMLScan>();
+		
+		if(operator instanceof XMLScan)
+			scansList.add((XMLScan)operator);
+		else {
+			for(BaseLogicalOperator child : operator.getChildren())
+				findXMLScanDescendants(child, scansList);
+		}
 	}
 }

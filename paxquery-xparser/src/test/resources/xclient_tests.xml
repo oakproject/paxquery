@@ -1622,6 +1622,250 @@
     </test>
     <test>
         <order>33</order>
+        <query>for $seller in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction//seller/@person for $person in distinct-values(collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person/@id) return &lt;res seller="{$seller}" person="{$person}"/&gt;</query>
+        <result>&lt;res seller="person15" person="person0"/&gt;
+&lt;res seller="person15" person="person1"/&gt;
+&lt;res seller="person15" person="person3"/&gt;
+&lt;res seller="person15" person="person4"/&gt;
+&lt;res seller="person15" person="person5"/&gt;
+&lt;res seller="person15" person="person6"/&gt;
+&lt;res seller="person15" person="person7"/&gt;
+&lt;res seller="person15" person="person8"/&gt;
+&lt;res seller="person15" person="person9"/&gt;
+&lt;res seller="person15" person="person10"/&gt;
+&lt;res seller="person15" person="person11"/&gt;
+&lt;res seller="person15" person="person12"/&gt;
+&lt;res seller="person15" person="person13"/&gt;
+&lt;res seller="person15" person="person14"/&gt;
+&lt;res seller="person15" person="person15"/&gt;
+&lt;res seller="person15" person="person16"/&gt;
+&lt;res seller="person15" person="person17"/&gt;
+&lt;res seller="person15" person="person18"/&gt;
+&lt;res seller="person15" person="person19"/&gt;
+&lt;res seller="person15" person="person20"/&gt;
+&lt;res seller="person15" person="person21"/&gt;
+&lt;res seller="person15" person="person22"/&gt;
+&lt;res seller="person15" person="person23"/&gt;
+&lt;res seller="person15" person="person24"/&gt;
+&lt;res seller="person10" person="person0"/&gt;
+&lt;res seller="person10" person="person1"/&gt;
+&lt;res seller="person10" person="person3"/&gt;
+&lt;res seller="person10" person="person4"/&gt;
+&lt;res seller="person10" person="person5"/&gt;
+&lt;res seller="person10" person="person6"/&gt;
+&lt;res seller="person10" person="person7"/&gt;
+&lt;res seller="person10" person="person8"/&gt;
+&lt;res seller="person10" person="person9"/&gt;
+&lt;res seller="person10" person="person10"/&gt;
+&lt;res seller="person10" person="person11"/&gt;
+&lt;res seller="person10" person="person12"/&gt;
+&lt;res seller="person10" person="person13"/&gt;
+&lt;res seller="person10" person="person14"/&gt;
+&lt;res seller="person10" person="person15"/&gt;
+&lt;res seller="person10" person="person16"/&gt;
+&lt;res seller="person10" person="person17"/&gt;
+&lt;res seller="person10" person="person18"/&gt;
+&lt;res seller="person10" person="person19"/&gt;
+&lt;res seller="person10" person="person20"/&gt;
+&lt;res seller="person10" person="person21"/&gt;
+&lt;res seller="person10" person="person22"/&gt;
+&lt;res seller="person10" person="person23"/&gt;
+&lt;res seller="person10" person="person24"/&gt;
+&lt;res seller="person8" person="person0"/&gt;
+&lt;res seller="person8" person="person1"/&gt;
+&lt;res seller="person8" person="person3"/&gt;
+&lt;res seller="person8" person="person4"/&gt;
+&lt;res seller="person8" person="person5"/&gt;
+&lt;res seller="person8" person="person6"/&gt;
+&lt;res seller="person8" person="person7"/&gt;
+&lt;res seller="person8" person="person8"/&gt;
+&lt;res seller="person8" person="person9"/&gt;
+&lt;res seller="person8" person="person10"/&gt;
+&lt;res seller="person8" person="person11"/&gt;
+&lt;res seller="person8" person="person12"/&gt;
+&lt;res seller="person8" person="person13"/&gt;
+&lt;res seller="person8" person="person14"/&gt;
+&lt;res seller="person8" person="person15"/&gt;
+&lt;res seller="person8" person="person16"/&gt;
+&lt;res seller="person8" person="person17"/&gt;
+&lt;res seller="person8" person="person18"/&gt;
+&lt;res seller="person8" person="person19"/&gt;
+&lt;res seller="person8" person="person20"/&gt;
+&lt;res seller="person8" person="person21"/&gt;
+&lt;res seller="person8" person="person22"/&gt;
+&lt;res seller="person8" person="person23"/&gt;
+&lt;res seller="person8" person="person24"/&gt;
+&lt;res seller="person12" person="person0"/&gt;
+&lt;res seller="person12" person="person1"/&gt;
+&lt;res seller="person12" person="person3"/&gt;
+&lt;res seller="person12" person="person4"/&gt;
+&lt;res seller="person12" person="person5"/&gt;
+&lt;res seller="person12" person="person6"/&gt;
+&lt;res seller="person12" person="person7"/&gt;
+&lt;res seller="person12" person="person8"/&gt;
+&lt;res seller="person12" person="person9"/&gt;
+&lt;res seller="person12" person="person10"/&gt;
+&lt;res seller="person12" person="person11"/&gt;
+&lt;res seller="person12" person="person12"/&gt;
+&lt;res seller="person12" person="person13"/&gt;
+&lt;res seller="person12" person="person14"/&gt;
+&lt;res seller="person12" person="person15"/&gt;
+&lt;res seller="person12" person="person16"/&gt;
+&lt;res seller="person12" person="person17"/&gt;
+&lt;res seller="person12" person="person18"/&gt;
+&lt;res seller="person12" person="person19"/&gt;
+&lt;res seller="person12" person="person20"/&gt;
+&lt;res seller="person12" person="person21"/&gt;
+&lt;res seller="person12" person="person22"/&gt;
+&lt;res seller="person12" person="person23"/&gt;
+&lt;res seller="person12" person="person24"/&gt;
+&lt;res seller="person12" person="person0"/&gt;
+&lt;res seller="person12" person="person1"/&gt;
+&lt;res seller="person12" person="person3"/&gt;
+&lt;res seller="person12" person="person4"/&gt;
+&lt;res seller="person12" person="person5"/&gt;
+&lt;res seller="person12" person="person6"/&gt;
+&lt;res seller="person12" person="person7"/&gt;
+&lt;res seller="person12" person="person8"/&gt;
+&lt;res seller="person12" person="person9"/&gt;
+&lt;res seller="person12" person="person10"/&gt;
+&lt;res seller="person12" person="person11"/&gt;
+&lt;res seller="person12" person="person12"/&gt;
+&lt;res seller="person12" person="person13"/&gt;
+&lt;res seller="person12" person="person14"/&gt;
+&lt;res seller="person12" person="person15"/&gt;
+&lt;res seller="person12" person="person16"/&gt;
+&lt;res seller="person12" person="person17"/&gt;
+&lt;res seller="person12" person="person18"/&gt;
+&lt;res seller="person12" person="person19"/&gt;
+&lt;res seller="person12" person="person20"/&gt;
+&lt;res seller="person12" person="person21"/&gt;
+&lt;res seller="person12" person="person22"/&gt;
+&lt;res seller="person12" person="person23"/&gt;
+&lt;res seller="person12" person="person24"/&gt;
+&lt;res seller="person12" person="person0"/&gt;
+&lt;res seller="person12" person="person1"/&gt;
+&lt;res seller="person12" person="person3"/&gt;
+&lt;res seller="person12" person="person4"/&gt;
+&lt;res seller="person12" person="person5"/&gt;
+&lt;res seller="person12" person="person6"/&gt;
+&lt;res seller="person12" person="person7"/&gt;
+&lt;res seller="person12" person="person8"/&gt;
+&lt;res seller="person12" person="person9"/&gt;
+&lt;res seller="person12" person="person10"/&gt;
+&lt;res seller="person12" person="person11"/&gt;
+&lt;res seller="person12" person="person12"/&gt;
+&lt;res seller="person12" person="person13"/&gt;
+&lt;res seller="person12" person="person14"/&gt;
+&lt;res seller="person12" person="person15"/&gt;
+&lt;res seller="person12" person="person16"/&gt;
+&lt;res seller="person12" person="person17"/&gt;
+&lt;res seller="person12" person="person18"/&gt;
+&lt;res seller="person12" person="person19"/&gt;
+&lt;res seller="person12" person="person20"/&gt;
+&lt;res seller="person12" person="person21"/&gt;
+&lt;res seller="person12" person="person22"/&gt;
+&lt;res seller="person12" person="person23"/&gt;
+&lt;res seller="person12" person="person24"/&gt;
+&lt;res seller="person14" person="person0"/&gt;
+&lt;res seller="person14" person="person1"/&gt;
+&lt;res seller="person14" person="person3"/&gt;
+&lt;res seller="person14" person="person4"/&gt;
+&lt;res seller="person14" person="person5"/&gt;
+&lt;res seller="person14" person="person6"/&gt;
+&lt;res seller="person14" person="person7"/&gt;
+&lt;res seller="person14" person="person8"/&gt;
+&lt;res seller="person14" person="person9"/&gt;
+&lt;res seller="person14" person="person10"/&gt;
+&lt;res seller="person14" person="person11"/&gt;
+&lt;res seller="person14" person="person12"/&gt;
+&lt;res seller="person14" person="person13"/&gt;
+&lt;res seller="person14" person="person14"/&gt;
+&lt;res seller="person14" person="person15"/&gt;
+&lt;res seller="person14" person="person16"/&gt;
+&lt;res seller="person14" person="person17"/&gt;
+&lt;res seller="person14" person="person18"/&gt;
+&lt;res seller="person14" person="person19"/&gt;
+&lt;res seller="person14" person="person20"/&gt;
+&lt;res seller="person14" person="person21"/&gt;
+&lt;res seller="person14" person="person22"/&gt;
+&lt;res seller="person14" person="person23"/&gt;
+&lt;res seller="person14" person="person24"/&gt;
+&lt;res seller="person5" person="person0"/&gt;
+&lt;res seller="person5" person="person1"/&gt;
+&lt;res seller="person5" person="person3"/&gt;
+&lt;res seller="person5" person="person4"/&gt;
+&lt;res seller="person5" person="person5"/&gt;
+&lt;res seller="person5" person="person6"/&gt;
+&lt;res seller="person5" person="person7"/&gt;
+&lt;res seller="person5" person="person8"/&gt;
+&lt;res seller="person5" person="person9"/&gt;
+&lt;res seller="person5" person="person10"/&gt;
+&lt;res seller="person5" person="person11"/&gt;
+&lt;res seller="person5" person="person12"/&gt;
+&lt;res seller="person5" person="person13"/&gt;
+&lt;res seller="person5" person="person14"/&gt;
+&lt;res seller="person5" person="person15"/&gt;
+&lt;res seller="person5" person="person16"/&gt;
+&lt;res seller="person5" person="person17"/&gt;
+&lt;res seller="person5" person="person18"/&gt;
+&lt;res seller="person5" person="person19"/&gt;
+&lt;res seller="person5" person="person20"/&gt;
+&lt;res seller="person5" person="person21"/&gt;
+&lt;res seller="person5" person="person22"/&gt;
+&lt;res seller="person5" person="person23"/&gt;
+&lt;res seller="person5" person="person24"/&gt;
+&lt;res seller="person6" person="person0"/&gt;
+&lt;res seller="person6" person="person1"/&gt;
+&lt;res seller="person6" person="person3"/&gt;
+&lt;res seller="person6" person="person4"/&gt;
+&lt;res seller="person6" person="person5"/&gt;
+&lt;res seller="person6" person="person6"/&gt;
+&lt;res seller="person6" person="person7"/&gt;
+&lt;res seller="person6" person="person8"/&gt;
+&lt;res seller="person6" person="person9"/&gt;
+&lt;res seller="person6" person="person10"/&gt;
+&lt;res seller="person6" person="person11"/&gt;
+&lt;res seller="person6" person="person12"/&gt;
+&lt;res seller="person6" person="person13"/&gt;
+&lt;res seller="person6" person="person14"/&gt;
+&lt;res seller="person6" person="person15"/&gt;
+&lt;res seller="person6" person="person16"/&gt;
+&lt;res seller="person6" person="person17"/&gt;
+&lt;res seller="person6" person="person18"/&gt;
+&lt;res seller="person6" person="person19"/&gt;
+&lt;res seller="person6" person="person20"/&gt;
+&lt;res seller="person6" person="person21"/&gt;
+&lt;res seller="person6" person="person22"/&gt;
+&lt;res seller="person6" person="person23"/&gt;
+&lt;res seller="person6" person="person24"/&gt;
+&lt;res seller="person9" person="person0"/&gt;
+&lt;res seller="person9" person="person1"/&gt;
+&lt;res seller="person9" person="person3"/&gt;
+&lt;res seller="person9" person="person4"/&gt;
+&lt;res seller="person9" person="person5"/&gt;
+&lt;res seller="person9" person="person6"/&gt;
+&lt;res seller="person9" person="person7"/&gt;
+&lt;res seller="person9" person="person8"/&gt;
+&lt;res seller="person9" person="person9"/&gt;
+&lt;res seller="person9" person="person10"/&gt;
+&lt;res seller="person9" person="person11"/&gt;
+&lt;res seller="person9" person="person12"/&gt;
+&lt;res seller="person9" person="person13"/&gt;
+&lt;res seller="person9" person="person14"/&gt;
+&lt;res seller="person9" person="person15"/&gt;
+&lt;res seller="person9" person="person16"/&gt;
+&lt;res seller="person9" person="person17"/&gt;
+&lt;res seller="person9" person="person18"/&gt;
+&lt;res seller="person9" person="person19"/&gt;
+&lt;res seller="person9" person="person20"/&gt;
+&lt;res seller="person9" person="person21"/&gt;
+&lt;res seller="person9" person="person22"/&gt;
+&lt;res seller="person9" person="person23"/&gt;
+&lt;res seller="person9" person="person24"/&gt;</result>
+    </test>
+    <test>
+        <order>34</order>
         <query>for $seller in distinct-values(collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction//seller/@person) for $person in distinct-values(collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person/@id) where $seller = $person return &lt;res seller="{$seller}" person="{$person}"/&gt;</query>
         <result>&lt;res seller="person15" person="person15"/&gt;
 &lt;res seller="person10" person="person10"/&gt;
@@ -1633,7 +1877,7 @@
 &lt;res seller="person9" person="person9"/&gt;</result>
     </test>
     <test>
-        <order>34</order>
+        <order>35</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[type/text() = "Regular"] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person15"/&gt;
@@ -1722,7 +1966,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>35</order>
+        <order>36</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person = "person12"] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person12"/&gt;
@@ -1809,7 +2053,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>36</order>
+        <order>37</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person != "person12"] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person15"/&gt;
@@ -1953,7 +2197,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>37</order>
+        <order>38</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction let $s := $ic/seller[@person != "person12"] return $s</query>
         <result>&lt;seller person="person15"/&gt;
 &lt;seller person="person10"/&gt;
@@ -1964,7 +2208,7 @@
 &lt;seller person="person9"/&gt;</result>
     </test>
     <test>
-        <order>38</order>
+        <order>39</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person = buyer/@person] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person12"/&gt;
@@ -2001,7 +2245,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>39</order>
+        <order>40</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml")//person/profile[@income=55386.86] return $ic</query>
         <result>&lt;profile income="55386.86"&gt;
   &lt;education&gt;High School&lt;/education&gt;
@@ -2011,7 +2255,7 @@
 &lt;/profile&gt;</result>
     </test>
     <test>
-        <order>40</order>
+        <order>41</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[quantity/text()=-1000.00] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2024,7 +2268,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>41</order>
+        <order>42</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() - 2000 = quantity/text()] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2037,7 +2281,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>42</order>
+        <order>43</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() - 1999 = quantity/text() - -1] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2050,7 +2294,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>43</order>
+        <order>44</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() + -2000 = quantity/text()] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2063,7 +2307,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>44</order>
+        <order>45</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() + -4000 = quantity/text() * 3] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2076,7 +2320,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>45</order>
+        <order>46</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() + -1500 = quantity/text() div 2] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2089,7 +2333,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>46</order>
+        <order>47</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() div 2 = quantity/text() +1500] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2102,17 +2346,17 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>47</order>
+        <order>48</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person="person15"]/buyer return $ic</query>
         <result>&lt;buyer person="person10"/&gt;</result>
     </test>
     <test>
-        <order>48</order>
+        <order>49</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person="person15"] let $b := $ic/buyer return $b</query>
         <result>&lt;buyer person="person10"/&gt;</result>
     </test>
     <test>
-        <order>49</order>
+        <order>50</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person="person15" and buyer/@person="person10"] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person15"/&gt;
@@ -2146,7 +2390,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>50</order>
+        <order>51</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person != "person12" or buyer/@person != "person10"] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person15"/&gt;
@@ -2373,7 +2617,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>51</order>
+        <order>52</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[seller/@person != "person12" and price/text() &gt; 100.0 or seller/@person != "person12" and price/text() &lt; 70.0] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person15"/&gt;
@@ -2501,7 +2745,7 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>52</order>
+        <order>53</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs2/XMarkClosedAuctions/file1.xml")//closed_auction[price/text() - 2000 = quantity/text() and price/text() = quantity/text() + 2000] return $ic</query>
         <result>&lt;closed_auction&gt;
   &lt;seller person="person1000"/&gt;
@@ -2514,13 +2758,13 @@
 &lt;/closed_auction&gt;</result>
     </test>
     <test>
-        <order>53</order>
+        <order>54</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[price/text() = 62.07 or price/text() = 155.28]/itemref return $ic</query>
         <result>&lt;itemref item="item1"/&gt;
 &lt;itemref item="item4"/&gt;</result>
     </test>
     <test>
-        <order>54</order>
+        <order>55</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[price/text() = 62.07 or price/text() = 155.28]/annotation let $p := $ic//@person where $p = "person12" return $ic</query>
         <result>&lt;annotation&gt;
   &lt;author person="person12"/&gt;
@@ -2559,7 +2803,7 @@
 &lt;/annotation&gt;</result>
     </test>
     <test>
-        <order>55</order>
+        <order>56</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[price/text() = 62.07][quantity/text() = 1]/annotation return $ic</query>
         <result>&lt;annotation&gt;
   &lt;author person="person12"/&gt;
@@ -2584,7 +2828,7 @@
 &lt;/annotation&gt;</result>
     </test>
     <test>
-        <order>56</order>
+        <order>57</order>
         <query>let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")//closed_auction[price/text() = 62.07][quantity/text() = 1]/annotation[author/@person = "person12"] return $ic</query>
         <result>&lt;annotation&gt;
   &lt;author person="person12"/&gt;

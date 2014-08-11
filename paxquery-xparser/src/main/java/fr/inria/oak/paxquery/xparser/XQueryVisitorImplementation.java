@@ -116,9 +116,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			constructChild = scans.get(0);
 		construct = new XMLConstruct(constructChild, apply, outputPath);
 		
-		//2nd step: calculate final positions
-		varMap.calculateFinalPositions(scans);
-		//3rd step: variable remapping
+		//variable remapping; final positions of variables are calculated for every operator in logicalPlan
 		logicalPlan.setRoot(construct);
 		logicalPlan.setLeaves(scans);
 		LogicalPlanRemapper.remapLogicalPlan(logicalPlan, varMap);

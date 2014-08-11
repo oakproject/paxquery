@@ -3,6 +3,7 @@ package fr.inria.oak.paxquery.xparser.mapping;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 //import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
@@ -38,23 +39,11 @@ public class VarMap {
 	 */
 	public HashMap<Integer, String> namesByTemporaryPosition; 	
 
-	/**
-	 * Binds variable names and the final order they occupy in the tree pattern forest, accessible by variable name
-	 */
-	public HashMap<String, Integer> finalPositionsByName;		
-	
-	/**
-	 * True if finalOrderByName has been updated with the final positions of variables in the tree pattern forest 
-	 */
-	private boolean arePositionsFinal;
-	
 	public VarMap() {
 		variables = new HashMap<String, Variable>();
 		nextTemporaryPosition = 0;
 		temporaryPositionsByName = new HashMap<String, Integer>();
 		namesByTemporaryPosition = new HashMap<Integer, String>();
-		finalPositionsByName = null;
-		arePositionsFinal = false;
 	}
 	
 	/**
@@ -101,8 +90,6 @@ public class VarMap {
 	 * @param varName the name of the variable to remove
 	 */
 	public void removeVariable(String varName) {
-		if(arePositionsFinal && finalPositionsByName != null)
-			finalPositionsByName.remove(varName);
 		int temporaryPosition = getTemporaryPositionByName(varName);
 		if(temporaryPosition != -1)
 			namesByTemporaryPosition.remove(temporaryPosition);
@@ -132,78 +119,19 @@ public class VarMap {
 	}
 	
 	/**
-	 * Returns the final position of the variable whose name matches varName. If not found the returned value is -1. If calculateFinalPositions() was not called earlier the returned value is -1.
-	 * @param varName the name of the variable to search for
-	 * @return the final position of the variable whose name matches varName, or -1 if not found, or -1 if calculateFinalPositions() was not called earlier
+	 * Calculates the final positions of variables in the tree pattern forest than hangs from this operator.
+	 * NOTE: the final positions returned are for operator only. Other operators may use different final position values.
+	 * @return a VariablePositionEquivalences object that contains the equivalence between the temporal positions and the final positions of variables 
 	 */
-	public int getFinalPositionByName(String varName) {
-		if(arePositionsFinal == false || finalPositionsByName == null)
-			return -1;
-		
-		Integer position = finalPositionsByName.get(varName);
-		if(position == null)
-			return -1;
-
-		return position;
-	}
-	
-	/**
-	 * Returns the name of the variable in the given final position. If not found the returned value is -1. If calculateFinalPositions() was not called earlier the returned value is "".
-	 * @param finalPosition the final position of the variable to search for
-	 * @return the name of the variable in the given final position, or null if not found, or null if calculateFinalPositions() was not called earlier
-	 */
-	public String getNameByFinalPosition(int finalPosition) {
-		for(String name : finalPositionsByName.keySet()) {
-			if(finalPositionsByName.get(name) == finalPosition)
-				return name;
-		}
-		return null;		
-	}
-	
-	/**
-	 * Calculates the final positions of variables in the tree pattern forest. 
-	 * @return the number of variables in the tree pattern forest.
-	 */
-	public int calculateFinalPositions(ArrayList<XMLScan> scanOperators) {
-		finalPositionsByName = new HashMap<String, Integer>();
+	public VariablePositionEquivalences calculateFinalPositions(ArrayList<XMLScan> scanOperators) {
+		VariablePositionEquivalences equivalences = new VariablePositionEquivalences();
 		int positionOffset = 0;
 		
-		//TODO: calculate in a similar way as XQueryUtils.buildVarsPos()
-		for(XMLScan scan : scanOperators) {
-			positionOffset = traverseTreePatternDFS(scan.getNavigationTreePattern().getRoot(), positionOffset);
-		}
+		for(XMLScan scan : scanOperators)
+			positionOffset = traverseTreePatternDFS(scan.getNavigationTreePattern().getRoot(), equivalences, positionOffset);
 		
-		arePositionsFinal = true;
-		return variables.size();
+		return equivalences;
 	}
-	
-	/**
-	 * Returns the final position of a variable with the given temporary position. If the specified temporary position is not found, then the returend value is -1. If calculateFinalPositions() was not called earlier the returned value is -1. 
-	 * @param temporaryPosition the temporary position of a variable
-	 * @return the final position of a variable with the given temporary position, or -1 if such temporary position is not found, or -1 if calculateFinalPositions() was not called earlier
-	 */
-	public int translateTemporaryPositionToFinalPosition(int temporaryPosition) {
-		String name = getNameByTemporaryPosition(temporaryPosition);
-		if(name != null)
-			return getFinalPositionByName(name);
-		return -1;
-	}
-	
-	/**
-	 * Invokes translateTemporaryPositionToFinalPosition(int) for each temporary position in the temporaryPositions array 
-	 * @param temporaryPositions an array with temporary positions of one or many variables
-	 * @return an array holding the final positions of the variables with the given temporary positions in the input array. The final position for a given variable may be -1 if its temporary position is not found, or if calculateFinalPositions() was not called earlier
-	 */
-	public int[] translateTemporaryPositionToFinalPosition(int[] temporaryPositions) {
-		if(temporaryPositions == null)
-			return null;
-		
-		int[] finalPositions = new int[temporaryPositions.length];
-		for(int i = 0; i < temporaryPositions.length; i++)
-			finalPositions[i] = translateTemporaryPositionToFinalPosition(temporaryPositions[i]);
-		return finalPositions;		
-	}
-
 	
 	/**
 	 * Traverses a TreePattern whose root is "root" and fills varspos with the following tuples:
@@ -214,13 +142,13 @@ public class VarMap {
 	 * @param posInTree position of variables in the tree
 	 * @return posInTree
 	 */
-	private int traverseTreePatternDFS(NavigationTreePatternNode root, int posInTree) {
+	private int traverseTreePatternDFS(NavigationTreePatternNode root, VariablePositionEquivalences equivalences, int posInTree) {
 		//visit this node
-		posInTree = visitNodeInTreePattern(root, posInTree);
+		posInTree = visitNodeInTreePattern(root, equivalences, posInTree);
 		ArrayList<NavigationTreePatternNode> children = root.getChildrenList();
 		//recursive call for descendant sub-trees, recursion ends when children.size()==0
 		for(NavigationTreePatternNode node : children)
-			posInTree = traverseTreePatternDFS(node, posInTree);	
+			posInTree = traverseTreePatternDFS(node, equivalences, posInTree);	
 		return posInTree;
 	}
 
@@ -232,10 +160,11 @@ public class VarMap {
 	 * @param posInTree position of variables in the tree
 	 * @return posInTree
 	 */
-	private int visitNodeInTreePattern(NavigationTreePatternNode node, int posInTree) {
+	private int visitNodeInTreePattern(NavigationTreePatternNode node, VariablePositionEquivalences equivalences, int posInTree) {
 		String varStoringValue = null;
 		String varStoringContent = null;
 		ArrayList<Variable> matchingVariables = node.getMatchingVariables();
+		int posInTreeFirstVariable = -1;
 		
 		//save a position for the ID
 		if(node.storesID())
@@ -248,15 +177,13 @@ public class VarMap {
 				var = matchingVariables.get(i);
 				if(var.dataType == Variable.VariableDataType.Value) {
 					if(varStoringValue == null) { //this means var is the first value-storing variable that we find in this node
-						if(getVariable(var.name) == null)
-							addNewVariable(var);
-						var.positionInForest = posInTree;
-						finalPositionsByName.put(var.name, posInTree);
+						posInTreeFirstVariable = posInTree;
+						equivalences.addEquivalence(getTemporaryPositionByName(var.name), posInTreeFirstVariable);
 						varStoringValue = var.name;
 						posInTree++;
 					}
 					else //we point other value-storing variables in this node to the same final position, since all these variables actually point to the same column
-						finalPositionsByName.put(var.name, finalPositionsByName.get(varStoringValue));
+						equivalences.addEquivalence(getTemporaryPositionByName(var.name), posInTreeFirstVariable);
 				}
 			}
 			//then count variables storing content
@@ -264,33 +191,16 @@ public class VarMap {
 				var = matchingVariables.get(i);
 				if(var.dataType == Variable.VariableDataType.Content) {
 					if(varStoringContent == null) { //this means var is the first content-storing variable we find in this node
-						var.positionInForest = posInTree;
-						if(getVariable(var.name) == null)
-							addNewVariable(var);
-						var.positionInForest = posInTree;
-						finalPositionsByName.put(var.name, posInTree);
+						posInTreeFirstVariable = posInTree;
+						equivalences.addEquivalence(getTemporaryPositionByName(var.name), posInTreeFirstVariable);
+						varStoringContent = var.name;
 						posInTree++;
 					}
 					else //we point other content-storing variables in this node to the same final position, since all these variables actually point to the same column 
-						finalPositionsByName.put(var.name, finalPositionsByName.get(varStoringContent));
-				}
-			}
-		
-			//then the rest, if any
-			for(int i = 0; i < matchingVariables.size(); i++) {
-				var = matchingVariables.get(i);
-				if(var.dataType != Variable.VariableDataType.Value &&
-						var.dataType != Variable.VariableDataType.Content) {
-					var.positionInForest = posInTree;
-					if(getVariable(var.name) == null)
-						addNewVariable(var);
-					var.positionInForest = posInTree;
-					finalPositionsByName.put(var.name, posInTree);
-					posInTree++;
+						equivalences.addEquivalence(getTemporaryPositionByName(var.name), posInTreeFirstVariable);
 				}
 			}
 		}
-		
 		return posInTree;
 	}
 	
@@ -298,7 +208,6 @@ public class VarMap {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("--TemporaryPositionsByName: "+temporaryPositionsByName.toString());
-		sb.append("\n--FinalPositionsByName: "+finalPositionsByName.toString());
 		return sb.toString();
 	}
 }

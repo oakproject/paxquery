@@ -99,7 +99,7 @@ public class XClient implements Program, ProgramDescription {
 			System.out.println("PatternTree ("+i+"): ");
 			System.out.println(loader.navigationTreePatterns.get(i).toString(PrintingLevel.SIMPLIFY));
 		}
-		System.out.println("HashMap:");
+		System.out.println("PatternNodeMap:");
 		System.out.println(loader.patternNodeMap.toString());
 		System.out.println("VarMap: ");
 		System.out.println(loader.varMap.toString());
