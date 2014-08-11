@@ -70,16 +70,31 @@ public final class ConstructionTreePatternNode implements Serializable {
 		return this.varPath;
 	}
 	
+	public void setVarPath(List<Integer> varPath) {
+		this.varPath = varPath;
+	}
+	
 	public String getTag() {
 		return this.tag;
+	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 	
 	public boolean isAttribute() {
 		return this.attribute;
 	}
 	
+	public void setAttribute(boolean isAttribute) {
+		this.attribute = isAttribute;
+	}
+	
 	public boolean isOptional() {
 		return this.optional;
 	}
 	
+	public void setOptiona(boolean isOptional) {
+		this.optional = isOptional;
+	}
 }
