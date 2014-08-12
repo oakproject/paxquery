@@ -16,6 +16,7 @@
 package fr.inria.oak.paxquery.common.xml.construction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,38 +26,56 @@ import java.util.List;
  */
 public final class ConstructionTreePatternNode implements Serializable {
 	
+	private static final long serialVersionUID = -3853137057985492439L;
+
+	public enum ContentType { 
+		ELEMENT, 			// The node stores an XML element node (e.g. <*element* attribute="attribute_value">element_value</*element*>, marked between *)
+		ATTRIBUTE, 			// The node stores an XML attribute node (e.g. <element *attribute*="attribute_value">element_value</element>, marked between *)
+		ATTRIBUTE_VALUE, 	// The node stores the value of an XML attribute node if literal (e.g. <element attribute="*attribute_value*">element_value</element>, marked between *)
+		ELEMENT_VALUE, 		// The node stores the value of an XML element node if literal (e.g. <element attribute="attribute_value">*element_value*</element>, marked between *)
+		VARIABLE_PATH };	// The node stores the variable path in an XML element node or attribute (e.g. <element attribute="attribute_value">{*$a*}</element>, marked between *)
+	
 	private ConstructionTreePattern ctp;
+
+	private ContentType contentType;	// What does this node store?
+	private List<Integer> varPath; 		// Path with variable positions
+	private String value;				// Either XML node tag, XML attribute tag, XML content (if literal) or attribute content (if literal)
+	private boolean optional;			// Is it an optional node?
 	
-	private List<Integer> varPath; 	// Path with variable positions
-	private String tag;				// Tag
-	private boolean attribute;		// Is it an XML attribute?
-	private boolean optional;		// Is it an optional node?
 	
-	
-	public ConstructionTreePatternNode(ConstructionTreePattern ctp, String tag, boolean attribute, boolean optional) {
-		this(ctp, null, tag, attribute, optional);
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, String value, boolean optional) {
+		this(ctp, contentType, null, value, optional);
 	}
 	
-	public ConstructionTreePatternNode(ConstructionTreePattern ctp, List<Integer> varPath, boolean optional) {
-		this(ctp, varPath, null, false, optional);
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, List<Integer> varPath, boolean optional) {
+		this(ctp, contentType, varPath, null, optional);
 	}
 	
-	public ConstructionTreePatternNode(String tag, boolean attribute, boolean optional) {
-		this(null, null, tag, attribute, optional);
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, int[] varPath, boolean optional) {
+		this(ctp, contentType, null, null, optional);		
+
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int var : varPath)
+			list.add(var);
+		this.setVarPath(list);
 	}
 	
-	public ConstructionTreePatternNode(List<Integer> varPath, boolean optional) {
-		this(null, varPath, null, false, optional);
+	public ConstructionTreePatternNode(ContentType contentType, String value, boolean optional) {
+		this(null, contentType, null, value, optional);
 	}
 	
-	public ConstructionTreePatternNode(ConstructionTreePattern ctp, List<Integer> varPath, String tag, boolean attribute, boolean optional) {
+	public ConstructionTreePatternNode(ContentType contentType, List<Integer> varPath, boolean optional) {
+		this(null, contentType, varPath, optional);
+	}
+		
+	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, List<Integer> varPath, String value, boolean optional) {
 		this.ctp = ctp;
 		this.varPath = varPath;
-		this.tag = tag;
-		this.attribute = attribute;
+		this.value = value;
+		this.contentType = contentType;
 		this.optional = optional;
 	}
-	
+
 	
 	public ConstructionTreePattern getConstructionTreePattern() {
 		return this.ctp;
@@ -74,22 +93,22 @@ public final class ConstructionTreePatternNode implements Serializable {
 		this.varPath = varPath;
 	}
 	
-	public String getTag() {
-		return this.tag;
+	public String getValue() {
+		return this.value;
 	}
 	
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setValue(String value) {
+		this.value = value;
 	}
 	
-	public boolean isAttribute() {
-		return this.attribute;
+	public ContentType getContentType() {
+		return this.contentType;
 	}
 	
-	public void setAttribute(boolean isAttribute) {
-		this.attribute = isAttribute;
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
 	}
-	
+		
 	public boolean isOptional() {
 		return this.optional;
 	}

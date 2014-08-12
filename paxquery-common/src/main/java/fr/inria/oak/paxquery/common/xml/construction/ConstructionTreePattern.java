@@ -146,7 +146,7 @@ public class ConstructionTreePattern {
 		ConstructionTreePatternNode top = root;
 		while(top != null) {
 			ConstructionTreePatternNode topCopy = new ConstructionTreePatternNode(
-					newCtp, top.getVarPath(), top.getTag(), top.isAttribute(), top.isOptional());
+					newCtp, top.getContentType(), top.getVarPath(), top.getValue(), top.isOptional());
 			newCtp.nodes.add(topCopy);
 			
 			if(top == root) {
