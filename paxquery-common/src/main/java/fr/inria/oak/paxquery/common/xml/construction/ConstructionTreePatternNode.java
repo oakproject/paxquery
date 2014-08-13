@@ -113,7 +113,38 @@ public final class ConstructionTreePatternNode implements Serializable {
 		return this.optional;
 	}
 	
-	public void setOptiona(boolean isOptional) {
+	public void setOptional(boolean isOptional) {
 		this.optional = isOptional;
+	}
+	
+	public ConstructionTreePatternNode getParent() {
+		if(ctp == null)
+			return null;
+
+		ConstructionTreePatternEdge edge = ctp.getParentEdges().get(this);
+		if(edge != null)
+			return edge.getParent();
+		
+		return null;
+	}
+	
+	public ArrayList<ConstructionTreePatternNode> getChildren() {
+		ArrayList<ConstructionTreePatternNode> children = new ArrayList<ConstructionTreePatternNode>();
+		if(ctp == null)
+			return children;
+		
+		for(ConstructionTreePatternEdge edge : ctp.getChildrenEdges().get(this))
+			children.add(edge.getChild());
+					
+		return children;			
+	}
+	
+	public String toString() {
+		String output;
+		if(contentType == ContentType.VARIABLE_PATH)
+			output = optional ? contentType + " " + varPath + " optional" : contentType + " " +varPath;
+		else
+			output = optional ? contentType + " " + value + " optional" : contentType + " " + value; 
+		return output;
 	}
 }

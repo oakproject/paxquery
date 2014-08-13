@@ -16,6 +16,7 @@
 package fr.inria.oak.paxquery.common.xml.construction;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -187,6 +188,25 @@ public class ConstructionTreePattern {
 
 	public ListMultimap<ConstructionTreePatternNode, ConstructionTreePatternEdge> getChildrenEdges() {
 		return this.childrenEdges;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		toStringRecursive(root, sb);
+		return sb.toString();
+	}
+	
+	private void toStringRecursive(ConstructionTreePatternNode node, StringBuilder sb) {
+		sb.append(node.toString());
+		ArrayList<ConstructionTreePatternNode> children = node.getChildren();
+		if(children.size() > 0) {
+			sb.append(" ( ");				
+			for(ConstructionTreePatternNode child : children) {
+				toStringRecursive(child, sb);
+				sb.append(" ");
+			}
+			sb.append(" ) ");				
+		}		
 	}
 
 }
