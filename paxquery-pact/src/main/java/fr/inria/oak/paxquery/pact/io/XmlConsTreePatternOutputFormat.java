@@ -145,11 +145,11 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						ctpNodeResult.append("<" + ctpNode.getValue());
 						int k;
 						for(k=0; 
-								k<childrenEdges.size() && childrenEdges.get(k).getChild().getContentType() == ContentType.ATTRIBUTE;
+								childrenEdges != null && k<childrenEdges.size() && childrenEdges.get(k).getChild().getContentType() == ContentType.ATTRIBUTE;
 								k++) {
 							ctpNodeResult.append(" " + resultChildren[k].toString());
 						}
-						if(k == childrenEdges.size()) {
+						if(childrenEdges == null || k == childrenEdges.size()) {
 							ctpNodeResult.append("/>");
 						}
 						else {
