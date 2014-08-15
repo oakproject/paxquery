@@ -22,6 +22,7 @@ package fr.inria.oak.paxquery.pact.configuration;
  */
 public enum PACTOperatorsConfiguration {
 	NTP_STRING("paxquery.input.ntp"),
+	CTP_BINARY("paxquery.output.ctp"),
 	ATTACH_DOCUMENTID_BOOLEAN("paxquery.input.attachdocumentID"),
 	APPLY_CONSTRUCT_BINARY("paxquery.output.applyconstruct"),
 	NRSMD1_BINARY("paxquery.operation.nrsmd1"),

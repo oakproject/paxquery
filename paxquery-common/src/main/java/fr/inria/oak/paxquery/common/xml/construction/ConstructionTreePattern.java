@@ -15,6 +15,7 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.common.xml.construction;
 
+import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -31,11 +32,11 @@ import com.google.common.collect.ListMultimap;
  * This class models the construction tree patterns.
  * 
  */
-public class ConstructionTreePattern {
-	
-	private Set<ConstructionTreePatternNode> nodes;
-
-	private ConstructionTreePatternNode root;
+public class ConstructionTreePattern implements Serializable {
+ 	
+	private Set<ConstructionTreePatternNode> nodes; //Tree pattern nodes
+ 
+	private ConstructionTreePatternNode root; //Tree pattern root
 	
 	private Map<ConstructionTreePatternNode,ConstructionTreePatternEdge> parentEdges; //From child
 	private ListMultimap<ConstructionTreePatternNode,ConstructionTreePatternEdge> childrenEdges; //From parent

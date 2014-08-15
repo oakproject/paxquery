@@ -46,6 +46,7 @@ import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoin;
 import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoinWithAggregation;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLTreeConstruct;
 import fr.inria.oak.paxquery.algebra.operators.unary.Aggregation;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.Flatten;
@@ -64,7 +65,8 @@ import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.metadata.MetadataTypesMapping;
-import fr.inria.oak.paxquery.pact.io.XmlNavInputFormat;
+import fr.inria.oak.paxquery.pact.io.XmlConsTreePatternOutputFormat;
+import fr.inria.oak.paxquery.pact.io.XmlNavTreePatternInputFormat;
 import fr.inria.oak.paxquery.pact.io.XmlOutputFormat;
 import fr.inria.oak.paxquery.pact.operations.KeyFactoryOperations;
 import fr.inria.oak.paxquery.pact.operators.binary.CartesianProductOperator;
@@ -112,6 +114,8 @@ public class Logical2Pact {
 		GenericDataSink result;
 		if (log instanceof XMLConstruct)
 			result = planTranslate((XMLConstruct) log);
+		else if (log instanceof XMLTreeConstruct)
+			result = planTranslate((XMLTreeConstruct) log);
 		else
 			throw new PAXQueryExecutionException("The top operator must translate into a data sink!");
 		
@@ -133,6 +137,25 @@ public class Logical2Pact {
 		XmlOutputFormat.configureRecordFormat(result)
 			.setSignature(as.getNRSMD())
 			.setApply(as.getApply());
+//		result.setDegreeOfParallelism(1);
+		
+		return result;
+	}
+	
+	private static final GenericDataSink planTranslate(XMLTreeConstruct as) {
+		//Generate plan
+		Operator[] childPlan = translate(as.getChild());
+		
+		//Store translation in a list
+		List<Operator> children = new ArrayList<Operator>();
+		for(int i=0; i<childPlan.length; i++)
+			children.add(childPlan[i]);
+		
+		//Create FileDataSink
+		FileDataSink result = new FileDataSink(XmlConsTreePatternOutputFormat.class, as.getOutputPath(), children, "Construct XML");
+		XmlConsTreePatternOutputFormat.configureRecordFormat(result)
+			.setSignature(as.getNRSMD())
+			.setConstructionTreePattern(as.getConstructionTreePattern());
 //		result.setDegreeOfParallelism(1);
 		
 		return result;
@@ -172,13 +195,13 @@ public class Logical2Pact {
 	}
 
 	private static final Operator[] translate(XMLScan xp) {
-		FileDataSource navigationExtraction = new FileDataSource(XmlNavInputFormat.class, xp.getPathDocuments(), "Parse XML");
+		FileDataSource navigationExtraction = new FileDataSource(XmlNavTreePatternInputFormat.class, xp.getPathDocuments(), "Parse XML");
 		if(xp.getNavigationTreePattern() != null)
-			XmlNavInputFormat.configureXmlNavInputFormat(navigationExtraction)
+			XmlNavTreePatternInputFormat.configureXmlNavInputFormat(navigationExtraction)
 					.setNavigationTreePattern(xp.getNavigationTreePattern())
 					.setAttachDocumentID(xp.isAttachDocumentID());
 		else
-			XmlNavInputFormat.configureXmlNavInputFormat(navigationExtraction)
+			XmlNavTreePatternInputFormat.configureXmlNavInputFormat(navigationExtraction)
 					.setAttachDocumentID(xp.isAttachDocumentID());
 		return new Operator[]{navigationExtraction};
 	}

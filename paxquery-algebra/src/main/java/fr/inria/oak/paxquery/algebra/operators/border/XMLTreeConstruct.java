@@ -47,6 +47,12 @@ public class XMLTreeConstruct extends BaseUnaryOperator {
 		this.nestedMetadata = this.getChild().getNRSMD();
 	}
 
-
+	public String getOutputPath() {
+		return this.outputPath;
+	}
+	
+	public ConstructionTreePattern getConstructionTreePattern() {
+		return this.ctp;
+	}
 
 }

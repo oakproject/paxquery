@@ -45,9 +45,9 @@ import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtrac
  * records based on the embeddings of a navigation tree pattern in the document.
  *
  */
-public class XmlNavInputFormat extends FileInputFormat {
+public class XmlNavTreePatternInputFormat extends FileInputFormat {
 	
-	private static final Log logger = LogFactory.getLog(XmlNavInputFormat.class);
+	private static final Log logger = LogFactory.getLog(XmlNavTreePatternInputFormat.class);
 	
 	
 	private String documentID;

@@ -38,7 +38,7 @@ import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
 
 /**
- * Output format that generates XML results out of records based on a construction pattern.
+ * Output format that generates XML results out of records.
  *
  */
 public class XmlOutputFormat extends FileOutputFormat {
