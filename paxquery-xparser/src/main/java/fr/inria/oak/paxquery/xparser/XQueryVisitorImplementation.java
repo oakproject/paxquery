@@ -11,13 +11,17 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
-import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
+import fr.inria.oak.paxquery.common.xml.construction.*;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
 import fr.inria.oak.paxquery.algebra.operators.binary.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
+import fr.inria.oak.paxquery.xparser.XQueryParser.AttContext;
+import fr.inria.oak.paxquery.xparser.XQueryParser.AttInner2Context;
+import fr.inria.oak.paxquery.xparser.XQueryParser.AttInnerContext;
 import fr.inria.oak.paxquery.xparser.mapping.LogicalPlanRemapper;
 import fr.inria.oak.paxquery.xparser.mapping.VarMap;
 
@@ -38,6 +42,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public ArrayList<XMLScan> scans;			//the leaves of the algebraic operators tree
 	public XMLConstruct construct;				//the root of the algebraic operators tree
+	public XMLTreeConstruct newConstruct;		//the new root of the algebraic operators tree
 	public BaseLogicalOperator constructChild;	//pointer to the immediate descendant of the XMLconstruct operator
 
 	/**
@@ -47,10 +52,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public VarMap varMap;						//stores info about the variables and their relation to pattern nodes
 	public HashMap<String, NavigationTreePatternNode> patternNodeMap;	//each tuple <String, PatternNode> stores the name of a variable and the PatternNode it addresses
 	public ArrayList<NavigationTreePattern> navigationTreePatterns;	//the list of all TreePattern objects built for a given query
+	
 	public ArrayList<String> applyEach;			//holds a String array for ApplyConstruct.each
 	public ArrayList<Integer> applyFields;		//holds a Integer array for ApplyConstruct.fields
 	public HashMap<String, ApplyConstruct> mappedApplys;	//stores all ApplyConstruct objects instantiated during query processing (lets and nested sub-queries). The mapping is <variable_name, associated_applyconstruc>
 	public ArrayList<ApplyConstruct> nestedApplys;	//this is XMLConstruct.NestedApplyConstruc[]
+
+	public ConstructionTreePattern constructionTreePattern;	//holds the XML tree indicated in the return statement. To be used with the XMLConstruct operator
+	public ConstructionTreePatternNode lastConstructionTreePatternNode;		
 	
 	/**
 	 * State variables for parsing
@@ -92,6 +101,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		nestedApplys = new ArrayList<ApplyConstruct>();
 		treePatternVisited = new ArrayList<Boolean>();
 		predicateStack = new Stack<BasePredicate>();
+		constructionTreePattern = null;	//instantiated at visitReturnStat
 	}
 	
 	/**
@@ -102,27 +112,16 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		visitChildren(ctx);
 				
 		//we instantiate the XMLConstruct operator here rather than in exitReturnStat since we can have several return clauses but just one XMLConstruct operator.
-		//we need to convert applyEach (ArrayList<String> to String[]
-		String[] each_array = applyEach.toArray(new String[0]);
-		//we need to convert applyFields (ArrayList<Integer>) to int[], it's ugly but necessary
-		int[] fields_array = new int[applyFields.size()];
-		int i = 0;
-		for(Integer integer : applyFields)
-			fields_array[i++] = integer.intValue();		
-		ApplyConstruct apply = new ApplyConstruct("", each_array, "", fields_array, nestedApplys.toArray(new ApplyConstruct[0]));
-		//instantiate the XMLConstruct operator and set "constructChild" as immediate descendant
-		//no algebraic op was set as child of XMLConstruct, we just plug the first XMLScan as a bail out solution, simply plug the first tree pattern to the XMLConstruct object
-		if(constructChild == null && scans.size() > 0)
-			constructChild = scans.get(0);
-		construct = new XMLConstruct(constructChild, apply, outputPath);
+		newConstruct = new XMLTreeConstruct(constructChild, constructionTreePattern, outputPath);
 		
 		//variable remapping; final positions of variables are calculated for every operator in logicalPlan
-		logicalPlan.setRoot(construct);
+		logicalPlan.setRoot(newConstruct);
 		logicalPlan.setLeaves(scans);
 		LogicalPlanRemapper.remapLogicalPlan(logicalPlan, varMap);
 
 		return null;
 	}
+
 
 	/**
 	 * letBinding
@@ -728,7 +727,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	//		}
 	//		else
 				lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
-	
+			
 			lastNode.removeMatchingVariables(lastVarLeftSide);
 			varMap.removeVariable(lastVarLeftSide);
 			if(lastNode.checkAnyMatchingVariableStoresValue() == false)
@@ -845,78 +844,68 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitReturnStat(XQueryParser.ReturnStatContext ctx) {
 		insideReturn = true;
-		returnXMLTags = new StringBuilder();
 		//manually visit the next rule
 		if(ctx.eleConst()!=null)
 			visit(ctx.eleConst());
-		//either it is an aggrExpr rule
 		else if(ctx.aggrExpr() != null)
 			visit(ctx.aggrExpr());
-		//or a VAR
-		else if(ctx.getChild(1).getText().startsWith("$")) {
-			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
-			if(patternTreeIndex != -1) {
-				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
-				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
-				if(treePatternVisited.get(patternTreeIndex) == false) {
-					constructChild = scans.get(patternTreeIndex);
-					//add varsPos for this tree
-					treePatternVisited.set(patternTreeIndex, true);
+		//if not, we have an aggrExpr or a VAR
+		else if(ctx.VAR() != null) {
+			String varName = ctx.VAR().getText();
+				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
+				if(patternTreeIndex != -1) {
+					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+					if(treePatternVisited.get(patternTreeIndex) == false) {
+						constructChild = scans.get(patternTreeIndex);
+						treePatternVisited.set(patternTreeIndex, true);
+					}
+					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+					ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(ctx.getChild(1).getText())}, false);
+					constructionTreePattern = new ConstructionTreePattern(root);
+					root.setConstructionTreePattern(constructionTreePattern);
+					lastConstructionTreePatternNode = root;
 				}
-				storeVarAndXMLText(ctx.getChild(1).getText());	
-				//if the variable contains nested tuples we also add the corresponding ApplyConstruct object
-				if(mappedApplys.containsKey(ctx.getChild(1).getText())) {
-					ApplyConstruct ac = mappedApplys.get(ctx.getChild(1).getText());
-					//now that varsPos has been updated we can check the varible's position
-					ac.setFields(new int[] {0});
-					nestedApplys.add(ac);
-				}
-			}
-		}
-		
-		storeXMLText();		
+				else
+					throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
+		}		
 		insideReturn = false;
 
 		return null;
 	}
-	
+
+
 	/**
 	 * visitEleConst
 	 * TODO: for the case eleConst : LT_S eaName att* CLOSE_OPENING_TAG we just plug the first XMLScan object to the XMLConstruct object. ANY BETTER SOLUTION?
 	 */
 	public Void visitEleConst(XQueryParser.EleConstContext ctx) {
-		//append '<' and the element name
-		returnXMLTags.append(ctx.LT_S()).append(ctx.eaName(0).getText());
-
+		String tag = ctx.eaName(0).getText();
+		ConstructionTreePatternNode node = new ConstructionTreePatternNode(ContentType.ELEMENT, tag, false);
+		if(constructionTreePattern == null)
+			constructionTreePattern = new ConstructionTreePattern(node);
+		else {
+			constructionTreePattern.addChild(lastConstructionTreePatternNode, node);
+			node.setConstructionTreePattern(constructionTreePattern);
+		}
+		lastConstructionTreePatternNode = node;
+		
 		//manually visit all attributes
-		for(int i = 0; i < ctx.children.size(); i++) {
-			if(ctx.children.get(i).getPayload().getClass() == XQueryParser.AttContext.class) {
-				visitAtt((XQueryParser.AttContext)ctx.children.get(i).getPayload());
-			}
-		}
-		//eleConst : LT_S eaName att* CLOSE_OPENING_TAG
-		if(ctx.CLOSE_OPENING_TAG()!=null) {
-			returnXMLTags.append(ctx.CLOSE_OPENING_TAG());	
-		}
-		//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
-		else if(ctx.GT_S().size() > 0) {
-			returnXMLTags.append(ctx.GT_S(0).getText());
+		for(int i = 0; i < ctx.att().size(); i++)
+			visit(ctx.att(i));
+		//if "eleConst : LT_S eaName att* CLOSE_OPENING_TAG" then we're done
 
+		//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
+		if(ctx.GT_S().size() > 0) {
 			for(int i = 0; i < ctx.children.size(); i++) {
-				if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class) 
-					visitEleConst((XQueryParser.EleConstContext)ctx.getChild(i).getPayload());
-				else if(ctx.getChild(i).getText().startsWith("{")) {
-					if(i+1 < ctx.children.size())
-						visitEleConstInner((XQueryParser.EleConstInnerContext)ctx.getChild(i+1).getPayload());
-				}					
+				lastConstructionTreePatternNode = node;
+				//we find an eleConst rule
+				if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
+						ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
+					visit(ctx.getChild(i));
+				}
 			}
-			//append the rest of the rule
-			if(ctx.OPEN_CLOSING_TAG() != null) 
-				returnXMLTags.append(ctx.OPEN_CLOSING_TAG().getText());
-			if(ctx.eaName().size() > 1) 
-				returnXMLTags.append(ctx.eaName(1).getText());
-			if(ctx.GT_S().size() > 1) 
-				returnXMLTags.append(ctx.GT_S(1).getText());			
+			lastConstructionTreePatternNode = node.getParent();					
 		}
 		return null;
 	}
@@ -925,8 +914,43 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * att
 	 */
 	public Void visitAtt(XQueryParser.AttContext ctx) {
-		returnXMLTags.append(" ").append(ctx.eaName().getText()).append('=');
-		visitAttInner(ctx.attInner());
+		ConstructionTreePatternNode auxNode;
+		ConstructionTreePatternNode attNode; 
+		//XML node for the attribute itself
+		attNode = new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE, ctx.eaName().getText(), false);
+		constructionTreePattern.addChild(lastConstructionTreePatternNode, attNode);
+		//XML node for the attribute content
+		AttInnerContext attInner = ctx.attInner();
+		if(attInner.attInner2() == null) 	//then we have attInner : STRING_LITERAL
+			constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE_VALUE, attInner.STRING_LITERAL().getText(), false));
+		else {
+			AttInner2Context attInner2 = attInner.attInner2();
+			if(attInner2.aggrExpr() != null) {	//it's an aggrExpr
+				auxNode = lastConstructionTreePatternNode;
+				lastConstructionTreePatternNode = attNode;
+				visit(attInner2.aggrExpr());
+				//lastConstructionTreePatternNode = node;
+				lastConstructionTreePatternNode = auxNode;
+			}
+			else {	//it's a VAR
+				String varName = attInner2.VAR().getText();
+				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+				if(patternTreeIndex != -1) {
+					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+					if(treePatternVisited.get(patternTreeIndex) == false) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndex);
+						else
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
+						treePatternVisited.set(patternTreeIndex, true);
+					}
+					constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, new int[]{varMap.getTemporaryPositionByName(varName)}, false));
+				}
+				else
+					throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
+			}
+		}	
 		return null;
 	}
 
@@ -989,37 +1013,35 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
 	/**
 	 * aggrExpr
-	 * TODO: currently we store the aggregation expression as XML text: obviously we need to treat this differently
+	 * TODO: currently we don't consider the aggregated expresion but the VAR within: obviously we need to address this differently
 	 */
 	public Void visitAggrExpr(XQueryParser.AggrExprContext ctx) {
 		if(insideReturn) {
-			//add the function name and the left parenthesis
-			String aggrfunct = ctx.AGGR_FUNCT().getText();
-			returnXMLTags.append(aggrfunct).append('(');
-			
-			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.VAR().getText());
-			
-			if(constructChild == null) {
-				constructChild = scans.get(patternTreeIndex);
-				treePatternVisited.set(patternTreeIndex, true);
+			String varName = ctx.VAR().getText();
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+			if(patternTreeIndex != -1) {
+				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+				if(treePatternVisited.get(patternTreeIndex) == false) {
+					constructChild = scans.get(patternTreeIndex);
+					treePatternVisited.set(patternTreeIndex, true);
+				}
+				//create the construct node
+				ConstructionTreePatternNode node = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(varName)}, false);
+				if(constructionTreePattern == null) {
+					constructionTreePattern = new ConstructionTreePattern(node);
+					node.setConstructionTreePattern(constructionTreePattern);
+				}
+				else
+					constructionTreePattern.addChild(lastConstructionTreePatternNode, node);					
 			}
-			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false) {
-				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-				treePatternVisited.set(patternTreeIndex, true);
-			}
-			//store the var's position and the XML text so far
-			storeVarAndXMLText(ctx.VAR().getText());
-			//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
-			if(mappedApplys.containsKey(ctx.VAR().getText())) {
-				ApplyConstruct ac = mappedApplys.get(ctx.VAR().getText());
-				ac.setFields(new int[] {0});
-				nestedApplys.add(ac);
-			}
-			//add the right parenthesis
-			returnXMLTags.append(')');
+			else
+				throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
 		}
+
 		return null;
 	}
+
 	
 	/**
 	 * eleConstInner
@@ -1029,41 +1051,32 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * TODO: if a variable within an XML element stores an attribute, then we currently terminate the execution
 	 * (since that is illegal). What we really should do is including it in the element's XML tag as an attribute
 	 * e.g: <item>@attrib</item> --> <item attrib="@attrib"></item>
-	 */
+	 */		
 	public Void visitEleConstInner(XQueryParser.EleConstInnerContext ctx) {
-		for(int i = 0; i < ctx.getChildCount(); i++) {
+		String varName;
+		for(int i = 0; i < ctx.children.size(); i++) {
+			varName = null;
 			ParseTree child = ctx.getChild(i);
 			//if VAR
 			if(child instanceof TerminalNode && child.getText().startsWith("$")) {
-				String varName = child.getText();
-				
-				//Test for illegal use of attributes
-				NavigationTreePatternNode node = patternNodeMap.get(varName);
-				if(node != null && node.isAttribute())
-					throw new PAXQueryExecutionException("Illegal to use an attribute as an XML value in the return statement: variable "+varName+".");
-				
+				varName = child.getText();
 				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
-				if(constructChild == null) {
-					constructChild = scans.get(patternTreeIndex);
-					treePatternVisited.set(patternTreeIndex, true);
-				}
-				else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false) {
-					constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-					treePatternVisited.set(patternTreeIndex, true);
-				}
-				//store the var's position and the XML text so far
-				storeVarAndXMLText(varName);
-				//if the variable contais nested tuples we also add the corresponding ApplyConstruct object
-				if(mappedApplys.containsKey(varName)) {
-					ApplyConstruct ac = mappedApplys.get(varName);
-					ac.setFields(new int[] {0});
-					nestedApplys.add(ac);	
-				}
+				if(patternTreeIndex != -1) {
+					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+					if(treePatternVisited.get(patternTreeIndex) == false) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndex);
+						else
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
+						treePatternVisited.set(patternTreeIndex, true);
+					}
+					constructionTreePattern.addChild(lastConstructionTreePatternNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(varName)}, false));
+				}	
 			}
 			//if aggrExpr
-			else if(child instanceof XQueryParser.AggrExprContext) {
+			else if(!(child instanceof TerminalNode) && child.getPayload().getClass() == XQueryParser.AggrExprContext.class)
 				visit(child);
-			} 
 		}
 
 		return null;

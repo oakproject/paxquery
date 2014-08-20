@@ -115,7 +115,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 				List<ConstructionTreePatternEdge> childrenEdges = ctp.getChildrenEdges().get(ctpNode);
 				
 				StringBuilder[] resultChildren = null;
-				if(childrenEdges != null) {
+				if(childrenEdges != null && childrenEdges.size() != 0) {
 					//Create list CTPs from child nodes
 					ConstructionTreePattern[] newCtps = new ConstructionTreePattern[childrenEdges.size()];
 					for(int j=0; j<newCtps.length; j++) {
@@ -170,7 +170,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						ctpNodeResult.append(ctpNode.getValue());
 					}
 					else if(ctpNode.getContentType() == ContentType.VARIABLE_PATH &&
-							childrenEdges == null) {
+							(childrenEdges == null || childrenEdges.size() == 0)) {
 						//Create content from the record
 						List<Integer> varPath = ctpNode.getVarPath();
 						if(varPath.size() == 1) {

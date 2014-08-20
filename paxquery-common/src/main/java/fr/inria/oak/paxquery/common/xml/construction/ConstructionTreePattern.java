@@ -143,7 +143,6 @@ public class ConstructionTreePattern implements Serializable {
 		
 		//Pass to assign nodes to this tree
 		Deque<ConstructionTreePatternNode> stack = new ArrayDeque<ConstructionTreePatternNode>();
-		stack.push(null);
 		ConstructionTreePattern rootCtp = root.getConstructionTreePattern();
 		ConstructionTreePatternNode top = root;
 		while(top != null) {
@@ -163,13 +162,15 @@ public class ConstructionTreePattern implements Serializable {
 			//Add children
 			List<ConstructionTreePatternEdge> children = rootCtp.childrenEdges.get(top);
 			if(children != null) {
-				for(ConstructionTreePatternEdge edge: children) {
-					stack.push(edge.getChild());
-				}
+				for(int i = children.size()-1; i >= 0; i--)
+					stack.push(children.get(i).getChild());
 			}
 			
 			//New top
-			top = stack.pop();
+			if(stack.isEmpty())
+				top = null;
+			else
+				top = stack.pop();
 		}
 		
 		return newCtp;

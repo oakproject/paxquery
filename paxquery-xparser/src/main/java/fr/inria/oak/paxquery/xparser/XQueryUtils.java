@@ -7,6 +7,7 @@ import java.util.List;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLTreeConstruct;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
@@ -128,6 +129,10 @@ public class XQueryUtils {
 	 */
 	public static String algebraicTreeToString(XMLConstruct root) {
 		return traverseAlgebraicOperatorsTree(root);		
+	}
+	
+	public static String algebraicTreeToString(XMLTreeConstruct root) {
+		return traverseAlgebraicOperatorsTree(root);
 	}
 	
 	/**

@@ -15,7 +15,7 @@ import fr.inria.oak.paxquery.algebra.operators.unary.BaseUnaryOperator;
  */
 public class LogicalPlan {
 	
-	private XMLConstruct root;
+	private XMLTreeConstruct root;
 	private List<XMLScan> leaves;
 
 	public LogicalPlan() {
@@ -23,11 +23,11 @@ public class LogicalPlan {
 		leaves = new ArrayList<XMLScan>();
 	}
 	
-	public XMLConstruct getRoot() {
+	public XMLTreeConstruct getRoot() {
 		return root;
 	}
 	
-	public void setRoot(XMLConstruct root) {
+	public void setRoot(XMLTreeConstruct root) {
 		this.root = root;
 	}
 	
@@ -93,7 +93,7 @@ public class LogicalPlan {
 	}	
 	
 	/**
-	 * Replaces old operator's child, i.e. oldChild, for newChild. If oldChild was not a child of operator, then nothing is done.
+	 * Replaces old operator's child, i.e. oldChild, for newChild. If oldChild was not a child of operator then nothing is done.
 	 * @param operator the operator with the child
 	 * @param oldChild the old of operator to be replaced
 	 * @param newChild the new child to be put in the place of oldChild

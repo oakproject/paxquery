@@ -1,12 +1,14 @@
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
-import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
-import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+//import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
+//import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
@@ -14,6 +16,8 @@ import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
 
 /**
  * Goes through a logical plan and updates the positions of the columns used as data inputs.
@@ -55,6 +59,8 @@ public class LogicalPlanRemapper {
 	private static void visitLogicalOperator(BaseLogicalOperator operator, VarMap varMap) {
 		if(operator instanceof XMLConstruct)
 			visitLogicalOperator((XMLConstruct) operator, varMap);
+		else if(operator instanceof XMLTreeConstruct)
+			visitLogicalOperator((XMLTreeConstruct) operator, varMap);
 		else if(operator instanceof DuplicateElimination)
 			visitLogicalOperator((DuplicateElimination) operator, varMap);
 		else if(operator instanceof Selection)
@@ -68,9 +74,9 @@ public class LogicalPlanRemapper {
 		//first find the XMLScan operators that hang from construct
 		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
 		findXMLScanDescendants(construct, scans);
-		//then calculate the positions of the variables in those XMLScans relative to dupElim
+		//then calculate the positions of the variables in those XMLScans relative to construct
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
-		//now substitute
+		//then substitute
 		int[] fields = construct.getApply().getFields();
 		construct.getApply().setFields(equivalences.getEquivalence(fields));
 
@@ -79,6 +85,29 @@ public class LogicalPlanRemapper {
 			for(int i = 0; i < nested.length; i++)
 				nested[i].setFields(equivalences.getEquivalence(nested[i].getFields()));
 		}
+	}
+	
+	private static void visitLogicalOperator(XMLTreeConstruct construct, VarMap varMap) {
+		//first find the XMLScan operators that hang from construct
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(construct, scans);
+		//then calculate the positions of the variables in those XMLScans relative to construct
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//then substitute
+		substituteVariablesInCTP(construct.getConstructionTreePattern().getRoot(), equivalences);
+	}
+	
+	private static void substituteVariablesInCTP(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
+		//substitute
+		substituteVariablesInCTPNode(node, equivalences);
+		//go to children
+		for(ConstructionTreePatternNode child : node.getChildren())
+			substituteVariablesInCTP(child, equivalences);
+	}
+	
+	private static void substituteVariablesInCTPNode(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
+		if(node.getContentType() == ContentType.VARIABLE_PATH)
+			node.setVarPath(equivalences.getEquivalence(node.getVarPath()));
 	}
 
 	private static void visitLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 

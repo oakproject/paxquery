@@ -34,7 +34,7 @@ public class XMLTreeConstruct extends BaseUnaryOperator {
 	public XMLTreeConstruct(BaseLogicalOperator child, ConstructionTreePattern ctp, String outputPath) throws PAXQueryExecutionException {
 		super(child);
 		
-		this.ownName = "XMLConstruct";
+		this.ownName = "XMLTreeConstruct";
 		this.ctp = ctp;
 		this.outputPath = outputPath;
 		this.visible = true;
