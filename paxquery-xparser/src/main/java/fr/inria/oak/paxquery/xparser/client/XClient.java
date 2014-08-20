@@ -108,7 +108,7 @@ public class XClient implements Program, ProgramDescription {
 		System.out.println("fields:");
 		System.out.println(loader.applyFields.toString());
 		System.out.println("Logical Plan:");
-		System.out.println(XQueryUtils.algebraicTreeToString(loader.logicalPlan.getRoot()));
+		System.out.println(loader.logicalPlan.toString());
 		System.out.println("Construction tree:");
 		System.out.println(loader.constructionTreePattern.toString());
 

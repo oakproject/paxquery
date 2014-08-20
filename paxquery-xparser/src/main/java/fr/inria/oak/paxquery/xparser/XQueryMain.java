@@ -36,8 +36,8 @@ public class XQueryMain {
 			System.out.println(loader.applyEach.toString());
 			System.out.println("fields:");
 			System.out.println(loader.applyFields.toString());
-			System.out.println("Algebraic tree:");
-			System.out.println(XQueryUtils.algebraicTreeToString(loader.construct));
+			//System.out.println("Algebraic tree:");
+			//System.out.println(XQueryUtils.algebraicTreeToString(loader.construct));
 		} catch(Exception e) {
 			System.out.println("Query malformed or not supported yet.");
 		}
@@ -102,8 +102,8 @@ public class XQueryMain {
 			sb.append("HM:");	//Hash Map
 			sb.append(loader.patternNodeMap.toString());
 			sb.append("---");
-			sb.append("AT:");	//Algebraic Tree
-			sb.append(XQueryUtils.algebraicTreeToString(loader.construct));
+			//sb.append("AT:");	//Algebraic Tree
+			//sb.append(XQueryUtils.algebraicTreeToString(loader.construct));
 						
 			System.out.println(sb.toString());
 			return sb.toString();

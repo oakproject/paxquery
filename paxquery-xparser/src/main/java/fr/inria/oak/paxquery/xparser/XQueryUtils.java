@@ -121,40 +121,6 @@ public class XQueryUtils {
 		return sb.toString();
 	}
 	
-	/**
-	 * Goes through the tree of algebraic operators in pre-order and prints it out.
-	 * Note that the root of such tree will always be an XMLConstruct object
-	 * @param root the root of the tree, always an XMLConstruct operator
-	 * @return
-	 */
-	public static String algebraicTreeToString(XMLConstruct root) {
-		return traverseAlgebraicOperatorsTree(root);		
-	}
-	
-	public static String algebraicTreeToString(XMLTreeConstruct root) {
-		return traverseAlgebraicOperatorsTree(root);
-	}
-	
-	/**
-	 * Traverses a tree of algebraic operators in pre-order and returns the string
-	 * representation.
-	 * @param root the root node of the subtree below
-	 * @return the string representation of the tree
-	 */
-	private static String traverseAlgebraicOperatorsTree(BaseLogicalOperator root) {
-		StringBuilder sb = new StringBuilder();
-		//visit this node
-		sb.append(root.getName());
-		//go to children; the base case is when there are no children (the node is a leaf)
-		if(root.getChildren() != null) {
-			sb.append(" -> ");
-			for(BaseLogicalOperator child : root.getChildren())
-				sb.append(traverseAlgebraicOperatorsTree(child));
-		}
-		return sb.toString();
-	}	
-
-	
 	public static int findVarInPatternTree(ArrayList<XMLScan> scans, HashMap<String, NavigationTreePatternNode> patternNodeMap, String varName) {
 		NavigationTreePatternNode node = patternNodeMap.get(varName);
 		if(node == null)

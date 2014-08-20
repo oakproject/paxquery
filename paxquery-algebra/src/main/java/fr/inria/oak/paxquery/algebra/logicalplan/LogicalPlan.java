@@ -106,5 +106,34 @@ public class LogicalPlan {
 				((BaseBinaryOperator) operator).replaceChild(oldChild,  newChild);
 		}
 	}
+	
+	/**
+	 * Goes through the tree of algebraic operators in pre-order and prints it out.
+	 * @param root the root of the tree, always an XMLConstruct operator
+	 * @return
+	 */
+	public String toString() {
+		return traverseAlgebraicOperatorsTree(root);
+	}
+	
+	/**
+	 * Traverses a tree of algebraic operators in pre-order and returns the string
+	 * representation.
+	 * @param root the root node of the subtree below
+	 * @return the string representation of the tree
+	 */
+	private String traverseAlgebraicOperatorsTree(BaseLogicalOperator root) {
+		StringBuilder sb = new StringBuilder();
+		//visit this node
+		sb.append(root.getName());
+		//go to children; the base case is when there are no children (the node is a leaf)
+		if(root.getChildren() != null) {
+			sb.append(" -> ");
+			for(BaseLogicalOperator child : root.getChildren())
+				sb.append(traverseAlgebraicOperatorsTree(child));
+		}
+		return sb.toString();
+	}	
+
 
 }
