@@ -3,11 +3,8 @@ package fr.inria.oak.paxquery.xparser.mapping;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
-//import fr.inria.oak.paxquery.common.xml.treepattern.core.PatternNode;
-//import fr.inria.oak.paxquery.common.xml.treepattern.core.Variable;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 /**

@@ -18,7 +18,6 @@ import fr.inria.oak.paxquery.common.xml.navigation.PrintingLevel;
 import fr.inria.oak.paxquery.translation.Logical2Pact;
 import fr.inria.oak.paxquery.xparser.XQueryLexer;
 import fr.inria.oak.paxquery.xparser.XQueryParser;
-import fr.inria.oak.paxquery.xparser.XQueryUtils;
 import fr.inria.oak.paxquery.xparser.XQueryVisitorImplementation;
 
 public class XClient implements Program, ProgramDescription {

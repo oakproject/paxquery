@@ -19,7 +19,6 @@ import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
-import fr.inria.oak.paxquery.xparser.XQueryParser.AttContext;
 import fr.inria.oak.paxquery.xparser.XQueryParser.AttInner2Context;
 import fr.inria.oak.paxquery.xparser.XQueryParser.AttInnerContext;
 import fr.inria.oak.paxquery.xparser.mapping.LogicalPlanRemapper;

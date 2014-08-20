@@ -2,15 +2,10 @@ package fr.inria.oak.paxquery.xparser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
-import fr.inria.oak.paxquery.algebra.operators.border.XMLConstruct;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
-import fr.inria.oak.paxquery.algebra.operators.border.XMLTreeConstruct;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
-import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 public class XQueryUtils {
 	
@@ -38,16 +33,6 @@ public class XQueryUtils {
 		}
 		return -1;
 	}
-	
-	/**
-	 * Returns a name for an auxiliar variable wich will point to a node within an XPath predicate
-	 * E.g:
-	 * let $mainVarName := whatever/lastNodeOutsideXPathPredicateName[lastNodeInsideXPathPredicateName = 'whatever']
-	 * Consecuently, the auxiliar variable with the returned name will point to the "lastNodeInsideXPathPredicateName" node.
-	 *//*
-	public static String buildAuxVariableName(String mainVarName, String lastNodeOutsideXPathPredicateName, String lastNodeInsideXPathPredicateName) {
-		return mainVarName + ":" + lastNodeOutsideXPathPredicateName + ":" + lastNodeInsideXPathPredicateName;
-	}*/
 	
 	/**
 	 * Returns a name for an auxiliar variable. The shape of the name is "auxVar"+auxVarCounter.
