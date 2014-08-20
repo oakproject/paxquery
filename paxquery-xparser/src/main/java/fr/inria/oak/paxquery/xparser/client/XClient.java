@@ -89,7 +89,7 @@ public class XClient implements Program, ProgramDescription {
 
 		printParseDetails(tree, parser, loader);
 		
-		return loader.newConstruct;
+		return loader.construct;
 	}
 	
 	private void printParseDetails(ParseTree tree, XQueryParser parser, XQueryVisitorImplementation loader) {
@@ -103,10 +103,6 @@ public class XClient implements Program, ProgramDescription {
 		System.out.println(loader.patternNodeMap.toString());
 		System.out.println("VarMap: ");
 		System.out.println(loader.varMap.toString());
-		System.out.println("each:");
-		System.out.println(loader.applyEach.toString());
-		System.out.println("fields:");
-		System.out.println(loader.applyFields.toString());
 		System.out.println("Logical Plan:");
 		System.out.println(loader.logicalPlan.toString());
 		System.out.println("Construction tree:");

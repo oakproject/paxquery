@@ -32,10 +32,10 @@ public class XQueryMain {
 			}
 			System.out.println("HashMap:");
 			System.out.println(loader.patternNodeMap.toString());
-			System.out.println("each:");
-			System.out.println(loader.applyEach.toString());
-			System.out.println("fields:");
-			System.out.println(loader.applyFields.toString());
+			//System.out.println("each:");
+			//System.out.println(loader.applyEach.toString());
+			//System.out.println("fields:");
+			//System.out.println(loader.applyFields.toString());
 			//System.out.println("Algebraic tree:");
 			//System.out.println(XQueryUtils.algebraicTreeToString(loader.construct));
 		} catch(Exception e) {
@@ -87,8 +87,8 @@ public class XQueryMain {
 			XQueryVisitorImplementation loader = new XQueryVisitorImplementation("");
 			loader.visit(tree);
 			
-			System.out.println("applyEach: "+loader.applyEach);
-			System.out.println("applyFields: "+loader.applyFields);
+			//System.out.println("applyEach: "+loader.applyEach);
+			//System.out.println("applyFields: "+loader.applyFields);
 			
 			//Print out normalized results
 			StringBuilder sb = new StringBuilder();
