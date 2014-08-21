@@ -41,6 +41,7 @@ import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
  * Output format that generates XML results out of records.
  *
  */
+@Deprecated
 public class XmlOutputFormat extends FileOutputFormat {
 	
 	private static final Log logger = LogFactory.getLog(XmlOutputFormat.class);

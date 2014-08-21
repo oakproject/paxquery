@@ -19,7 +19,11 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -98,11 +102,11 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 	public void writeRecord(Record record) throws IOException {		
 		RecordList recordList = new RecordList();
 		recordList.add(record);
-		StringBuilder sb = writeRecord(recordList, this.signature, new ConstructionTreePattern[] {this.ctp})[0];
+		StringBuilder sb = writeRecord(recordList, this.signature, new ConstructionTreePattern[] {this.ctp}, new AtomicBoolean[] {new AtomicBoolean()})[0];
 		this.wrt.append(sb);
 	}
 	
-	private StringBuilder[] writeRecord(RecordList listRecords, NestedMetadata signature, ConstructionTreePattern[] ctps) throws IOException {
+	private StringBuilder[] writeRecord(RecordList listRecords, NestedMetadata signature, ConstructionTreePattern[] ctps, AtomicBoolean[] nullResults) throws IOException {
 		StringBuilder[] result = new StringBuilder[ctps.length];
 		for(int i=0; i<result.length; i++) {
 			result[i] = new StringBuilder();
@@ -115,6 +119,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 				List<ConstructionTreePatternEdge> childrenEdges = ctp.getChildrenEdges().get(ctpNode);
 				
 				StringBuilder[] resultChildren = null;
+				AtomicBoolean[] nullResultChildren = null;
 				if(childrenEdges != null && childrenEdges.size() != 0) {
 					//Create list CTPs from child nodes
 					ConstructionTreePattern[] newCtps = new ConstructionTreePattern[childrenEdges.size()];
@@ -132,14 +137,19 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						newListRecords = listRecords;
 						newSignature = signature;
 					}
+					//Holder for booleans for null results
+					nullResultChildren = new AtomicBoolean[childrenEdges.size()];
+					for(int j=0; j<nullResultChildren.length; j++) {
+						nullResultChildren[j] = new AtomicBoolean();
+					}
 					//Obtain result children
-					resultChildren = writeRecord(newListRecords, newSignature, newCtps);
+					resultChildren = writeRecord(newListRecords, newSignature, newCtps, nullResultChildren);
 				}
 				
 				//Construct the subtree starting at this node
 				StringBuilder ctpNodeResult = new StringBuilder();
-				if(!ctpNode.isOptional() ||
-						!allNullUnderNode(ctpNode)) {
+				boolean allNull = allNullUnderNode(nullResultChildren);
+				if(!ctpNode.isOptional() || !allNull) {
 					//
 					if(ctpNode.getContentType() == ContentType.ELEMENT) {
 						ctpNodeResult.append("<" + ctpNode.getValue());
@@ -171,10 +181,17 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 					}
 					else if(ctpNode.getContentType() == ContentType.VARIABLE_PATH &&
 							(childrenEdges == null || childrenEdges.size() == 0)) {
+						allNull = true;
 						//Create content from the record
 						List<Integer> varPath = ctpNode.getVarPath();
 						if(varPath.size() == 1) {
-							ctpNodeResult.append(record.getField(varPath.get(0), StringValue.class));
+							StringValue v = record.getField(varPath.get(0), StringValue.class);
+							if(!v.getValue().equals("\0")) {
+								ctpNodeResult.append(v);
+							}
+							else {
+								allNull = false;
+							}
 						}
 						else {
 							RecordList list = record.getField(varPath.get(0), RecordList.class);
@@ -186,27 +203,44 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 								list = newList;
 							}
 							for(Record nestedRecord: list) {
-								ctpNodeResult.append(nestedRecord.getField(varPath.get(varPath.size()-1), StringValue.class));
+								StringValue v = nestedRecord.getField(varPath.get(varPath.size()-1), StringValue.class);
+								if(!v.getValue().equals("\0")) {
+									ctpNodeResult.append(v);
+								}
+								else {
+									allNull = false;
+								}
 							}
 						}
 					}
 					else { //childrenEdges != null
 						//Copy content from children
-						for(StringBuilder resultChild: resultChildren) {
-							ctpNodeResult.append(resultChild);
+						for(int k=0; k<resultChildren.length; k++) {
+							ctpNodeResult.append(resultChildren[k].toString());
 						}
 					}
 				}
 				result[i] = ctpNodeResult;
+				nullResults[i].set(allNull);
 			}
 		}
 		
 		return result;
 	}
 	
-	private boolean allNullUnderNode(ConstructionTreePatternNode ctpNode) {
-		//TODO
-		return false;
+	//Return true if all elements in the array are true
+	private boolean allNullUnderNode(AtomicBoolean[] nullResults) {
+		if(nullResults == null) {
+			return false;
+		}
+
+		for(AtomicBoolean nullResult: nullResults) {
+			if(!nullResult.get()) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	// ============================================================================================
