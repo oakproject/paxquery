@@ -134,7 +134,8 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						newSignature = signature.getNestedChild(ctpNode.getVarPath().get(0));
 					}
 					else {
-						newListRecords = listRecords;
+						newListRecords = new RecordList();
+						newListRecords.add(record);
 						newSignature = signature;
 					}
 					//Holder for booleans for null results
@@ -165,7 +166,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						else {
 							ctpNodeResult.append(">");
 							for(; k<childrenEdges.size(); k++) {
-								ctpNodeResult.append(" " + resultChildren[k].toString());
+								ctpNodeResult.append(resultChildren[k].toString());
 							}
 							ctpNodeResult.append("</" + ctpNode.getValue() + ">");
 						}
@@ -188,8 +189,6 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 							StringValue v = record.getField(varPath.get(0), StringValue.class);
 							if(!v.getValue().equals("\0")) {
 								ctpNodeResult.append(v);
-							}
-							else {
 								allNull = false;
 							}
 						}
@@ -206,8 +205,6 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 								StringValue v = nestedRecord.getField(varPath.get(varPath.size()-1), StringValue.class);
 								if(!v.getValue().equals("\0")) {
 									ctpNodeResult.append(v);
-								}
-								else {
 									allNull = false;
 								}
 							}
@@ -220,7 +217,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						}
 					}
 				}
-				result[i] = ctpNodeResult;
+				result[i].append(ctpNodeResult);
 				nullResults[i].set(allNull);
 			}
 		}
