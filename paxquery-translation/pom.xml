@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>paxquery-translation</artifactId>
-	<name>paxquery-client</name>
+	<name>paxquery-translation</name>
 	<description>PAXQuery algebra to PACT translation</description>
 
 	<packaging>jar</packaging>

@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>paxquery-common</artifactId>
-	<name>paxquery-client</name>
+	<name>paxquery-common</name>
 	<description>PAXQuery common</description>
 
 	<packaging>jar</packaging>
