@@ -1,5 +1,7 @@
 package fr.inria.oak.paxquery.pact.io;
 
+import static org.junit.Assert.*;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,13 +103,119 @@ public class TestXMLConsTreePatternOutputFormat {
 		ConstructionTreePatternNode child3 = new ConstructionTreePatternNode(ctp1, ContentType.VARIABLE_PATH, child3Path, false);
 		ctp1.addChild(root, child3);	
 				
-		String result1 = this.getConstructionResult(
+		String result = this.getConstructionResult(
 				this.recordList,
 				this.signature, 
 				new ConstructionTreePattern[] {ctp1}, 
 				this.nullResults);
 		
-		System.out.println(result1);
+		assertEquals(result,
+				"<person><name>Martin</name><zip>75</zip><city>Paris</city></person>"
+				+ "<person><name>Bernard</name><zip>69</zip><zip>75</zip><city>Lyon</city><city>Paris</city></person>"
+				+ "<person><name>Dubois</name></person>");
+	}
+	
+	@Test
+	public void testCtp2() throws Exception {
+		ConstructionTreePatternNode root = new ConstructionTreePatternNode(ContentType.ELEMENT, "person", false);
+		ConstructionTreePattern ctp2 = new ConstructionTreePattern(root);
+		List<Integer> child1Path = new ArrayList<Integer>();
+		child1Path.add(0);
+		ConstructionTreePatternNode child1 = new ConstructionTreePatternNode(ctp2, ContentType.VARIABLE_PATH, child1Path, false);
+		ctp2.addChild(root, child1);
+		ConstructionTreePatternNode child2 = new ConstructionTreePatternNode(ctp2, ContentType.ELEMENT, "address", true);
+		ctp2.addChild(root, child2);
+		List<Integer> child21Path = new ArrayList<Integer>();
+		child21Path.add(1);
+		child21Path.add(0);
+		ConstructionTreePatternNode child21 = new ConstructionTreePatternNode(ctp2, ContentType.VARIABLE_PATH, child21Path, false);
+		ctp2.addChild(child2, child21);
+		List<Integer> child22Path = new ArrayList<Integer>();
+		child22Path.add(1);
+		child22Path.add(1);
+		ConstructionTreePatternNode child22 = new ConstructionTreePatternNode(ctp2, ContentType.VARIABLE_PATH, child22Path, false);
+		ctp2.addChild(child2, child22);	
+				
+		String result = this.getConstructionResult(
+				this.recordList,
+				this.signature, 
+				new ConstructionTreePattern[] {ctp2}, 
+				this.nullResults);
+		
+		assertEquals(result,
+				"<person><name>Martin</name><address><zip>75</zip><city>Paris</city></address></person>"
+				+ "<person><name>Bernard</name><address><zip>69</zip><zip>75</zip><city>Lyon</city><city>Paris</city></address></person>"
+				+ "<person><name>Dubois</name></person>");
+	}
+	
+	@Test
+	public void testCtp3() throws Exception {
+		ConstructionTreePatternNode root = new ConstructionTreePatternNode(ContentType.ELEMENT, "person", false);
+		ConstructionTreePattern ctp3 = new ConstructionTreePattern(root);
+		List<Integer> child1Path = new ArrayList<Integer>();
+		child1Path.add(0);
+		ConstructionTreePatternNode child1 = new ConstructionTreePatternNode(ctp3, ContentType.VARIABLE_PATH, child1Path, false);
+		ctp3.addChild(root, child1);
+		ConstructionTreePatternNode child2 = new ConstructionTreePatternNode(ctp3, ContentType.ELEMENT, "address", false);
+		ctp3.addChild(root, child2);
+		List<Integer> child21Path = new ArrayList<Integer>();
+		child21Path.add(1);
+		ConstructionTreePatternNode child21 = new ConstructionTreePatternNode(ctp3, ContentType.VARIABLE_PATH, child21Path, false);
+		ctp3.addChild(child2, child21);
+		List<Integer> child211Path = new ArrayList<Integer>();
+		child211Path.add(0);
+		ConstructionTreePatternNode child211 = new ConstructionTreePatternNode(ctp3, ContentType.VARIABLE_PATH, child211Path, false);
+		ctp3.addChild(child21, child211);
+		List<Integer> child212Path = new ArrayList<Integer>();
+		child212Path.add(1);
+		ConstructionTreePatternNode child212 = new ConstructionTreePatternNode(ctp3, ContentType.VARIABLE_PATH, child212Path, false);
+		ctp3.addChild(child21, child212);	
+				
+		String result = this.getConstructionResult(
+				this.recordList,
+				this.signature, 
+				new ConstructionTreePattern[] {ctp3}, 
+				this.nullResults);
+		
+		assertEquals(result,
+				"<person><name>Martin</name><address><zip>75</zip><city>Paris</city></address></person>"
+				+ "<person><name>Bernard</name><address><zip>69</zip><city>Lyon</city><zip>75</zip><city>Paris</city></address></person>"
+				+ "<person><name>Dubois</name><address></address></person>");
+	}
+	
+	@Test
+	public void testCtp4() throws Exception {
+		ConstructionTreePatternNode root = new ConstructionTreePatternNode(ContentType.ELEMENT, "person", false);
+		ConstructionTreePattern ctp4 = new ConstructionTreePattern(root);
+		List<Integer> child1Path = new ArrayList<Integer>();
+		child1Path.add(0);
+		ConstructionTreePatternNode child1 = new ConstructionTreePatternNode(ctp4, ContentType.VARIABLE_PATH, child1Path, false);
+		ctp4.addChild(root, child1);
+		List<Integer> child2Path = new ArrayList<Integer>();
+		child2Path.add(1);
+		ConstructionTreePatternNode child2 = new ConstructionTreePatternNode(ctp4, ContentType.VARIABLE_PATH, child2Path, false);
+		ctp4.addChild(root, child2);
+		ConstructionTreePatternNode child21 = new ConstructionTreePatternNode(ctp4, ContentType.ELEMENT, "address", false);
+		ctp4.addChild(child2, child21);
+		List<Integer> child211Path = new ArrayList<Integer>();
+		child211Path.add(0);
+		ConstructionTreePatternNode child211 = new ConstructionTreePatternNode(ctp4, ContentType.VARIABLE_PATH, child211Path, false);
+		ctp4.addChild(child21, child211);
+		List<Integer> child212Path = new ArrayList<Integer>();
+		child212Path.add(1);
+		ConstructionTreePatternNode child212 = new ConstructionTreePatternNode(ctp4, ContentType.VARIABLE_PATH, child212Path, false);
+		ctp4.addChild(child21, child212);	
+				
+		String result = this.getConstructionResult(
+				this.recordList,
+				this.signature, 
+				new ConstructionTreePattern[] {ctp4}, 
+				this.nullResults);
+		
+		assertEquals(result,
+				"<person><name>Martin</name><address><zip>75</zip><city>Paris</city></address></person>"
+				+ "<person><name>Bernard</name><address><zip>69</zip><city>Lyon</city></address><address><zip>75</zip><city>Paris</city></address></person>"
+				+ "<person><name>Dubois</name><address></address></person>");
 	}
 
 	private String getConstructionResult(RecordList recordList, NestedMetadata signature, ConstructionTreePattern[] ctps, AtomicBoolean[] nullResults) throws Exception {
