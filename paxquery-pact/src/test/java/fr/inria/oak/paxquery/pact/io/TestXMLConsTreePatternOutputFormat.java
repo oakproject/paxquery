@@ -226,13 +226,17 @@ public class TestXMLConsTreePatternOutputFormat {
 				ConstructionTreePattern[].class,
 				AtomicBoolean[].class);
 		method.setAccessible(true);
-		StringBuilder[] results = (StringBuilder[]) method.invoke(
+		StringBuilder[][] results = (StringBuilder[][]) method.invoke(
 				XmlConsTreePatternOutputFormat.class.newInstance(),
 				recordList,
 				signature,
 				ctps,
 				nullResults);
-		return results[0].toString();
+		StringBuilder finalResult = new StringBuilder();
+		for(int i=0; i<results.length; i++) {
+			finalResult.append(results[i][0]);
+		}
+		return finalResult.toString();
 	}
 
 }

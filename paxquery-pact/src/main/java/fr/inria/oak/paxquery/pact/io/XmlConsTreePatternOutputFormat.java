@@ -19,9 +19,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -102,29 +99,37 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 	public void writeRecord(Record record) throws IOException {		
 		RecordList recordList = new RecordList();
 		recordList.add(record);
-		StringBuilder sb = writeRecord(recordList, this.signature, new ConstructionTreePattern[] {this.ctp}, new AtomicBoolean[] {new AtomicBoolean()})[0];
+		StringBuilder sb = writeRecord(recordList, this.signature, new ConstructionTreePattern[] {this.ctp}, new AtomicBoolean[] {new AtomicBoolean()})[0][0];
 		this.wrt.append(sb);
 	}
 	
-	private StringBuilder[] writeRecord(RecordList listRecords, NestedMetadata signature, ConstructionTreePattern[] ctps, AtomicBoolean[] nullResults) throws IOException {
-		StringBuilder[] result = new StringBuilder[ctps.length];
-		for(int i=0; i<result.length; i++) {
-			result[i] = new StringBuilder();
+	private StringBuilder[][] writeRecord(RecordList listRecords, NestedMetadata signature, ConstructionTreePattern[] ctps, AtomicBoolean[] nullResults) throws IOException {
+		StringBuilder[][] result = new StringBuilder[listRecords.size()][ctps.length];
+		for(int i=0; i<listRecords.size(); i++) {
+			for(int j=0; j<ctps.length; j++) {
+				result[i][j] = new StringBuilder();
+			}
 		}
 		
-		for(Record record: listRecords) { //For each record
-			for(int i=0; i<result.length; i++) { //For each CTP
-				ConstructionTreePattern ctp = ctps[i];
+		for(int i=0; i<listRecords.size(); i++) { //For each record
+			Record record = listRecords.get(i);
+			for(int j=0; j<ctps.length; j++) { //For each CTP
+				ConstructionTreePattern ctp = ctps[j];
 				ConstructionTreePatternNode ctpNode = ctp.getRoot();
 				List<ConstructionTreePatternEdge> childrenEdges = ctp.getChildrenEdges().get(ctpNode);
 				
-				StringBuilder[] resultChildren = null;
+				StringBuilder[][] resultChildren = null;
 				AtomicBoolean[] nullResultChildren = null;
 				if(childrenEdges != null && childrenEdges.size() != 0) {
 					//Create list CTPs from child nodes
 					ConstructionTreePattern[] newCtps = new ConstructionTreePattern[childrenEdges.size()];
-					for(int j=0; j<newCtps.length; j++) {
-						newCtps[j] = ConstructionTreePattern.deepCopySubtree(childrenEdges.get(j).getChild());
+					for(int k=0; k<newCtps.length; k++) {
+						newCtps[k] = ConstructionTreePattern.deepCopySubtree(childrenEdges.get(k).getChild());
+					}
+					//Holder for booleans for null results
+					nullResultChildren = new AtomicBoolean[childrenEdges.size()];
+					for(int k=0; k<nullResultChildren.length; k++) {
+						nullResultChildren[k] = new AtomicBoolean();
 					}
 					//Create list records
 					RecordList newListRecords;
@@ -137,11 +142,6 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						newListRecords = new RecordList();
 						newListRecords.add(record);
 						newSignature = signature;
-					}
-					//Holder for booleans for null results
-					nullResultChildren = new AtomicBoolean[childrenEdges.size()];
-					for(int j=0; j<nullResultChildren.length; j++) {
-						nullResultChildren[j] = new AtomicBoolean();
 					}
 					//Obtain result children
 					resultChildren = writeRecord(newListRecords, newSignature, newCtps, nullResultChildren);
@@ -158,7 +158,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						for(k=0; 
 								childrenEdges != null && k<childrenEdges.size() && childrenEdges.get(k).getChild().getContentType() == ContentType.ATTRIBUTE;
 								k++) {
-							ctpNodeResult.append(" " + resultChildren[k].toString());
+							ctpNodeResult.append(" " + resultChildren[0][k].toString());
 						}
 						if(childrenEdges == null || k == childrenEdges.size()) {
 							ctpNodeResult.append("/>");
@@ -166,13 +166,13 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 						else {
 							ctpNodeResult.append(">");
 							for(; k<childrenEdges.size(); k++) {
-								ctpNodeResult.append(resultChildren[k].toString());
+								ctpNodeResult.append(resultChildren[0][k].toString());
 							}
 							ctpNodeResult.append("</" + ctpNode.getValue() + ">");
 						}
 					}
 					else if(ctpNode.getContentType() == ContentType.ATTRIBUTE) {
-						ctpNodeResult.append(ctpNode.getValue() + "=\"" + resultChildren[0].toString() + "\"");
+						ctpNodeResult.append(ctpNode.getValue() + "=\"" + resultChildren[0][0].toString() + "\"");
 					}
 					else if(ctpNode.getContentType() == ContentType.ELEMENT_VALUE) {
 						ctpNodeResult.append(ctpNode.getValue());
@@ -212,13 +212,15 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 					}
 					else { //childrenEdges != null
 						//Copy content from children
-						for(int k=0; k<resultChildren.length; k++) {
-							ctpNodeResult.append(resultChildren[k].toString());
+						for(int x=0; x<resultChildren.length; x++) {
+							for(int k=0; k<resultChildren[x].length; k++) {
+								ctpNodeResult.append(resultChildren[x][k].toString());
+							}
 						}
 					}
 				}
-				result[i].append(ctpNodeResult);
-				nullResults[i].set(allNull);
+				result[i][j].append(ctpNodeResult);
+				nullResults[j].set(allNull);
 			}
 		}
 		
