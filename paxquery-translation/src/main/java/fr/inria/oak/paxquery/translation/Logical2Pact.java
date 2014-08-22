@@ -27,16 +27,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.stratosphere.api.common.Plan;
-import eu.stratosphere.api.common.operators.FileDataSink;
-import eu.stratosphere.api.common.operators.FileDataSource;
-import eu.stratosphere.api.common.operators.GenericDataSink;
 import eu.stratosphere.api.common.operators.Operator;
 import eu.stratosphere.api.java.record.operators.CoGroupOperator;
 import eu.stratosphere.api.java.record.operators.CrossOperator;
+import eu.stratosphere.api.java.record.operators.FileDataSink;
+import eu.stratosphere.api.java.record.operators.FileDataSource;
 import eu.stratosphere.api.java.record.operators.JoinOperator;
 import eu.stratosphere.api.java.record.operators.MapOperator;
 import eu.stratosphere.api.java.record.operators.ReduceOperator;
 import eu.stratosphere.types.IntValue;
+import eu.stratosphere.types.Record;
 import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
@@ -111,7 +111,7 @@ public class Logical2Pact {
 
 		logger.debug("After pushing: " + log.getName());
 				
-		GenericDataSink result;
+		FileDataSink result;
 		if (log instanceof XMLConstruct)
 			result = planTranslate((XMLConstruct) log);
 		else if (log instanceof XMLTreeConstruct)
@@ -123,12 +123,12 @@ public class Logical2Pact {
 		return resultPactPlan;
 	}
 	
-	private static final GenericDataSink planTranslate(XMLConstruct as) {
+	private static final FileDataSink planTranslate(XMLConstruct as) {
 		//Generate plan
-		Operator[] childPlan = translate(as.getChild());
+		Operator<Record>[] childPlan = translate(as.getChild());
 		
 		//Store translation in a list
-		List<Operator> children = new ArrayList<Operator>();
+		List<Operator<Record>> children = new ArrayList<Operator<Record>>();
 		for(int i=0; i<childPlan.length; i++)
 			children.add(childPlan[i]);
 		
@@ -142,12 +142,12 @@ public class Logical2Pact {
 		return result;
 	}
 	
-	private static final GenericDataSink planTranslate(XMLTreeConstruct as) {
+	private static final FileDataSink planTranslate(XMLTreeConstruct as) {
 		//Generate plan
-		Operator[] childPlan = translate(as.getChild());
+		Operator<Record>[] childPlan = translate(as.getChild());
 		
 		//Store translation in a list
-		List<Operator> children = new ArrayList<Operator>();
+		List<Operator<Record>> children = new ArrayList<Operator<Record>>();
 		for(int i=0; i<childPlan.length; i++)
 			children.add(childPlan[i]);
 		
@@ -161,8 +161,8 @@ public class Logical2Pact {
 		return result;
 	}
 
-	private static final Operator[] translate(BaseLogicalOperator log) {
-		Operator[] translation = null;
+	private static final Operator<Record>[] translate(BaseLogicalOperator log) {
+		Operator<Record>[] translation = null;
 
 		if (log instanceof XMLScan)
 			translation = translate((XMLScan) log);
@@ -194,7 +194,7 @@ public class Logical2Pact {
 		return translation;
 	}
 
-	private static final Operator[] translate(XMLScan xp) {
+	private static final Operator<Record>[] translate(XMLScan xp) {
 		FileDataSource navigationExtraction = new FileDataSource(XmlNavTreePatternInputFormat.class, xp.getPathDocuments(), "Parse XML");
 		if(xp.getNavigationTreePattern() != null)
 			XmlNavTreePatternInputFormat.configureXmlNavInputFormat(navigationExtraction)
@@ -206,8 +206,8 @@ public class Logical2Pact {
 		return new Operator[]{navigationExtraction};
 	}
 	
-	private static final Operator[] translate(Selection sel) {
-		Operator[] childPlan = translate(sel.getChild());
+	private static final Operator<Record>[] translate(Selection sel) {
+		Operator<Record>[] childPlan = translate(sel.getChild());
 
 		// create MapOperator for selecting some records
 		MapOperator selection = MapOperator.builder(SelectionOperator.class)
@@ -224,8 +224,8 @@ public class Logical2Pact {
 		return new Operator[]{selection};
 	}
 	
-	private static final Operator[] translate(Projection proj) {
-		Operator[] childPlan = translate(proj.getChild());
+	private static final Operator<Record>[] translate(Projection proj) {
+		Operator<Record>[] childPlan = translate(proj.getChild());
 
 		// create MapOperator for projecting a column
 		MapOperator projection = MapOperator.builder(ProjectionOperator.class)
@@ -242,8 +242,8 @@ public class Logical2Pact {
 		return new Operator[]{projection};
 	}
 	
-	private static final Operator[] translate(Navigation nav) {
-		Operator[] childPlan = translate(nav.getChild());
+	private static final Operator<Record>[] translate(Navigation nav) {
+		Operator<Record>[] childPlan = translate(nav.getChild());
 
 		// create MapOperator for navigating in a column
 		MapOperator navigation = MapOperator.builder(NavigationOperator.class)
@@ -261,8 +261,8 @@ public class Logical2Pact {
 		return new Operator[]{navigation};
 	}
 	
-	private static final Operator[] translate(Flatten flat) {
-		Operator[] childPlan = translate(flat.getChild());
+	private static final Operator<Record>[] translate(Flatten flat) {
+		Operator<Record>[] childPlan = translate(flat.getChild());
 
 		// create MapOperator to flatten tuples
 		MapOperator flatten = MapOperator.builder(FlattenOperator.class)
@@ -279,10 +279,10 @@ public class Logical2Pact {
 		return new Operator[]{flatten};
 	}
 	
-	private static final Operator[] translate(GroupBy gb) {
+	private static final Operator<Record>[] translate(GroupBy gb) {
 		final boolean withAggregation = gb instanceof GroupByWithAggregation;
 		
-		Operator[] childPlan = translate(gb.getChild());
+		Operator<Record>[] childPlan = translate(gb.getChild());
 
 		// create ReduceOperator for grouping
 		ReduceOperator.Builder groupByBuilder;
@@ -319,8 +319,8 @@ public class Logical2Pact {
 		return new Operator[]{groupBy};
 	}
 	
-	private static final Operator[] translate(DuplicateElimination dupElim) {
-		Operator[] childPlan = translate(dupElim.getChild());
+	private static final Operator<Record>[] translate(DuplicateElimination dupElim) {
+		Operator<Record>[] childPlan = translate(dupElim.getChild());
 
 		// create ReduceOperator for removing records
 		ReduceOperator.Builder duplicateEliminationBuilder = ReduceOperator.builder(DuplicateEliminationOperator.class)
@@ -339,10 +339,10 @@ public class Logical2Pact {
 		return new Operator[]{duplicateElimination};
 	}
 	
-	private static final Operator[] translate(Aggregation aggr) {
-		Operator[] childPlan = translate(aggr.getChild());
+	private static final Operator<Record>[] translate(Aggregation aggr) {
+		Operator<Record>[] childPlan = translate(aggr.getChild());
 
-		Operator aggregation;
+		Operator<Record> aggregation;
 		if(aggr.getAggregationPath().length > 1) {
 			// create MapOperator for aggregating
 			aggregation = MapOperator.builder(NestedAggregationOperator.class)
@@ -422,9 +422,9 @@ public class Logical2Pact {
 		return new Operator[]{aggregation};
 	}
 	
-	private static final Operator[] translate(CartesianProduct cp) {
-		Operator[] childPlan1 = translate(cp.getLeft());
-		Operator[] childPlan2 = translate(cp.getRight());
+	private static final Operator<Record>[] translate(CartesianProduct cp) {
+		Operator<Record>[] childPlan1 = translate(cp.getLeft());
+		Operator<Record>[] childPlan2 = translate(cp.getRight());
 
 		// create CrossOperator for cartesian product
 		CrossOperator cartesianProduct = CrossOperator.builder(CartesianProductOperator.class)
@@ -442,11 +442,11 @@ public class Logical2Pact {
 		return new Operator[]{cartesianProduct};
 	}
 	
-	private static final Operator[] translate(Join j) {
-		Operator[] childPlan1 = translate(j.getLeft());
-		Operator[] childPlan2 = translate(j.getRight());
+	private static final Operator<Record>[] translate(Join j) {
+		Operator<Record>[] childPlan1 = translate(j.getLeft());
+		Operator<Record>[] childPlan2 = translate(j.getRight());
 
-		Operator[] join;
+		Operator<Record>[] join;
 		
 		if(!j.getPred().isOnlyEqui()) { //THETA INNER JOIN
 			// create CrossOperator for theta join
@@ -538,11 +538,11 @@ public class Logical2Pact {
 		return join;
 	}
 	
-	private static final Operator[] translate(LeftOuterJoin loj) {
-		Operator[] childPlan1 = translate(loj.getLeft());
-		Operator[] childPlan2 = translate(loj.getRight());
+	private static final Operator<Record>[] translate(LeftOuterJoin loj) {
+		Operator<Record>[] childPlan1 = translate(loj.getLeft());
+		Operator<Record>[] childPlan2 = translate(loj.getRight());
 
-		Operator[] conjLeftOuterJoin;
+		Operator<Record>[] conjLeftOuterJoin;
 		
 		if(!loj.getPred().isOnlyEqui()) { // THETA
 			// 1) create ReduceOperator for pre join processing
@@ -745,13 +745,13 @@ public class Logical2Pact {
 		return conjLeftOuterJoin;
 	}
 	
-	private static final Operator[] translate(LeftOuterNestedJoin lonj) {
+	private static final Operator<Record>[] translate(LeftOuterNestedJoin lonj) {
 		final boolean withAggregation = lonj instanceof LeftOuterNestedJoinWithAggregation;
 
-		Operator[] childPlan1 = translate(lonj.getLeft());
-		Operator[] childPlan2 = translate(lonj.getRight());
+		Operator<Record>[] childPlan1 = translate(lonj.getLeft());
+		Operator<Record>[] childPlan2 = translate(lonj.getRight());
 		
-		Operator[] conjLeftOuterNestedJoin;
+		Operator<Record>[] conjLeftOuterNestedJoin;
 
 		if(!lonj.getPred().isOnlyEqui()) { // THETA
 			// 1) create ReduceOperator for pre join processing

@@ -27,9 +27,8 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import eu.stratosphere.api.common.operators.FileDataSink;
 import eu.stratosphere.api.java.record.io.FileOutputFormat;
+import eu.stratosphere.api.java.record.operators.FileDataSink;
 import eu.stratosphere.configuration.Configuration;
 import eu.stratosphere.types.Record;
 import eu.stratosphere.types.StringValue;

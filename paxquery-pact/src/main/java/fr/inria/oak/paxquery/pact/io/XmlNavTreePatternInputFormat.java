@@ -27,8 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.stratosphere.api.common.io.statistics.BaseStatistics;
-import eu.stratosphere.api.common.operators.FileDataSource;
 import eu.stratosphere.api.java.record.io.FileInputFormat;
+import eu.stratosphere.api.java.record.operators.FileDataSource;
 import eu.stratosphere.configuration.Configuration;
 import eu.stratosphere.core.fs.FileInputSplit;
 import eu.stratosphere.types.Record;
