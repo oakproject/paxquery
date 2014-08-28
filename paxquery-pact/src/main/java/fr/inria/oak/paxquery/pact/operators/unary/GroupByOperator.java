@@ -22,10 +22,10 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
+import org.apache.flink.util.Collector;
 
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.util.Collector;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 

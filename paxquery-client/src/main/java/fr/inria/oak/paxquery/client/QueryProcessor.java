@@ -17,13 +17,13 @@ package fr.inria.oak.paxquery.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.api.common.Plan;
+import org.apache.flink.api.common.Program;
+import org.apache.flink.api.common.ProgramDescription;
+import org.apache.flink.core.fs.FSDataInputStream;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
 
-import eu.stratosphere.api.common.Plan;
-import eu.stratosphere.api.common.Program;
-import eu.stratosphere.api.common.ProgramDescription;
-import eu.stratosphere.core.fs.FSDataInputStream;
-import eu.stratosphere.core.fs.FileSystem;
-import eu.stratosphere.core.fs.Path;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.test.parser.LogicalPlanParser;
 import fr.inria.oak.paxquery.translation.Logical2Pact;

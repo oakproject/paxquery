@@ -20,14 +20,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
 
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
+import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
-import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.pact.datamodel.metadata.MetadataTypesMapping;
 

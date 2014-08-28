@@ -28,8 +28,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.types.Record;
 
-import eu.stratosphere.types.Record;
 import fr.inria.oak.paxquery.common.configuration.GlobalConfiguration;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternEdge;

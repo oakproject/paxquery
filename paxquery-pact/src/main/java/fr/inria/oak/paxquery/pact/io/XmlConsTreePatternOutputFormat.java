@@ -27,11 +27,12 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import eu.stratosphere.api.java.record.io.FileOutputFormat;
-import eu.stratosphere.api.java.record.operators.FileDataSink;
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
+import org.apache.flink.api.java.record.io.FileOutputFormat;
+import org.apache.flink.api.java.record.operators.FileDataSink;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
+
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePattern;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternEdge;

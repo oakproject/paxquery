@@ -15,8 +15,8 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.datamodel.type;
 
-import eu.stratosphere.types.ListValue;
-import eu.stratosphere.types.Record;
+import org.apache.flink.types.ListValue;
+import org.apache.flink.types.Record;
 
 
 /**

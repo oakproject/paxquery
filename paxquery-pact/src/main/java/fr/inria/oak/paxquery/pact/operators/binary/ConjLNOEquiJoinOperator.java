@@ -17,9 +17,10 @@ package fr.inria.oak.paxquery.pact.operators.binary;
 
 import java.util.Iterator;
 
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.util.Collector;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
+import org.apache.flink.util.Collector;
+
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 

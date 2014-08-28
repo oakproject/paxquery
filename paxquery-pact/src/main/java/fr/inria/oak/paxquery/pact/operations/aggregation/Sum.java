@@ -17,9 +17,9 @@ package fr.inria.oak.paxquery.pact.operations.aggregation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.types.StringValue;
+import org.apache.flink.types.Value;
 
-import eu.stratosphere.types.StringValue;
-import eu.stratosphere.types.Value;
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 
 /**

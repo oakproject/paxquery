@@ -15,9 +15,9 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.operators.binary;
 
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.util.Collector;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
+
 import fr.inria.oak.paxquery.pact.operations.RecordOperations;
 import fr.inria.oak.paxquery.pact.operators.BaseCrossOperator;
 
@@ -34,9 +34,9 @@ public class CartesianProductOperator extends BaseCrossOperator {
 	}
 	
 	@Override
-	public void cross(Record record1, Record record2, Collector<Record> collector) {
+	public Record cross(Record record1, Record record2) {
 		RecordOperations.concatenate(record1,record2);
-		collector.collect(record1);
+		return record1;
 	}
 	
 }

@@ -18,9 +18,9 @@ package fr.inria.oak.paxquery.pact.operators;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.flink.api.java.record.functions.ReduceFunction;
+import org.apache.flink.configuration.Configuration;
 
-import eu.stratosphere.api.java.record.functions.ReduceFunction;
-import eu.stratosphere.configuration.Configuration;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
 

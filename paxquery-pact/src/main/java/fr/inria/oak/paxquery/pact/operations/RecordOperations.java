@@ -15,9 +15,10 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.operations;
 
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
-import eu.stratosphere.types.Value;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
+import org.apache.flink.types.Value;
+
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;

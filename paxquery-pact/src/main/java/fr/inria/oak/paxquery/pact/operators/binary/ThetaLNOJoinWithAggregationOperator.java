@@ -18,10 +18,9 @@ package fr.inria.oak.paxquery.pact.operators.binary;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
 
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.util.Collector;
 import fr.inria.oak.paxquery.common.aggregation.AggregationType;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
@@ -57,9 +56,9 @@ public class ThetaLNOJoinWithAggregationOperator extends ThetaLNOJoinOperator {
 	}
 
 	@Override
-	public void cross(Record record1, Record record2, Collector<Record> collector) {
-		thetaLNOJoinWithAggregation(this.inputRecordsSignature1, record1, this.inputRecordsSignature2, record2,
-				this.pred, this.nullRecord, this.aggregationColumn, this.aggregationType, this.excludeNestedField, collector);
+	public Record cross(Record record1, Record record2) {
+		return thetaLNOJoinWithAggregation(this.inputRecordsSignature1, record1, this.inputRecordsSignature2, record2,
+				this.pred, this.nullRecord, this.aggregationColumn, this.aggregationType, this.excludeNestedField);
 	}
 	
 	/**
@@ -73,10 +72,10 @@ public class ThetaLNOJoinWithAggregationOperator extends ThetaLNOJoinOperator {
 	 * @param aggregationType
 	 * @param collector
 	 */
-	public static void thetaLNOJoinWithAggregation(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred, 
-			Record nullRecord, int aggregationColumn, AggregationType aggregationType, boolean excludeNestedField, Collector<Record> collector) {
-		crossJoin(inputRecordSignature1, record1, inputRecordSignature2, record2, pred, 
-				true, nullRecord, true, true, aggregationColumn, aggregationType, excludeNestedField, collector);
+	public static Record thetaLNOJoinWithAggregation(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred, 
+			Record nullRecord, int aggregationColumn, AggregationType aggregationType, boolean excludeNestedField) {
+		return crossJoin(inputRecordSignature1, record1, inputRecordSignature2, record2, pred, 
+				true, nullRecord, true, true, aggregationColumn, aggregationType, excludeNestedField);
 	}
 
 }

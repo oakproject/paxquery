@@ -15,10 +15,10 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.operations;
 
-import eu.stratosphere.api.java.record.operators.CoGroupOperator;
-import eu.stratosphere.api.java.record.operators.JoinOperator;
-import eu.stratosphere.api.java.record.operators.ReduceOperator;
-import eu.stratosphere.types.Key;
+import org.apache.flink.api.java.record.operators.CoGroupOperator;
+import org.apache.flink.api.java.record.operators.JoinOperator;
+import org.apache.flink.api.java.record.operators.ReduceOperator;
+import org.apache.flink.types.Key;
 
 
 /**

@@ -1,17 +1,17 @@
 package fr.inria.oak.paxquery.pact.io;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePattern;

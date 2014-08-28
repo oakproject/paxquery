@@ -17,11 +17,10 @@ package fr.inria.oak.paxquery.pact.operators.binary;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.types.IntValue;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
 
-import eu.stratosphere.types.IntValue;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
-import eu.stratosphere.util.Collector;
 import fr.inria.oak.paxquery.common.aggregation.AggregationType;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
@@ -44,9 +43,8 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 	private static final Log logger = LogFactory.getLog(BaseCrossJoinOperator.class);
 	
 	
-	protected static void crossJoin(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred, 
-			boolean outer, Record nullRecord, boolean nested, boolean addMark, int aggregationColumn, AggregationType aggregationType, boolean excludeNestedField,
-			Collector<Record> collector) {
+	protected static Record crossJoin(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred, 
+			boolean outer, Record nullRecord, boolean nested, boolean addMark, int aggregationColumn, AggregationType aggregationType, boolean excludeNestedField) {
 		BaseAggregationOperation operation = null;
 		if(aggregationColumn != -1) {
 			switch(aggregationType) {
@@ -64,7 +62,7 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 					break;
 				default:
 					logger.error("Aggregation type not supported!");
-					return;
+					return null;
 			}
 		}
 		
@@ -91,7 +89,7 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 				if(addMark)
 					record1.addField(new IntValue(1));
 			}
-			collector.collect(record1);
+
 		}
 		else {
 			if(outer) {
@@ -121,9 +119,11 @@ public abstract class BaseCrossJoinOperator extends BaseCrossOperator {
 					if(addMark)
 						record1.addField(new IntValue(0));
 				}
-				collector.collect(record1);
+
 			}
 		}
+		
+		return record1;
 	}
 	
 

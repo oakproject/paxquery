@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
 
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;

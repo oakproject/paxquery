@@ -18,14 +18,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>eu.stratosphere</groupId>
-			<artifactId>stratosphere-core</artifactId>
-			<version>${core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.stratosphere</groupId>
-			<artifactId>stratosphere-compiler</artifactId>
-			<version>${core.version}</version>
+  			<groupId>org.apache.flink</groupId>
+  			<artifactId>flink-java</artifactId>
+  			<version>${core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.inria.oak</groupId>

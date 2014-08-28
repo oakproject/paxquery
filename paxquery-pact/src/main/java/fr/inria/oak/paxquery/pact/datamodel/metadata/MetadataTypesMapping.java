@@ -15,13 +15,14 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.datamodel.metadata;
 
-import eu.stratosphere.types.DoubleValue;
-import eu.stratosphere.types.IntValue;
-import eu.stratosphere.types.Key;
-import eu.stratosphere.types.LongValue;
-import eu.stratosphere.types.NullValue;
-import eu.stratosphere.types.StringValue;
-import eu.stratosphere.types.Value;
+import org.apache.flink.types.DoubleValue;
+import org.apache.flink.types.IntValue;
+import org.apache.flink.types.Key;
+import org.apache.flink.types.LongValue;
+import org.apache.flink.types.NullValue;
+import org.apache.flink.types.StringValue;
+import org.apache.flink.types.Value;
+
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.pact.datamodel.type.RecordList;
 

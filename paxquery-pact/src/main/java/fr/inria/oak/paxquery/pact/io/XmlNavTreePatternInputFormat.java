@@ -25,14 +25,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.flink.api.common.io.statistics.BaseStatistics;
+import org.apache.flink.api.java.record.io.FileInputFormat;
+import org.apache.flink.api.java.record.operators.FileDataSource;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.core.fs.FileInputSplit;
+import org.apache.flink.types.Record;
+import org.apache.flink.types.StringValue;
 
-import eu.stratosphere.api.common.io.statistics.BaseStatistics;
-import eu.stratosphere.api.java.record.io.FileInputFormat;
-import eu.stratosphere.api.java.record.operators.FileDataSource;
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.core.fs.FileInputSplit;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.types.StringValue;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;

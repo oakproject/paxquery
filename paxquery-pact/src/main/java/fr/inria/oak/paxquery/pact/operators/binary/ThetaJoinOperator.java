@@ -18,10 +18,9 @@ package fr.inria.oak.paxquery.pact.operators.binary;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.types.Record;
 
-import eu.stratosphere.configuration.Configuration;
-import eu.stratosphere.types.Record;
-import eu.stratosphere.util.Collector;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
@@ -45,9 +44,9 @@ public class ThetaJoinOperator extends BaseCrossJoinOperator {
 	}
 
 	@Override
-	public void cross(Record record1, Record record2, Collector<Record> collector) {
-		thetaJoin(this.inputRecordsSignature1, record1, this.inputRecordsSignature2, record2,
-				this.pred, collector);
+	public Record cross(Record record1, Record record2) {
+		return thetaJoin(this.inputRecordsSignature1, record1, this.inputRecordsSignature2, record2,
+				this.pred);
 	}
 	
 	/**
@@ -61,12 +60,10 @@ public class ThetaJoinOperator extends BaseCrossJoinOperator {
 	 * @param outer
 	 * @param nested
 	 * @param addMark
-	 * @param collector
 	 */
-	public static void thetaJoin(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred, 
-			Collector<Record> collector) {
-		crossJoin(inputRecordSignature1, record1, inputRecordSignature2, record2, pred, 
-			false, null, false, false, -1, null, false, collector);
+	public static Record thetaJoin(NestedMetadata inputRecordSignature1, Record record1, NestedMetadata inputRecordSignature2, Record record2, BasePredicate pred) {
+		return crossJoin(inputRecordSignature1, record1, inputRecordSignature2, record2, pred, 
+			false, null, false, false, -1, null, false);
 	}
 
 }

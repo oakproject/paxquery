@@ -15,7 +15,7 @@
  ******************************************************************************/
 package fr.inria.oak.paxquery.pact.operations.aggregation;
 
-import eu.stratosphere.types.Value;
+import org.apache.flink.types.Value;
 
 
 /**
