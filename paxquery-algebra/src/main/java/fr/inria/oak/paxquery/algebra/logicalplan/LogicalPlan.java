@@ -134,6 +134,8 @@ public class LogicalPlan {
 		}
 		return sb.toString();
 	}	
-
-
+	
+	public void draw(String folderName, String givenFileName) {
+		root.draw(folderName, givenFileName);
+	}
 }

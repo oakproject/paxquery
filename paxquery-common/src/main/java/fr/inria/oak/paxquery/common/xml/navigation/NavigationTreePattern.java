@@ -106,6 +106,7 @@ public final class NavigationTreePattern implements Serializable {
 	 */
 	public void setRoot(NavigationTreePatternNode root) {
 		this.root = root;
+		this.root.setNestingDepth(0);
 	}
 
 	/**
@@ -202,6 +203,7 @@ public final class NavigationTreePattern implements Serializable {
 	 * @param query true if the pattern that we want to draw is a query or false otherwise.
 	 * Query nodes will be filled in yellow and view nodes will be filled in blue
 	 */
+	/*
 	public void draw(String imagesPath, String givenFilename, boolean query, String backgroundColor, String foregroundColor) 
 	{
 		String fileName;
@@ -242,6 +244,56 @@ public final class NavigationTreePattern implements Serializable {
 			// removing the .dot file
 			Process p2=r.exec("rm "+fileNameDot+"\n");
 			p2.waitFor();
+		}
+		catch (IOException e) {
+			logger.error("IOException: ",e);
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException: ",e);
+		}
+	}*/
+	public void draw(String imagesPath, String givenFilename, boolean query, String backgroundColor, String foregroundColor) 
+	{
+		String fileName;
+		Calendar cal = new GregorianCalendar();
+		if(givenFilename == null) {
+			if(query)
+				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + "-Query";
+			else
+				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+		} else {
+			if(query)
+				fileName = givenFilename + "-Query";
+			else
+				fileName = givenFilename;
+		}
+		
+		String sb = getDotString(fileName, backgroundColor, foregroundColor);
+		
+		try 
+		{
+			String fileNameDot =  new String(fileName + ".dot");
+			String fileNamePNG;
+			if(fileName.contains("/"))
+				//fileNamePNG = new String(fileName + ".pdf");
+				fileNamePNG = new String(fileName + ".png");
+			else
+				//fileNamePNG = new String(imagesPath + File.separator + fileName + ".pdf");
+				fileNamePNG = new String(imagesPath + File.separator + fileName + ".png");
+			FileWriter file = new FileWriter(fileNameDot);
+			
+			// writing the  .dot file to disk
+			file.write(sb);
+			file.close();
+			
+			// calling GraphViz
+			Runtime r = Runtime.getRuntime();
+			//String com = new String("/usr/local/bin/dot -Tpdf " + fileNameDot + " -o " + fileNamePNG);
+			String com = new String("/usr/local/bin/dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
+			Process p = r.exec(com);
+			p.waitFor();
+			// removing the .dot file
+			//Process p2=r.exec("rm "+fileNameDot+"\n");
+			//p2.waitFor();
 		}
 		catch (IOException e) {
 			logger.error("IOException: ",e);

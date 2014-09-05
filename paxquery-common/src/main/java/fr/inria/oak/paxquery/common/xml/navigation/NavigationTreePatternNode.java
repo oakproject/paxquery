@@ -856,11 +856,24 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 	 * @param nested
 	 * 
 	 */
+	/*
 	public void addEdge(NavigationTreePatternNode child, boolean parent, boolean nested, boolean optional) {
 		NavigationTreePatternEdge e = new NavigationTreePatternEdge(this, child, parent, nested, optional);
 
 		this.edges.add(e);
 		child.parentEdge = e;
+	}*/
+	public void addEdge(NavigationTreePatternNode child, boolean parent, boolean nested, boolean optional) {
+		NavigationTreePatternEdge e = new NavigationTreePatternEdge(this, child, parent, nested, optional);
+		
+		this.edges.add(e);
+		child.parentEdge = e;
+		
+		if(nested)
+			child.setNestingDepth(this.getNestingDepth()+1);
+		else
+			child.setNestingDepth(this.getNestingDepth());
+			
 	}
 	
 	/**
@@ -1392,6 +1405,16 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 	}
 	
 	/**
+	 * Returns whether this given node is linked to its parent through a nested edge
+	 * @return
+	 */
+	public boolean isNested() {
+		if(this.parentEdge == null)
+			return false;
+		return this.parentEdge.isNested();
+	}
+	
+	/**
 	 * Returns the list of edges that connect this node to its children/descendants.
 	 * 
 	 * @return the edges
@@ -1458,7 +1481,7 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 	
 	/**
 	 * Builds the nested depth from this node.
-	 */
+	 *//*
 	public void setNestingDepth() {
 		Stack<NavigationTreePatternNode> st = new Stack<NavigationTreePatternNode>();
 		st.push(this);
@@ -1482,8 +1505,11 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 				}
 			}
 		}
+	}*/
+	public void setNestingDepth(int depth) {
+		nestingDepth = depth;
 	}
-
+	
 	/**
 	 * Returns true if this node is virtual.
 	 * 
@@ -1627,6 +1653,11 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 			} else {
 				sb.append("//");
 			}
+			if(e.isNested())
+				sb.append("N");
+			if(e.isOptional())
+				sb.append("O");
+			sb.append(" ");
 			e.n2.recTreeToString(sb, level);
 			sb.append(" ");
 		}

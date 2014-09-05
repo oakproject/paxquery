@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 
-	public enum StatementType { NONE, LET, FOR };
+	public enum StatementType { NONE, LET, LET_OUTER, FOR };
 	
 	/**
 	 * Operators
@@ -67,10 +67,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean nextNodeIsAttribute;
 	private boolean insideReturn;
 	private ArrayList<Boolean> treePatternVisited = null; //for algebraic operators tree construction
-	private boolean specialEdgeFlag = false;	//set to true for edges VAR/whatever, so we can decided whether the edge is nested and optional or not
 	private Stack<BasePredicate> predicateStack;
 	private boolean insideXPathPredicate = false;	//for XPath predicate building
 	private int lastTreePatternInsideXPathPredicateIndex;
+	private StatementType currentStatement = StatementType.NONE;
+	private boolean doNesting = true;
 	
 	
 	/**
@@ -118,6 +119,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * VAR := whatever
 	 */
 	public Void visitLetBinding(XQueryParser.LetBindingContext ctx) {
+		currentStatement = StatementType.LET;
 		//store the left-side var so we can assign the xpath tree to it
 		lastVarLeftSide = ctx.VAR().getText();		
 		//do visit, ctx.getChild(2) can be (pathExpr_xq | flwrexpr | aggrExpr | arithmeticExpr_xq | literal)
@@ -127,6 +129,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastVarLeftSide = null;
 		lastNode = null;
 		lastSlashToken = 0;
+		currentStatement = StatementType.NONE;
 		
 		return null;	//// Java says must return something even when Void
 	}
@@ -136,6 +139,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * store the left-side var so we can assign the xpath tree to it
 	 */	
 	public Void visitForBinding(XQueryParser.ForBindingContext ctx) { 
+		currentStatement = StatementType.FOR;
 		//store the left-side var so we can assign the xpath tree to it
 		lastVarLeftSide = ctx.VAR().getText();
 		//do visit
@@ -145,6 +149,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastVarLeftSide = null;
 		lastNode = null;
 		lastSlashToken = 0;
+		currentStatement = StatementType.NONE;
 		
 		return null;
 	}
@@ -179,6 +184,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * TODO: merge with visitPathExprInner_xq_doc
 	 */
 	public Void visitPathExprInner_xq_collection(XQueryParser.PathExprInner_xq_collectionContext ctx) {
+		//avoid nesting if we're in a "let $a := collection()" statement
+		if(currentStatement == StatementType.LET)
+			currentStatement = StatementType.LET_OUTER;
 		//root node construction
 		String rootTag = "";
 		lastTreePattern = new NavigationTreePattern();
@@ -210,6 +218,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * TODO: merge with visitPathExprInner_xq_doc
 	 */
 	public Void visitPathExprInner_xq_doc(XQueryParser.PathExprInner_xq_docContext ctx) { 
+		//avoid nesting if we're in a "let $a := doc()" statement
+		if(currentStatement == StatementType.LET)
+			currentStatement = StatementType.LET_OUTER;
 		//root node construction
 		String rootTag = "";
 		lastTreePattern = new NavigationTreePattern();
@@ -301,7 +312,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		lastNode = varMap.getVariable(var_to_expand).node;
 		
 		lastTreePattern = lastNode.getTreePattern();
-		specialEdgeFlag = true;
 		
 		return null;
 	}
@@ -652,29 +662,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 */
 	public Void visitGroupBy(XQueryParser.GroupByContext ctx) { 
 		return visitChildren(ctx);
-		/*
-		int[] groupByColumns = new int[ctx.VAR().size()];
-		String currentVar;
-		
-		for(int i = 0; i < ctx.VAR().size(); i++) {
-			currentVar = ctx.VAR(i).getText();
-			//TODO: this is a complete hack, since the same treepattern might be modified later by a new variable (a let statement after this where statement). We need to address this (e.g. by incrementing all positionInForest values in varspos in one after each new variable)
-			//build varsPos for the left-hand VAR if needed
-			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, currentVar);
-			if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-				XQueryUtils.buildVarsPos(varsPos, scans.get(patternTreeIndex).getNavigationTreePattern(), varsPos.size());
-			}
-			if(constructChild == null)
-				constructChild = scans.get(patternTreeIndex);
-			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false)
-				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the variable
-			treePatternVisited.set(patternTreeIndex, true);
-			groupByColumns[i] = varsPos.get(currentVar).positionInForest;
-		}
-		//constructChild = new GroupBy(constructChild, groupByColumns, new int[] {});
-	
-		return null;*/
 	}
 
 	/**
@@ -708,14 +695,18 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	
 		if(insideXPathPredicate == false) {
 			boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
-			//handle let-nesting
-	//		if(specialEdgeFlag && currentStatement == StatementType.LET) {
-	//			lastNode.addEdge(node, parent, true, true);
-	//			specialEdgeFlag = false;
-	//			mappedApplys.put(lastVarLeftSide, (new ApplyConstruct("", new String[] {""}, "", null, new ApplyConstruct[0])));	//the null fields must be filled after varsPos is built
-	//		}
-	//		else
-				lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+			
+			if(doNesting) {
+				//handle let-nesting
+				if(currentStatement == StatementType.LET) {
+					lastNode.addEdge(node, parent, true, true);
+					currentStatement = StatementType.NONE;
+				}
+				else
+					lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+			}
+			else
+				lastNode.addEdge(node, parent, false, false);	//don't handle let-nesting
 			
 			lastNode.removeMatchingVariables(lastVarLeftSide);
 			varMap.removeVariable(lastVarLeftSide);
@@ -807,7 +798,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			if(matchingVar != null) {
 				matchingVar.dataType = Variable.VariableDataType.Value;
 				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresContent() == false)
-					lastNodeInsideXPathPredicate.setStoresContent(false);	//no vars storing content anymor
+					lastNodeInsideXPathPredicate.setStoresContent(false);	//no vars storing content any more
 				lastNodeInsideXPathPredicate.setStoresValue(true);
 			}
 			else {
@@ -840,22 +831,38 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			visit(ctx.aggrExpr());
 		//if not, we have an aggrExpr or a VAR
 		else if(ctx.VAR() != null) {
-				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, ctx.getChild(1).getText());
-				if(patternTreeIndex != -1) {
-					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
-					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
-					if(treePatternVisited.get(patternTreeIndex) == false) {
-						constructChild = scans.get(patternTreeIndex);
-						treePatternVisited.set(patternTreeIndex, true);
+			String varName = ctx.VAR().getText();
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+			if(patternTreeIndex != -1) {
+				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+				if(treePatternVisited.get(patternTreeIndex) == false) {
+					constructChild = scans.get(patternTreeIndex);
+					treePatternVisited.set(patternTreeIndex, true);
+				}
+				//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+				Variable var = varMap.getVariable(varName);
+				int[] varpath = null; 
+				//if(var.node != null && var.node.isNested()) {
+				if(var.node != null && var.node.getNestingDepth() > 0) {
+					if(var.hasNestedVariables()) {
+						//TODO: fill in for nested subqueries
 					}
-					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
-					ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(ctx.getChild(1).getText())}, false);
-					constructionTreePattern = new ConstructionTreePattern(root);
-					root.setConstructionTreePattern(constructionTreePattern);
-					lastConstructionTreePatternNode = root;
+					else {	//we have a nested let
+						varpath = new int[2];
+						varpath[0] = varMap.getTemporaryPositionByName(varName);
+						varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+					}
 				}
 				else
-					throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
+					varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+				ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+				constructionTreePattern = new ConstructionTreePattern(root);
+				root.setConstructionTreePattern(constructionTreePattern);
+				lastConstructionTreePatternNode = root;
+			}
+			else
+				throw new PAXQueryExecutionException("The variable "+ varName +" was not previously assigned.");
 		}		
 		insideReturn = false;
 
@@ -932,7 +939,23 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
 						treePatternVisited.set(patternTreeIndex, true);
 					}
-					constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, new int[]{varMap.getTemporaryPositionByName(varName)}, false));
+					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+					Variable var = varMap.getVariable(varName);
+					int[] varpath = null; 
+					//if(var.node != null && var.node.isNested()) {
+					if(var.node != null && var.node.getNestingDepth() > 0) {
+						if(var.hasNestedVariables()) {
+							//TODO: fill in for nested subqueries!
+						}
+						else {	//we have a nested let
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+					}
+					else
+						varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+					constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false));
 				}
 				else
 					throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
@@ -957,13 +980,26 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					treePatternVisited.set(patternTreeIndex, true);
 				}
 				//create the construct node
-				ConstructionTreePatternNode node = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(varName)}, false);
-				if(constructionTreePattern == null) {
-					constructionTreePattern = new ConstructionTreePattern(node);
-					node.setConstructionTreePattern(constructionTreePattern);
+				Variable var = varMap.getVariable(varName);
+				int[] varpath = null; 
+				if(var.node != null && var.node.getNestingDepth() > 0) {
+					if(var.hasNestedVariables()) {
+						//TODO: fill in for nested subqueries!
+					}
+					else {	//we have a nested let
+						varpath = new int[2];
+						varpath[0] = varMap.getTemporaryPositionByName(varName);
+						varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+					}
 				}
 				else
+					varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+				ConstructionTreePatternNode node = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+				if(constructionTreePattern == null)
+					constructionTreePattern = new ConstructionTreePattern(node);
+				else
 					constructionTreePattern.addChild(lastConstructionTreePatternNode, node);					
+				node.setConstructionTreePattern(constructionTreePattern);
 			}
 			else
 				throw new PAXQueryExecutionException("The variable "+ctx.getChild(1).getText()+" was not previously assigned.");
@@ -1001,7 +1037,22 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
 						treePatternVisited.set(patternTreeIndex, true);
 					}
-					constructionTreePattern.addChild(lastConstructionTreePatternNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, new int[] {varMap.getTemporaryPositionByName(varName)}, false));
+					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+					Variable var = varMap.getVariable(varName);
+					int[] varpath = null; 
+					if(var.node != null && var.node.getNestingDepth() > 0) {
+						if(var.hasNestedVariables()) {
+							//TODO: fill in for nested subqueries!
+						}
+						else {	//we have a nested let
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+					}
+					else
+						varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+					constructionTreePattern.addChild(lastConstructionTreePatternNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false));					
 				}	
 			}
 			//if aggrExpr

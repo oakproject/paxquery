@@ -83,7 +83,7 @@ public abstract class BaseLogicalOperator {
 				dir.mkdirs();
 			}
 			
-			String fileNameDot =  new String(givenFileName + ".dot");
+			String fileNameDot =  new String(folder+File.separator+givenFileName + "-LogPlan.dot");
 			String fileNamePNG = new String(folder + File.separator + givenFileName + "-LogPlan.png");
 			
 			FileWriter file = new FileWriter(fileNameDot);
@@ -95,12 +95,11 @@ public abstract class BaseLogicalOperator {
 			Process p = r.exec(com);
 			p.waitFor();
 			logger.debug("Logical plan drawn.");
-			Process p2=r.exec("rm "+fileNameDot+"\n");
-			p2.waitFor();
 		} catch (Exception e) {
 			logger.error("Exception: ",e);
 		}
 	}
+
 
 	public NestedMetadata getNRSMD() {
 		if(this.nestedMetadata == null)
