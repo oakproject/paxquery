@@ -912,6 +912,37 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 		return children;
 	}
 	
+	/**
+	 * Returns true if this node has a child with the same tag and the same parenthood relationship
+	 * @param descendantTag the tag of the (possibly) descendant node
+	 * @param directDescendant the relationship between both nodes: true means parent/chid (-), false means ancestor/descendant (=)
+	 * @return true if this node has a child with the same tag and the same parenthood relationship
+	 */
+	public boolean hasChild(String descendantTag, boolean directDescendant) {
+		for(NavigationTreePatternEdge edge : edges) {
+			//the relationship and the tag must be the same
+			if(edge.isParent() == directDescendant && edge.n2.tag.compareTo(descendantTag) == 0)
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the child whose tag is "descendantTag" and is connected as specified by "directDescendant" (whether a direct descendant or undirect descendant), or
+	 * null if no child with the same tag and relationship is found.
+	 * @param descendantTag the tag of the (possible) child
+	 * @param directDescendant whether the child is a direct descendant (true) or undirect descendant (false)
+	 * @return the child, or null if such child with such relationship was not found.
+	 */
+	public NavigationTreePatternNode getChild(String descendantTag, boolean directDescendant) {
+		for(NavigationTreePatternEdge edge : edges) {
+			//the relationship and the tag must be the same
+			if(edge.isParent() == directDescendant && edge.n2.tag.compareTo(descendantTag) == 0)
+				return edge.n2;
+		}
+		return null;
+	}
+	
 	/* Getters/setters */
 	/* Node related getters/setters */
 	/**

@@ -690,55 +690,76 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		else if(ctx.getChild(0).getText().compareTo("mod") == 0)
 			tag = "mod";
 		
-		int nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
-		NavigationTreePatternNode node = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
-	
-		if(insideXPathPredicate == false) {
-			boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+		//check whether the node already exists, we need to consider the type of edge too
+		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+
+		int nodeCode = -1;
+		NavigationTreePatternNode childNode = null;
+				
+		//NOT IN A XPATH PREDICATE
+		if(insideXPathPredicate == false) {	
+			childNode = lastNode.getChild(tag, parent);
 			
-			if(doNesting) {
-				//handle let-nesting
-				if(currentStatement == StatementType.LET) {
-					lastNode.addEdge(node, parent, true, true);
-					currentStatement = StatementType.NONE;
+			//If the node child does not exist then create a new one
+			if(childNode == null) {
+				nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+				childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+				
+				if(doNesting) {
+					//handle let-nesting
+					if(currentStatement == StatementType.LET) {
+						lastNode.addEdge(childNode, parent, true, true);
+						currentStatement = StatementType.NONE;
+					}
+					else
+						lastNode.addEdge(childNode, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
 				}
 				else
-					lastNode.addEdge(node, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+					lastNode.addEdge(childNode, parent, false, false);	//don't handle let-nesting
 			}
-			else
-				lastNode.addEdge(node, parent, false, false);	//don't handle let-nesting
-			
+
 			lastNode.removeMatchingVariables(lastVarLeftSide);
 			varMap.removeVariable(lastVarLeftSide);
 			if(lastNode.checkAnyMatchingVariableStoresValue() == false)
 				lastNode.setStoresValue(false);
 			if(lastNode.checkAnyMatchingVariableStoresContent() == false)
 				lastNode.setStoresContent(false);
-			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, node);
+			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, childNode);
 			varMap.addNewVariable(newVar);
-			node.addMatchingVariables(newVar);
-			node.setStoresContent(true);
+			childNode.addMatchingVariables(newVar);
+			childNode.setStoresContent(true);
 			if(nextNodeIsAttribute) {
 				//attributes store values
 				newVar.dataType = Variable.VariableDataType.Value;
-				node.setAttribute(true);
-				node.setStoresValue(true);
-				node.setStoresContent(false);
+				childNode.setAttribute(true);
+				childNode.setStoresValue(true);
+				childNode.setStoresContent(false);
 				nextNodeIsAttribute = false;
 			}
 			//update the affected variable so it points to this node
-			patternNodeMap.put(lastVarLeftSide, node);
-			lastNode = node;	//for further expansion
+			patternNodeMap.put(lastVarLeftSide, childNode);
+			lastNode = childNode;	//for further expansion				
 		}
-		else {
+		//INSIDE AN XPATH PREDICATE
+		else {	
 			if(lastNodeInsideXPathPredicate == null) {
-				lastNode.addEdge(node, true, false, false);
+				childNode = lastNode.getChild(tag, true);
+				if(childNode == null) {
+					nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+					childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+					lastNode.addEdge(childNode, true, false, false);
+				}				
 				if(lastVarXPathPredicate == "")
 					lastVarXPathPredicate = XQueryUtils.getNextAuxVariableName();
 			}
 			else {
-				boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
-				lastNodeInsideXPathPredicate.addEdge(node, parent, false, false);
+				childNode = lastNodeInsideXPathPredicate.getChild(tag, parent);
+				if(childNode == null) {
+					nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+					childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+					//boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+					lastNodeInsideXPathPredicate.addEdge(childNode, parent, false, false);
+				}					
 				//remove the last variable from the last node inside the predicate
 				lastNodeInsideXPathPredicate.removeMatchingVariables(lastVarXPathPredicate);
 				varMap.removeVariable(lastVarXPathPredicate);
@@ -748,24 +769,25 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					lastNodeInsideXPathPredicate.setStoresContent(false);
 			}
 			//add a new aux variable to the appropriate node
-			Variable newVar = new Variable(lastVarXPathPredicate, Variable.VariableDataType.Content, node);
+			Variable newVar = new Variable(lastVarXPathPredicate, Variable.VariableDataType.Content, childNode);
 			varMap.addNewVariable(newVar);
-			node.addMatchingVariables(newVar);
-			node.setStoresContent(true);
+			childNode.addMatchingVariables(newVar);
+			childNode.setStoresContent(true);
 			if(nextNodeIsAttribute) {
 				newVar.dataType = Variable.VariableDataType.Value;
-				node.setAttribute(true);
-				node.setStoresValue(true);
-				node.setStoresContent(false);
+				childNode.setAttribute(true);
+				childNode.setStoresValue(true);
+				childNode.setStoresContent(false);
 				nextNodeIsAttribute = false;
 			}
 			//update the affected variable so it points to this node
-			patternNodeMap.put(lastVarXPathPredicate, node);
-			lastNodeInsideXPathPredicate = node;
+			patternNodeMap.put(lastVarXPathPredicate, childNode);
+			lastNodeInsideXPathPredicate = childNode;
 		}
-				
+			
 		return null;
-	}	
+	}
+
 
 	/**
 	 * textTest (in XPath)
