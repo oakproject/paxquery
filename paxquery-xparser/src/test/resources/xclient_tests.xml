@@ -1436,7 +1436,7 @@
     </test>
     <test>
         <order>17</order>
-        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction let $ppp := $pp/@id let $ipp := $ip/seller/@person let $it := $ip/itemref/@item where $ppp = $ipp return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
+        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person, $ppp in $pp/@id for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction, $ipp in $ip/seller/@person, $it in $ip/itemref/@item where $ppp = $ipp return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
         <result>&lt;res person="person5" item="item19"/&gt;
 &lt;res person="person6" item="item20"/&gt;
 &lt;res person="person8" item="item6"/&gt;
@@ -1450,13 +1450,13 @@
     </test>
     <test>
         <order>18</order>
-        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction let $ppp := $pp/@id let $ipp := $ip/seller/@person let $it := $ip/itemref/@item let $age := $pp//age/text() where $ppp = $ipp and $age &gt; 30 return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
+        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person, $ppp in $pp/@id, $age in $pp//age/text() for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction, $ipp in $ip/seller/@person, $it in $ip/itemref/@item where $ppp = $ipp and $age &gt; 30 return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
         <result>&lt;res person="person9" item="item21"/&gt;
 &lt;res person="person10" item="item4"/&gt;</result>
     </test>
     <test>
         <order>19</order>
-        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item for $ic in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction let $ii_id := $ii/@id let $ic_id := $ic/itemref/@item let $ic_buyer := $ic/buyer/@person where $ii_id = $ic_id return &lt;res item="{$ii_id}" buyer="{$ic_buyer}"/&gt;</query>
+        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item, $ii_id in $ii/@id for $ic in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction, $ic_id in $ic/itemref/@item, $ic_buyer in $ic/buyer/@person where $ii_id = $ic_id return &lt;res item="{$ii_id}" buyer="{$ic_buyer}"/&gt;</query>
         <result>&lt;res item="item1" buyer="person10"/&gt;
 &lt;res item="item4" buyer="person12"/&gt;
 &lt;res item="item6" buyer="person11"/&gt;
@@ -1470,7 +1470,7 @@
     </test>
     <test>
         <order>20</order>
-        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item let $location := $ii/location/text() let $id := $ii/@id where $location = "United States" return &lt;res itemid="{$id}"/&gt;</query>
+        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item, $location in $ii/location/text(), $id in $ii/@id where $location = "United States" return &lt;res itemid="{$id}"/&gt;</query>
         <result>&lt;res itemid="item0"/&gt;
 &lt;res itemid="item1"/&gt;
 &lt;res itemid="item4"/&gt;
@@ -1494,39 +1494,82 @@
     </test>
     <test>
         <order>21</order>
-        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item let $location := $ii/location/text() let $id := $ii/@id where $location != "United States" return &lt;res itemid="{$id}"/&gt;</query>
+        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item, $location in $ii/location/text(), $id in $ii/@id where $location != "United States" return &lt;res itemid="{$id}"/&gt;</query>
         <result>&lt;res itemid="item2"/&gt;
 &lt;res itemid="item3"/&gt;</result>
     </test>
     <test>
         <order>22</order>
-        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item let $category := $ii/incategory/@category let $id := $ii/@id where $category = "category0" return &lt;res itemid="{$id}"/&gt;</query>
+        <query>for $ii in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml')//item, $category in $ii/incategory/@category, $id in $ii/@id where $category = "category0" return &lt;res itemid="{$id}"/&gt;</query>
         <result>&lt;res itemid="item0"/&gt;
+&lt;res itemid="item0"/&gt;
+&lt;res itemid="item0"/&gt;
+&lt;res itemid="item0"/&gt;
+&lt;res itemid="item0"/&gt;
+&lt;res itemid="item1"/&gt;
+&lt;res itemid="item1"/&gt;
+&lt;res itemid="item1"/&gt;
+&lt;res itemid="item1"/&gt;
+&lt;res itemid="item1"/&gt;
 &lt;res itemid="item1"/&gt;
 &lt;res itemid="item2"/&gt;
+&lt;res itemid="item2"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
+&lt;res itemid="item3"/&gt;
 &lt;res itemid="item3"/&gt;
 &lt;res itemid="item4"/&gt;
 &lt;res itemid="item5"/&gt;
+&lt;res itemid="item5"/&gt;
 &lt;res itemid="item6"/&gt;
+&lt;res itemid="item6"/&gt;
+&lt;res itemid="item7"/&gt;
+&lt;res itemid="item7"/&gt;
+&lt;res itemid="item7"/&gt;
 &lt;res itemid="item7"/&gt;
 &lt;res itemid="item8"/&gt;
 &lt;res itemid="item9"/&gt;
 &lt;res itemid="item10"/&gt;
+&lt;res itemid="item10"/&gt;
+&lt;res itemid="item11"/&gt;
 &lt;res itemid="item11"/&gt;
 &lt;res itemid="item12"/&gt;
+&lt;res itemid="item12"/&gt;
+&lt;res itemid="item13"/&gt;
 &lt;res itemid="item13"/&gt;
 &lt;res itemid="item14"/&gt;
 &lt;res itemid="item15"/&gt;
+&lt;res itemid="item15"/&gt;
+&lt;res itemid="item16"/&gt;
 &lt;res itemid="item16"/&gt;
 &lt;res itemid="item17"/&gt;
+&lt;res itemid="item17"/&gt;
+&lt;res itemid="item17"/&gt;
+&lt;res itemid="item17"/&gt;
+&lt;res itemid="item17"/&gt;
+&lt;res itemid="item18"/&gt;
+&lt;res itemid="item18"/&gt;
 &lt;res itemid="item18"/&gt;
 &lt;res itemid="item19"/&gt;
+&lt;res itemid="item19"/&gt;
+&lt;res itemid="item19"/&gt;
 &lt;res itemid="item20"/&gt;
+&lt;res itemid="item20"/&gt;
+&lt;res itemid="item20"/&gt;
+&lt;res itemid="item20"/&gt;
+&lt;res itemid="item21"/&gt;
+&lt;res itemid="item21"/&gt;
+&lt;res itemid="item21"/&gt;
+&lt;res itemid="item21"/&gt;
 &lt;res itemid="item21"/&gt;</result>
     </test>
     <test>
         <order>23</order>
-        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person let $pname := $ip/name/text() let $age := $ip/profile/age/text() where $age &lt;= 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
+        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person, $pname in $ip/name/text(), $age in $ip/profile/age/text() where $age &lt;= 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
         <result>&lt;res person="Ewing Andrade" age="18"/&gt;
 &lt;res person="Saul Schaap" age="23"/&gt;
 &lt;res person="Martti Halgason" age="20"/&gt;
@@ -1535,7 +1578,7 @@
     </test>
     <test>
         <order>24</order>
-        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person let $pname := $ip/name/text() let $age := $ip/profile/age/text() where $age &lt;= 18 or $age &gt; 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
+        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person, $pname in $ip/name/text(), $age in $ip/profile/age/text() where $age &lt;= 18 or $age &gt; 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
         <result>&lt;res person="Huei Demke" age="37"/&gt;
 &lt;res person="Ewing Andrade" age="18"/&gt;
 &lt;res person="Jamaludin Kleiser" age="34"/&gt;
@@ -1544,24 +1587,24 @@
     </test>
     <test>
         <order>25</order>
-        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person let $pname := $ip/name/text() let $age := $ip/profile/age/text() where $age &lt;= 18 or $pname = "Huei Demke" return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
+        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person, $pname in $ip/name/text(), $age in $ip/profile/age/text() where $age &lt;= 18 or $pname = "Huei Demke" return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
         <result>&lt;res person="Huei Demke" age="37"/&gt;
 &lt;res person="Ewing Andrade" age="18"/&gt;</result>
     </test>
     <test>
         <order>26</order>
-        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction let $ppp := $pp/@id let $ipp := $ip/seller/@person let $it := $ip/itemref/@item let $age := $pp//age/text() where $ppp = $ipp and $age &gt; 30 return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
+        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person, $ppp in $pp/@id, $age in $pp//age/text() for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction, $ipp in $ip/seller/@person, $it in $ip/itemref/@item where $ppp = $ipp and $age &gt; 30 return &lt;res person="{$ppp}" item="{$it}"/&gt;</query>
         <result>&lt;res person="person9" item="item21"/&gt;
 &lt;res person="person10" item="item4"/&gt;</result>
     </test>
     <test>
         <order>27</order>
-        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person let $pname := $ip/name/text() let $age := $ip/profile/age/text() where $age +1 &lt;= 18 or $age - 7 &gt; 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
+        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person, $pname in $ip/name/text(), $age in $ip/profile/age/text() where $age +1 &lt;= 18 or $age - 7 &gt; 30 return &lt;res person="{$pname}" age="{$age}"/&gt;</query>
         <result>&lt;res person="Masanao Marsiglia" age="48"/&gt;</result>
     </test>
     <test>
         <order>28</order>
-        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person let $pname := $ip/name/text() where $pname != "Huei Demke" return &lt;res person="{$pname}"/&gt;</query>
+        <query>for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')//person, $pname in $ip/name/text() where $pname != "Huei Demke" return &lt;res person="{$pname}"/&gt;</query>
         <result>&lt;res person="Thomas"/&gt;
 &lt;res person="Kawon Unni"/&gt;
 &lt;res person="Ewing Andrade"/&gt;
@@ -1589,7 +1632,7 @@
     </test>
     <test>
         <order>29</order>
-        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction let $ppp := $pp/@id let $ipp := $ip/seller/@person let $it := $ip/itemref/@item where $ppp = $ipp let $bpp := $ip/buyer/@person where $bpp = $ipp return &lt;res seller="{$ppp}" buyer="{$bpp}" item="{$it}"/&gt;</query>
+        <query>for $pp in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site/people/person, $ppp in $pp/@id for $ip in collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml')/site/closed_auctions/closed_auction, $ipp in $ip/seller/@person, $it in $ip/itemref/@item, $bpp in $ip/buyer/@person where $ppp = $ipp where $bpp = $ipp return &lt;res seller="{$ppp}" buyer="{$bpp}" item="{$it}"/&gt;</query>
         <result>&lt;res seller="person12" buyer="person12" item="item15"/&gt;</result>
     </test>
     <test>
