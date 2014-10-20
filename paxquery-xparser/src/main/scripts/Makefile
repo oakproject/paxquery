@@ -3,16 +3,18 @@
 ##########
 ## Configuration by the user
 ### set FLINK_PATH to the path to Flink directory in your system
-FLINK_PATH=
+FLINK_PATH=/Users/jalvaro/flink-0.6-incubating
 ### set PAXQUERY_INSTALLATION_PATH  to the path where Paxquery is installed
-PAXQUERY_INSTALLATION_PATH=
+#PAXQUERY_INSTALLATION_PATH=""
+PAXQUERY_INSTALLATION_PATH=/Users/jalvaro/paxquery-installation
+#FILES_ORIGIN=/Users/jalvaro/XML/libs
+FILES_ORIGIN=.
 ##########
 
 # Variables
 PAXQUERY_INSTALLATION_BIN=$(PAXQUERY_INSTALLATION_PATH)/bin
 PAXQUERY_INSTALLATION_LIB=$(PAXQUERY_INSTALLATION_PATH)/lib
 PAXQUERY_INSTALLATION_SCRIPTS=$(PAXQUERY_INSTALLATION_PATH)/scripts
-FILES_ORIGIN=.
 
 #check whether paths are set
 ifndef FLINK_PATH
@@ -35,6 +37,7 @@ install:
 	cp $(FILES_ORIGIN)/paxquery-translation-0.1.jar $(PAXQUERY_INSTALLATION_BIN)/paxquery-translation-0.1.jar
 	cp $(FILES_ORIGIN)/paxquery-xparser-0.1.jar $(PAXQUERY_INSTALLATION_BIN)/paxquery-xparser-0.1.jar
 	cp $(FILES_ORIGIN)/antlr-runtime-4.2.jar $(PAXQUERY_INSTALLATION_LIB)/antlr-runtime-4.2.jar
+	cp $(FILES_ORIGIN)/json-simple-1.1.jar $(PAXQUERY_INSTALLATION_LIB)/json-simple-1.1.jar
 	cp $(FILES_ORIGIN)/paxquery-common-0.1.jar $(FLINK_PATH)/lib/paxquery-common-0.1.jar
 	cp $(FILES_ORIGIN)/paxquery-pact-0.1.jar $(FLINK_PATH)/lib/paxquery-pact-0.1.jar
 	cp $(FILES_ORIGIN)/paxquery-run.sh $(PAXQUERY_INSTALLATION_SCRIPTS)/paxquery-run.sh
