@@ -20,6 +20,8 @@ import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
+
 
 /**
  * Simplest predicate. Comparison between two columns or a column and a constant.
@@ -30,8 +32,10 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 	private static final Log logger = LogFactory.getLog(SimplePredicate.class);
 
 	private int column1;
+	private Variable variable1;
 	private final ArithmeticOperation operation1;
 	private int column2;
+	private Variable variable2;
 	private final ArithmeticOperation operation2;	
 	private final String stringConstant;
 	private final double doubleConstant;
@@ -48,6 +52,19 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		this.predCode = predCode;
 	}
 	
+	public SimplePredicate(int column1, Variable variable1, int column2, Variable variable2, PredicateType predCode) {
+		this.column1 = column1;
+		this.variable1 = variable1;
+		this.operation1 = null;
+		this.column2 = column2;
+		this.variable2 = variable2;
+		this.operation2 = null;
+		this.stringConstant = null;
+		this.doubleConstant = -1;
+		this.predCode = predCode;
+	}
+
+	
 	public SimplePredicate(int column1, String stringConstant, PredicateType predCode) {
 		this.column1 = column1;
 		this.operation1 = null;
@@ -60,6 +77,17 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 	
 	public SimplePredicate(int column1, ArithmeticOperation operation1, String stringConstant, PredicateType predCode) {
 		this.column1 = column1;
+		this.operation1 = operation1;
+		this.stringConstant = stringConstant;
+		this.doubleConstant = -1;
+		this.column2 = -1;
+		this.operation2 = null;
+		this.predCode = predCode;
+	}
+	
+	public SimplePredicate(int column1, Variable variable1, ArithmeticOperation operation1, String stringConstant, PredicateType predCode) {
+		this.column1 = column1;
+		this.variable1 = variable1;
 		this.operation1 = operation1;
 		this.stringConstant = stringConstant;
 		this.doubleConstant = -1;
@@ -88,10 +116,33 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		this.predCode = predCode;
 	}
 	
+	public SimplePredicate(int column1, Variable variable1, ArithmeticOperation operation1, double doubleConstant, PredicateType predCode) {
+		this.column1 = column1;
+		this.variable1 = variable1;
+		this.operation1 = operation1;
+		this.stringConstant = null;
+		this.doubleConstant = doubleConstant;
+		this.column2 = -1;
+		this.operation2 = null;
+		this.predCode = predCode;
+	}
+	
 	public SimplePredicate(int column1, ArithmeticOperation operation1, int column2, ArithmeticOperation operation2, PredicateType predCode) {
 		this.column1 = column1;
 		this.operation1 = operation1;
 		this.column2 = column2;
+		this.operation2 = operation2;
+		this.stringConstant = null;
+		this.doubleConstant = -1;
+		this.predCode = predCode;
+	}
+	
+	public SimplePredicate(int column1, Variable variable1, ArithmeticOperation operation1, int column2, Variable variable2, ArithmeticOperation operation2, PredicateType predCode) {
+		this.column1 = column1;
+		this.variable1 = variable1;
+		this.operation1 = operation1;
+		this.column2 = column2;
+		this.variable2 = variable2;
 		this.operation2 = operation2;
 		this.stringConstant = null;
 		this.doubleConstant = -1;
@@ -106,6 +157,14 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		this.column1 = column1;
 	}
 	
+	public Variable getVariable1() {
+		return this.variable1;
+	}
+	
+	public void setVariable1(Variable variable1) {
+		this.variable1 = variable1;
+	}
+	
 	public ArithmeticOperation getOperation1() {
 		return this.operation1;
 	}
@@ -118,6 +177,14 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		this.column2 = column2;
 	}
 	
+	public Variable getVariable2() {
+		return this.variable2;
+	}
+	
+	public void setVariable2(Variable variable2) {
+		this.variable2 = variable2;
+	}
+	
 	public ArithmeticOperation getOperation2() {
 		return this.operation2;
 	}
@@ -128,6 +195,14 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 	
 	public double getDoubleConstant() {
 		return this.doubleConstant;
+	}
+	
+	public boolean comparesToConstant() {
+		return column2 == -1;
+	}
+	
+	public boolean comparesToVariable() {
+		return column2 != -1;
 	}
 	
 //	public PactString getPactStringConstant() {
@@ -176,6 +251,7 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		return this.predCode == PredicateType.PREDICATE_EQUAL;
 	}	
 	
+	/*
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -192,6 +268,29 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 			sb.append(this.column2).append(" ").append(this.operation2.toString());
 		else
 			sb.append(this.column2);
+		return sb.toString();
+	}*/
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String var1name = this.variable1.name.startsWith("$") && this.variable1.name.length() > 1 ? this.variable1.name.substring(1) : this.variable1.name;
+		String var2name = null;
+		if(this.operation1 != null)
+			sb.append(var1name).append(" ").append(this.operation1.toString());
+		else
+			sb.append(var1name).append(" ");
+		sb.append(this.predCode.toString()+" ");
+		if(this.stringConstant != null)
+			sb.append(this.stringConstant);
+		else if(this.doubleConstant != -1)
+			sb.append(this.doubleConstant);
+		else {
+			var2name = this.variable2.name != null && this.variable2.name.startsWith("$") && this.variable2.name.length() > 1 ? this.variable2.name.substring(1) : this.variable2.name;
+			if(this.operation2 != null)
+				sb.append(" ").append(var2name).append(" ").append(this.operation2.toString());
+			else
+				sb.append(" ").append(var2name);
+		}
 		return sb.toString();
 	}
 	

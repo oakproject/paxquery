@@ -46,6 +46,10 @@ public final class NavigationTreePattern implements Serializable {
 
 	private static final Log logger = LogFactory.getLog(NavigationTreePattern.class);
 	
+	private static String graphicsPath = ".";
+	private static boolean printGraphics = true;
+	private static int printCardinal = 0;
+	
 	/**
 	 * Unique identifier for the Pattern
 	 */
@@ -85,6 +89,22 @@ public final class NavigationTreePattern implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public static void setGraphicsPath(String folderName) {
+		graphicsPath = folderName;
+	}
+	
+	public static void setPrintGraphics(boolean doPrint) {
+		printGraphics = doPrint;
+	}
+	
+	public static void resetPrintCardinal() {
+		setPrintCardinal(0);
+	}
+	
+	public static void setPrintCardinal(int cardinal) {
+		printCardinal = cardinal;
 	}
 
 	/**
@@ -190,7 +210,8 @@ public final class NavigationTreePattern implements Serializable {
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("graph  " + givenFilename + "{\n");
-		sb.append("node [fontname=\"Lucida Grande\" fontsize=18 color=\"white\"]\n");
+		sb.append("graph[label=\""); sb.append(name); sb.append("\" fontsize=22 labeljust=center]\n");
+		sb.append("node [fontname=\"LucidaGrande\" fontsize=18 color=\"white\"]\n");
 		this.root.drawTree(sb, backgroundColor, foregroundColor);
 		sb.append("}\n");
 		
@@ -252,7 +273,7 @@ public final class NavigationTreePattern implements Serializable {
 		}
 	}*/
 	public void draw(String imagesPath, String givenFilename, boolean query, String backgroundColor, String foregroundColor) 
-	{
+	{		
 		String fileName;
 		Calendar cal = new GregorianCalendar();
 		if(givenFilename == null) {
@@ -301,6 +322,67 @@ public final class NavigationTreePattern implements Serializable {
 			logger.error("InterruptedException: ",e);
 		}
 	}
+	
+	public void draw(boolean query, String backgroundColor, String foregroundColor) 
+	{
+		if(printGraphics == false)
+			return;
+
+		String fileName;
+		/*Calendar cal = new GregorianCalendar();
+		if(givenFilename == null) {
+			if(query)
+				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + "-Query";
+			else
+				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+		} else {
+			if(query)
+				fileName = givenFilename + "-Query";
+			else
+				fileName = givenFilename;
+		}*/
+		if(graphicsPath.endsWith("/") == true)
+			fileName = graphicsPath + "tp"+printCardinal;
+		else
+			fileName = graphicsPath + "/tp"+printCardinal;
+
+		String sb = getDotString("tp"+printCardinal, backgroundColor, foregroundColor);
+		printCardinal++;
+		
+		try 
+		{
+			String fileNameDot =  new String(fileName + ".dot");
+			String fileNamePNG = new String(fileName + ".png");
+			/*String fileNamePNG;
+			if(fileName.contains("/"))
+				//fileNamePNG = new String(fileName + ".pdf");
+				fileNamePNG = new String(fileName + ".png");
+			else
+				//fileNamePNG = new String(imagesPath + File.separator + fileName + ".pdf");
+				fileNamePNG = new String(imagesPath + File.separator + fileName + ".png");*/
+			FileWriter file = new FileWriter(fileNameDot);
+			
+			// writing the  .dot file to disk
+			file.write(sb);
+			file.close();
+			
+			// calling GraphViz
+			Runtime r = Runtime.getRuntime();
+			//String com = new String("/usr/local/bin/dot -Tpdf " + fileNameDot + " -o " + fileNamePNG);
+			String com = new String("/usr/local/bin/dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
+			Process p = r.exec(com);
+			p.waitFor();
+			// removing the .dot file
+			//Process p2=r.exec("rm "+fileNameDot+"\n");
+			//p2.waitFor();
+		}
+		catch (IOException e) {
+			logger.error("IOException: ",e);
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException: ",e);
+		}
+	}
+
 
 	public final NavigationTreePattern deepCopy(){
 		NavigationTreePattern p = new NavigationTreePattern(this.root.deepCopy(), this.ordered);

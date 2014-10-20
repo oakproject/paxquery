@@ -17,6 +17,9 @@ public class LogicalPlan {
 	
 	private XMLTreeConstruct root;
 	private List<XMLScan> leaves;
+	
+	private boolean parentsAdjusted = false;
+	private boolean navigationTreePatternsAdjusted = false;
 
 	public LogicalPlan() {
 		root = null;
@@ -114,6 +117,49 @@ public class LogicalPlan {
 	 */
 	public String toString() {
 		return traverseAlgebraicOperatorsTree(root);
+	}
+	
+	/**
+	 * Makes the "parent" variable of each node point the node's parent 
+	 */
+	public void adjustParents() {
+		adjustParent(root);
+		parentsAdjusted = true;
+	}
+	
+	private void adjustParent(BaseLogicalOperator parent) {
+		ArrayList<BaseLogicalOperator> children = parent.getChildren();
+		if(children != null) {
+			for(BaseLogicalOperator child : children) {
+				child.setParent(parent);
+				adjustParent(child);
+			}
+		}
+	}
+	
+	public void adjustNavigationTreePatterns() {
+		if(parentsAdjusted == false)
+			adjustParents();
+		adjustNavigationTreePatterns(root);
+		navigationTreePatternsAdjusted = true;
+	}
+	
+	private void adjustNavigationTreePatterns(BaseLogicalOperator parent) {
+		ArrayList<BaseLogicalOperator> children = parent.getChildren();
+		if(children == null)
+			return;
+		if(parent instanceof BaseUnaryOperator) {
+			BaseLogicalOperator child = ((BaseUnaryOperator) parent).getChild();
+			adjustNavigationTreePatterns(child);
+			((BaseUnaryOperator) parent).setNavigationTreePatterns(child.getNavigationTreePatterns());	
+		} else if(parent instanceof BaseBinaryOperator) {
+			BaseLogicalOperator leftChild = ((BaseBinaryOperator) parent).getLeft();
+			adjustNavigationTreePatterns(leftChild);
+			((BaseBinaryOperator) parent).setNavigationTreePatternsLeft(leftChild.getNavigationTreePatterns());
+			BaseLogicalOperator rightChild = ((BaseBinaryOperator) parent).getRight();
+			adjustNavigationTreePatterns(rightChild);
+			((BaseBinaryOperator) parent).setNavigationTreePatternsRight(rightChild.getNavigationTreePatterns());
+		}			
 	}
 	
 	/**

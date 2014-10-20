@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 
 /**
@@ -62,6 +63,8 @@ public abstract class BaseLogicalOperator {
 		int firstAvailableNo);
 	
 	public abstract void recDisplayNRSMD();
+	
+	public abstract ArrayList<NavigationTreePattern> getNavigationTreePatterns();
 
 
 	/*
@@ -118,6 +121,21 @@ public abstract class BaseLogicalOperator {
 
 	public ArrayList<BaseLogicalOperator> getChildren() {
 		return this.children;
+	}
+	
+	public int getChildIndex(BaseLogicalOperator child) {
+		if(children != null) {
+			for(int i = 0; i < children.size(); i++) {
+				if(children.get(i) == child)
+					return i;					
+			}
+		}
+		
+		return -1;
+	}
+	
+	public void setParent(BaseLogicalOperator parent) {
+		this.parent = parent;
 	}
 	
 	public BaseLogicalOperator getParent() {

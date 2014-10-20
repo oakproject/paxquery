@@ -71,7 +71,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean insideXPathPredicate = false;	//for XPath predicate building
 	private int lastTreePatternInsideXPathPredicateIndex;
 	private StatementType currentStatement = StatementType.NONE;
-	private boolean doNesting = true;
+	private boolean doNesting = false;
 	
 	
 	/**
@@ -404,7 +404,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		// VAR ARITH_OP op string_literal,
 		if(ctx.STRING_LITERAL() != null) {
 			rightExpr = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
-			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, rightExpr, predType);
+			//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightExpr, predType);
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightExpr, predType);
 			if(constructChild == null)
 				constructChild = scans.get(patternTreeIndexLeft);
 			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
@@ -415,7 +416,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		// VAR ARITH_OP op ('-')? numeric_literal, or
 		else if(ctx.numericLiteral() != null) {
 			rightExpr = ctx.OP_SUB()!=null ? ctx.OP_SUB().getText()+ctx.numericLiteral().getText() : ctx.numericLiteral().getText();
-			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, Double.parseDouble(rightExpr), predType);
+			//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, Double.parseDouble(rightExpr), predType);
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, Double.parseDouble(rightExpr), predType);
 			
 			//build the operator
 			if(constructChild == null)
@@ -431,7 +433,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			if(patternTreeIndexRight != -1) {
 				if(patternTreeIndexRight == patternTreeIndexLeft) {
 					//TODO: i think this predicate can be erased, since a new predicate is built at the end of the method. This is probably an error.
-					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getTemporaryPositionByName(rightExpr), predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, varMap.getTemporaryPositionByName(rightExpr), rightExpr, predType);
+					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), predType);
 					if(constructChild == null)
 						constructChild = scans.get(patternTreeIndexLeft);
 					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
@@ -473,7 +476,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				arithOpRight = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
 			}
 			
-			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), arithOpRight, predType);
+			//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), rightExpr, arithOpRight, predType);
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), arithOpRight, predType);
 		}
 	
 		//insert the new predicate in the predicate stack
@@ -639,13 +643,16 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			//now instantiate the predicate
 			if(leftExpr.compareTo("") != 0) {
 				if(rightExpr.compareTo("") != 0)
-					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), arithOpRight, predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), rightExpr, arithOpRight, predType);
+					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), arithOpRight, predType);
 					
 				else if(rightStringLiteral != null) {
-					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, rightStringLiteral, predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightStringLiteral, predType);
+					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightStringLiteral, predType);
 				}
 				else if(rightDoubleLiteral != null)
-					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), arithOpLeft, rightDoubleLiteral, predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightDoubleLiteral, predType);
+					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightDoubleLiteral, predType);
 				if(predicate != null)
 					predicateStack.push(predicate);
 				lastTreePatternInsideXPathPredicateIndex = patternTreeIndexLeft;

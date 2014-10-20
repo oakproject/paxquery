@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 
 /**
@@ -26,7 +27,8 @@ import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
  *
  */
 public abstract class BaseUnaryOperator extends BaseLogicalOperator{
-	
+
+	private ArrayList<NavigationTreePattern> navigationTreePatterns;
 
 	public BaseUnaryOperator(BaseLogicalOperator child) throws PAXQueryExecutionException {
 		if (child == null){
@@ -72,7 +74,7 @@ public abstract class BaseUnaryOperator extends BaseLogicalOperator{
 			selfNumber = firstAvailable;
 			sb.append(selfNumber + " [label=\"" + this.ownName);
 			if (this.ownDetails != null){
-				sb.append(" " + this.ownDetails);
+				sb.append("\\n" + this.ownDetails);
 			}
 			sb.append("\"] ; \n");
 			if (parentNo >= 100) {
@@ -107,6 +109,21 @@ public abstract class BaseUnaryOperator extends BaseLogicalOperator{
 	public int getJoinDepth() {
 		return getChild().getJoinDepth();
 	}
-
 	
+	public ArrayList<NavigationTreePattern> getNavigationTreePatterns() {
+		if(this.navigationTreePatterns == null)
+			this.navigationTreePatterns = new ArrayList<NavigationTreePattern>();
+		return this.navigationTreePatterns;
+	}
+	
+	public void setNavigationTreePatterns(ArrayList<NavigationTreePattern> navigationTreePatterns) {
+		this.navigationTreePatterns = navigationTreePatterns;
+	}
+	
+	public void addNavigationTreePatterns(NavigationTreePattern... navigationTreePatterns) {
+		if(this.navigationTreePatterns == null)
+			this.navigationTreePatterns = new ArrayList<NavigationTreePattern>();
+		for(NavigationTreePattern ntp : navigationTreePatterns)
+			this.navigationTreePatterns.add(ntp);
+	}
 }

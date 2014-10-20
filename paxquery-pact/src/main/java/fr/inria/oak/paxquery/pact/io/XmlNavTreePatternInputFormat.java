@@ -47,6 +47,12 @@ import fr.inria.oak.paxquery.pact.operations.xml.navigation.SingleDocumentExtrac
  */
 public class XmlNavTreePatternInputFormat extends FileInputFormat {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -159202727923158624L;
+
+
 	private static final Log logger = LogFactory.getLog(XmlNavTreePatternInputFormat.class);
 	
 	

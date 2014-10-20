@@ -1,10 +1,11 @@
 package fr.inria.oak.paxquery.common.xml.navigation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
 
-public class Variable {
+public class Variable implements Serializable {
 	public enum VariableDataType { None, Value, Content }
 
 	/**

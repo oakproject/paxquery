@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 
 /**
@@ -31,6 +32,8 @@ public abstract class BaseBinaryOperator extends BaseLogicalOperator{
 	
 	private static final Log logger = LogFactory.getLog(BaseBinaryOperator.class);
 	
+	ArrayList<NavigationTreePattern> navigationTreePatternsLeft;
+	ArrayList<NavigationTreePattern> navigationTreePatternsRight;
 	
 	/**
 	 * @param left the left child
@@ -148,4 +151,63 @@ public abstract class BaseBinaryOperator extends BaseLogicalOperator{
 		return 1+Math.max(getLeft().getJoinDepth(), getRight().getJoinDepth());
 	}
 	
+	public ArrayList<NavigationTreePattern> getNavigationTreePatternsLeft() {
+		if(this.navigationTreePatternsLeft == null)
+			this.navigationTreePatternsLeft = new ArrayList<NavigationTreePattern>();
+		return this.navigationTreePatternsLeft;
+	}
+	
+	public void setNavigationTreePatternsLeft(ArrayList<NavigationTreePattern> navigationTreePatternsLeft) {
+		this.navigationTreePatternsLeft = navigationTreePatternsLeft;
+	}
+	
+	public void addNavigationTreePatternsLeft(NavigationTreePattern... navigationTreePatternsLeft) {
+		if(this.navigationTreePatternsLeft == null)
+			this.navigationTreePatternsLeft = new ArrayList<NavigationTreePattern>();
+		for(NavigationTreePattern ntp : navigationTreePatternsLeft)
+			this.navigationTreePatternsLeft.add(ntp);
+	}
+	
+	public ArrayList<NavigationTreePattern> getNavigationTreePatternsRight() {
+		if(this.navigationTreePatternsRight == null)
+			this.navigationTreePatternsRight = new ArrayList<NavigationTreePattern>();
+		return this.navigationTreePatternsRight;
+	}
+	
+	public void setNavigationTreePatternsRight(ArrayList<NavigationTreePattern> navigationTreePatternsRight) {
+		this.navigationTreePatternsRight = navigationTreePatternsRight;
+	}
+	
+	public void addNavigationTreePatternsRight(NavigationTreePattern... navigationTreePatternsRight) {
+		if(this.navigationTreePatternsRight == null)
+			this.navigationTreePatternsRight = new ArrayList<NavigationTreePattern>();
+		for(NavigationTreePattern ntp : navigationTreePatternsRight)
+			this.navigationTreePatternsRight.add(ntp);
+	}
+	
+	public ArrayList<NavigationTreePattern> getNavigationTreePatterns() {
+		ArrayList<NavigationTreePattern> allNavigationTreePatterns = new ArrayList<NavigationTreePattern>(this.navigationTreePatternsLeft);
+		allNavigationTreePatterns.addAll(this.navigationTreePatternsRight);
+		return allNavigationTreePatterns;
+	}
+	
+	public boolean isInNavigationTreePatternsLeft(NavigationTreePattern navigationTreePattern) {
+		if(this.navigationTreePatternsLeft == null)
+			return false;
+		for(NavigationTreePattern ntp : this.navigationTreePatternsLeft) {
+			if(ntp == navigationTreePattern)
+				return true;
+		}			
+		return false;
+	}
+	
+	public boolean isInNavigationTreePatternsRight(NavigationTreePattern navigationTreePattern) {
+		if(this.navigationTreePatternsRight == null)
+			return false;
+		for(NavigationTreePattern ntp : this.navigationTreePatternsRight) {
+			if(ntp == navigationTreePattern)
+				return true;
+		}
+		return false;
+	}
 }

@@ -80,6 +80,12 @@ public class XMLScan extends BaseLeafOperator {
 		return this.navigationTreePattern;
 	}
 	
+	public ArrayList<NavigationTreePattern> getNavigationTreePatterns() {
+		ArrayList<NavigationTreePattern> navigationTreePatterns = new ArrayList<NavigationTreePattern>();
+		navigationTreePatterns.add(this.navigationTreePattern);
+		return navigationTreePatterns;
+	}
+	
 	public boolean isAttachDocumentID() {
 		return this.attachDocumentID;
 	}
@@ -106,6 +112,10 @@ public class XMLScan extends BaseLeafOperator {
 		return 0;
 	}
 	
+	public static void resetColorCounter() {
+		i = 0;
+	}
+	
 	@Override
 	public int recursiveDotString(StringBuffer sb, int parentNo, int firstAvailableNo) {
 		String color, fillColor;
@@ -122,7 +132,11 @@ public class XMLScan extends BaseLeafOperator {
 			fillColor = "#ffbfef";
 		}
 		i++;
-		this.navigationTreePattern.draw(".", String.valueOf(System.currentTimeMillis()), false, fillColor, color);
+		//this.navigationTreePattern.draw(".", String.valueOf(System.currentTimeMillis()), false, fillColor, color);
+		int nameStartIndex = pathDocuments.lastIndexOf('/');
+		if(nameStartIndex+1 < pathDocuments.length())
+			this.navigationTreePattern.setName(pathDocuments.substring(nameStartIndex+1));
+		this.navigationTreePattern.draw(false, fillColor, color);
 		
 		int selfNumber = -1;
 		if (this.visible) {
@@ -137,7 +151,8 @@ public class XMLScan extends BaseLeafOperator {
 					+ this.ownDetails
 					+ ")");
 			}
-			
+			if(this.navigationTreePattern != null)
+				sb.append("\n\'" + this.navigationTreePattern.getName()+"\'");
 			sb.append("\"] ; \n");
 			
 			if (parentNo != -1){
