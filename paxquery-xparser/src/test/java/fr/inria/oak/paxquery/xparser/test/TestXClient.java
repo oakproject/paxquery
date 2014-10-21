@@ -84,6 +84,9 @@ public class TestXClient {
 	@Test
 	public void test() {
 		try {
+			System.out.println("\nTest "+test_number);
+			System.out.println("Query: "+query);
+			
 			String outputfile = query_to_test_filepath+test_number+"."+query_to_test_fileextension;
 			//process query
 			XClient.test_main(query, outputfile, "1");
