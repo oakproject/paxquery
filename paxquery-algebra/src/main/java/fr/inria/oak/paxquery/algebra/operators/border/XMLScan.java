@@ -132,10 +132,18 @@ public class XMLScan extends BaseLeafOperator {
 			fillColor = "#ffbfef";
 		}
 		i++;
-		//this.navigationTreePattern.draw(".", String.valueOf(System.currentTimeMillis()), false, fillColor, color);
 		int nameStartIndex = pathDocuments.lastIndexOf('/');
-		if(nameStartIndex+1 < pathDocuments.length())
-			this.navigationTreePattern.setName(pathDocuments.substring(nameStartIndex+1));
+		String treeName;
+		String[] pathParts = pathDocuments.split("/");
+		if(pathParts == null || pathParts.length == 0)
+			treeName = "";
+		else {
+			if(pathParts.length > 1 && pathParts[pathParts.length-1].contains("."))
+				treeName = pathParts[pathParts.length-2];	//get the second to last part of the name, most probably the folder
+			else
+				treeName = pathParts[pathParts.length-1];	//get the last part of the name, it can be either the file or the folder
+		}
+		this.navigationTreePattern.setName(treeName);		
 		this.navigationTreePattern.draw(false, fillColor, color);
 		
 		int selfNumber = -1;
