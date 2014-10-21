@@ -132,7 +132,6 @@ public class XMLScan extends BaseLeafOperator {
 			fillColor = "#ffbfef";
 		}
 		i++;
-		int nameStartIndex = pathDocuments.lastIndexOf('/');
 		String treeName;
 		String[] pathParts = pathDocuments.split("/");
 		if(pathParts == null || pathParts.length == 0)
