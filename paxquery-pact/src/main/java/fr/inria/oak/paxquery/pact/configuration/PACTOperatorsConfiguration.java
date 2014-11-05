@@ -42,7 +42,6 @@ public enum PACTOperatorsConfiguration {
 	POST_AGGREGATION_COLUMN_INT("paxquery.operation.postaggregationcolumn"),
 	UNNEST_PATH_BINARY("paxquery.operation.unnestpath"),
 	NAVIGATION_COLUMN_INT("paxquery.operation.navigationcolumn"),
-	RECORD_IDENTIFIER_COLUMN_INT("paxquery.operation.recordidentifiercolumn"),
 	NESTED_RECORDS_COLUMN_INT("paxquery.operation.nestedrecordscolumn"),
 	EVALUATION_COLUMN_INT("paxquery.operation.evaluationresultcolumn");
 		

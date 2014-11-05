@@ -16,9 +16,7 @@
 package fr.inria.oak.paxquery.translation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -55,12 +53,10 @@ import fr.inria.oak.paxquery.algebra.operators.unary.GroupByWithAggregation;
 import fr.inria.oak.paxquery.algebra.operators.unary.Navigation;
 import fr.inria.oak.paxquery.algebra.operators.unary.Projection;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
-import fr.inria.oak.paxquery.algebra.optimizer.pushdown.PushdownUtility;
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
-import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
@@ -92,7 +88,6 @@ import fr.inria.oak.paxquery.pact.operators.unary.PostAggregationOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.PostLNOJoinOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.PostLNOJoinWithAggregationOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.PostLOJoinOperator;
-import fr.inria.oak.paxquery.pact.operators.unary.PreJoinOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.ProjectionOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.SelectionOperator;
 
@@ -545,65 +540,36 @@ public class Logical2Pact {
 		Operator<Record>[] conjLeftOuterJoin;
 		
 		if(!loj.getPred().isOnlyEqui()) { // THETA
-			// 1) create ReduceOperator for pre join processing
-			ReduceOperator.Builder preJoinBuilder = ReduceOperator.builder(PreJoinOperator.class)
-					.input(childPlan1)
-					.name("PreLOJoin");
-			//Document ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getDocumentIDColumn())),
-					loj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getNodeIDColumn())),
-					loj.getNodeIDColumn());
-			ReduceOperator preJoin = preJoinBuilder.build();
-
-			// preJoin configuration
-			// we need to create the new NRSMD for the right side
-			NestedMetadata nrsmdPreJoinRightSide = new NestedMetadata(1, new MetadataTypes[] {MetadataTypes.INTEGER_TYPE});
-			final NestedMetadata nrsmdPreJoin = NestedMetadataUtils.appendNRSMD(loj.getLeft().getNRSMD(), nrsmdPreJoinRightSide);
-			final String encodedNRSMDPreJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPreJoin));
-			preJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
-			
-			// 2) create CrossOperator for join processing
+			// 1) create CrossOperator for join processing
 			CrossOperator thetaJoin = CrossOperator.builder(ThetaLOJoinOperator.class)
-					.input1(preJoin)
+					.input1(childPlan1)
 					.input2(childPlan2)
 					.name("LOJoinEval")
 					.build();
 
 			// theta join configuration
-			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
+			final String encodedNRSMD1 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(loj.getLeft().getNRSMD()));
+			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD1);
 			final String encodedNRSMD2 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(loj.getRight().getNRSMD()));
 			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD2_BINARY.toString(), encodedNRSMD2);
 			
-			//Change the right side of the predicate to accommodate the new field on the left
-			final int[][] rightColumns = loj.getPred().getRightColumns();
-			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for(int i=0; i<rightColumns.length; i++)
-				for(int j=0; j<rightColumns[i].length; j++)
-					map.put(rightColumns[i][j], rightColumns[i][j]+1);
-			BasePredicate pred = PushdownUtility.updatePredicate(loj.getPred(), map);
-			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(pred));
+			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(loj.getPred()));
 			thetaJoin.setParameter(PACTOperatorsConfiguration.PRED_BINARY.toString(), encodedPredicate);
 		
-			// 3) create ReduceOperator for post join processing
+			// 2) create ReduceOperator for post join processing
 			ReduceOperator.Builder postJoinBuilder = ReduceOperator.builder(PostLOJoinOperator.class)
 					.input(thetaJoin)
 					.name("PostLOJoin");
 			//Document ID column
 			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(loj.getDocumentIDColumn())),
+					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getDocumentIDColumn())),
 					loj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(loj.getNodeIDColumn())),
-					loj.getNodeIDColumn());
-			//Record ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(MetadataTypes.INTEGER_TYPE),
-					loj.getLeft().getNRSMD().getColNo());
+			//Node ID columns
+			for(int index: loj.getNodeIDColumns()) {
+				KeyFactoryOperations.addKey(postJoinBuilder,
+						MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(index)),
+						index);
+			}
 			ReduceOperator postJoin = postJoinBuilder.build();
 
 			// postJoin configuration
@@ -611,50 +577,22 @@ public class Logical2Pact {
 			final NestedMetadata nrsmdPostJoin = loj.getNRSMD();
 			final String encodedNRSMDPostJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPostJoin));
 			postJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPostJoin);
-			postJoin.setParameter(PACTOperatorsConfiguration.RECORD_IDENTIFIER_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo());
-			postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo()+1);
+			postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo());
 			postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), loj.getNRSMD().getColNo());
 			
 			conjLeftOuterJoin = new Operator[]{postJoin};
 		}
 		else if(loj.getPred() instanceof DisjunctivePredicate 
-				&& ((DisjunctivePredicate)loj.getPred()).getConjunctivePreds().size() != 1) { // DISJ EQUI
-			// 1) create ReduceOperator for pre join processing
-			ReduceOperator.Builder preJoinBuilder = ReduceOperator.builder(PreJoinOperator.class)
-					.input(childPlan1)
-					.name("PreLOJoin");
-			//Document ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getDocumentIDColumn())),
-					loj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getNodeIDColumn())),
-					loj.getNodeIDColumn());
-			ReduceOperator preJoin = preJoinBuilder.build();
-
-			// preJoin configuration
-			// we need to create the new NRSMD for the right side
-			NestedMetadata nrsmdPreJoinRightSide = new NestedMetadata(1, new MetadataTypes[] {MetadataTypes.INTEGER_TYPE});
-			final NestedMetadata nrsmdPreJoin = NestedMetadataUtils.appendNRSMD(loj.getLeft().getNRSMD(), nrsmdPreJoinRightSide);
-			final String encodedNRSMDPreJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPreJoin));
-			preJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
-						
-			// 2) create CoGroup contracts for join processing
+				&& ((DisjunctivePredicate)loj.getPred()).getConjunctivePreds().size() != 1) { // DISJ EQUI						
+			// 1) create CoGroup contracts for join processing
 			// create CoGroup contracts for disjunctive equi join
 			DisjunctivePredicate disjPred = (DisjunctivePredicate) loj.getPred();
 			final int[][] leftColumns = loj.getPred().getLeftColumns();
 			final int[][] rightColumns = loj.getPred().getRightColumns();
 			
-			//Parameters that will be used later for configuring each contract
+			//Parameters that will be used later for configuring each contract			
+			final String encodedNRSMD1 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(loj.getLeft().getNRSMD()));
 			final String encodedNRSMD2 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(loj.getRight().getNRSMD()));
-
-			//Change the right side of the predicate to accommodate the new field on the left
-			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for(int i=0; i<rightColumns.length; i++)
-				for(int j=0; j<rightColumns[i].length; j++)
-					map.put(rightColumns[i][j], rightColumns[i][j]+1);
-			disjPred = (DisjunctivePredicate) PushdownUtility.updatePredicate(disjPred, map);
 			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(disjPred));
 			
 			//We create the join with the number of contracts needed for evaluation
@@ -662,43 +600,41 @@ public class Logical2Pact {
 			for(int i=0; i<disjJoin.length; i++) {
 				CoGroupOperator.Builder conjEquiJoinBuilder = CoGroupOperator.builder (
 						DisjLOEquiJoinOperator.class,
-						MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(leftColumns[i][0])),
+						MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(leftColumns[i][0])),
 						leftColumns[i][0],
 						rightColumns[i][0]-loj.getLeft().getNRSMD().getColNo() );
-				conjEquiJoinBuilder.input1(preJoin).input2(childPlan2)
+				conjEquiJoinBuilder.input1(childPlan1).input2(childPlan2)
 						.name("LOJoinEval(" + i + ")");
 				
 				for(int k=1; k<leftColumns[i].length; k++)
 					KeyFactoryOperations.addKey (
 							conjEquiJoinBuilder,
-							MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(leftColumns[i][k])),
+							MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(leftColumns[i][k])),
 							leftColumns[i][k],
 							rightColumns[i][k]-loj.getLeft().getNRSMD().getColNo() );
 				
 				disjJoin[i] = conjEquiJoinBuilder.build();			
 				// join configuration
-				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
+				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD1);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD2_BINARY.toString(), encodedNRSMD2);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.PRED_BINARY.toString(), encodedPredicate);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.PRED_INT.toString(), i);
 			}
 			
-			// 3) create ReduceOperator for post join processing
+			// 2) create ReduceOperator for post join processing
 			ReduceOperator.Builder postJoinBuilder = ReduceOperator.builder(PostLOJoinOperator.class)
 					.input(disjJoin)
 					.name("PostLOJoin");
 			//Document ID column
 			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(loj.getDocumentIDColumn())),
+					MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(loj.getDocumentIDColumn())),
 					loj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(loj.getNodeIDColumn())),
-					loj.getNodeIDColumn());
-			//Record ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(MetadataTypes.INTEGER_TYPE),
-					loj.getLeft().getNRSMD().getColNo());
+			//Node ID columns
+			for(int index: loj.getNodeIDColumns()) {
+				KeyFactoryOperations.addKey(postJoinBuilder,
+						MetadataTypesMapping.getKeyClass(loj.getLeft().getNRSMD().getType(index)),
+						index);
+			}
 			ReduceOperator postJoin = postJoinBuilder.build();
 
 			// postJoin configuration
@@ -706,8 +642,7 @@ public class Logical2Pact {
 			final NestedMetadata nrsmdPostJoin = loj.getNRSMD();
 			final String encodedNRSMDPostJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPostJoin));
 			postJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPostJoin);
-			postJoin.setParameter(PACTOperatorsConfiguration.RECORD_IDENTIFIER_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo());
-			postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo()+1);
+			postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), loj.getLeft().getNRSMD().getColNo());
 			postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), loj.getNRSMD().getColNo());
 			
 			conjLeftOuterJoin = new Operator[]{postJoin};
@@ -754,55 +689,27 @@ public class Logical2Pact {
 		Operator<Record>[] conjLeftOuterNestedJoin;
 
 		if(!lonj.getPred().isOnlyEqui()) { // THETA
-			// 1) create ReduceOperator for pre join processing
-			ReduceOperator.Builder preJoinBuilder = ReduceOperator.builder(PreJoinOperator.class)
-					.input(childPlan1)
-					.name("PreLNOJoin");
-			//Document ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getDocumentIDColumn())),
-					lonj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getNodeIDColumn())),
-					lonj.getNodeIDColumn());
-			ReduceOperator preJoin = preJoinBuilder.build();
-
-			// preJoin configuration
-			// we need to create the new NRSMD for the right side
-			NestedMetadata nrsmdPreJoinRightSide = new NestedMetadata(1, new MetadataTypes[] {MetadataTypes.INTEGER_TYPE});
-			final NestedMetadata nrsmdPreJoin = NestedMetadataUtils.appendNRSMD(lonj.getLeft().getNRSMD(), nrsmdPreJoinRightSide);
-			final String encodedNRSMDPreJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPreJoin));
-			preJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
-			
-			// 2) create CrossOperator for join processing
+			// 1) create CrossOperator for join processing
 			CrossOperator thetaJoin;
 			if(withAggregation)
 				thetaJoin = CrossOperator.builder(ThetaLNOJoinWithAggregationOperator.class)
-						.input1(preJoin)
+						.input1(childPlan1)
 						.input2(childPlan2)
 						.name("LNOJoinEvalAgg")
 						.build();
 			else
 				thetaJoin = CrossOperator.builder(ThetaLNOJoinOperator.class)
-						.input1(preJoin)
+						.input1(childPlan1)
 						.input2(childPlan2)
 						.name("LNOJoinEval")
 						.build();
 
 			// theta join configuration
-			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
+			final String encodedNRSMD1 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonj.getLeft().getNRSMD()));
+			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD1);
 			final String encodedNRSMD2 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonj.getRight().getNRSMD()));
 			thetaJoin.setParameter(PACTOperatorsConfiguration.NRSMD2_BINARY.toString(), encodedNRSMD2);
-
-			//Change the right side of the predicate to accommodate the new field on the left
-			final int[][] rightColumns = lonj.getPred().getRightColumns();
-			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for(int i=0; i<rightColumns.length; i++)
-				for(int j=0; j<rightColumns[i].length; j++)
-					map.put(rightColumns[i][j], rightColumns[i][j]+1);
-			BasePredicate pred = PushdownUtility.updatePredicate(lonj.getPred(), map);
-			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(pred));
+			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonj.getPred()));
 			thetaJoin.setParameter(PACTOperatorsConfiguration.PRED_BINARY.toString(), encodedPredicate);
 			if(withAggregation) {
 				LeftOuterNestedJoinWithAggregation lonja = (LeftOuterNestedJoinWithAggregation) lonj;
@@ -815,7 +722,7 @@ public class Logical2Pact {
 				thetaJoin.setParameter(PACTOperatorsConfiguration.EXCLUDE_NESTED_FIELD_BOOLEAN.toString(), lonja.isExcludeNestedField());
 			}
 			
-			// 3) create ReduceOperator for post join processing
+			// 2) create ReduceOperator for post join processing
 			ReduceOperator.Builder postJoinBuilder;
 			if(withAggregation)
 				postJoinBuilder = ReduceOperator.builder(PostLNOJoinWithAggregationOperator.class)
@@ -827,16 +734,14 @@ public class Logical2Pact {
 						.name("PostLNOJoin");
 			//Document ID column
 			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(lonj.getDocumentIDColumn())),
+					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getDocumentIDColumn())),
 					lonj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(lonj.getNodeIDColumn())),
-					lonj.getNodeIDColumn());
-			//Record ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(MetadataTypes.INTEGER_TYPE),
-					lonj.getLeft().getNRSMD().getColNo());
+			//Node ID columns
+			for(int index: lonj.getNodeIDColumns()) {
+				KeyFactoryOperations.addKey(postJoinBuilder,
+						MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(index)),
+						index);
+			}
 			ReduceOperator postJoin = postJoinBuilder.build();
 
 			// postJoin configuration
@@ -844,16 +749,15 @@ public class Logical2Pact {
 			final NestedMetadata nrsmdPostJoin = lonj.getNRSMD();
 			final String encodedNRSMDPostJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPostJoin));
 			postJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPostJoin);
-			postJoin.setParameter(PACTOperatorsConfiguration.RECORD_IDENTIFIER_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
 			if(withAggregation) {
 				LeftOuterNestedJoinWithAggregation lonja = (LeftOuterNestedJoinWithAggregation) lonj;
 				
 				if(lonja.isExcludeNestedField())
-					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);					
+					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());					
 				else {
-					postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
-					postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
-					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+3);
+					postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
+					postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
+					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
 				}
 
 				final String encodedAggregationType = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonja.getAggregationType()));
@@ -862,50 +766,23 @@ public class Logical2Pact {
 				postJoin.setParameter(PACTOperatorsConfiguration.EXCLUDE_NESTED_FIELD_BOOLEAN.toString(), lonja.isExcludeNestedField());
 			}
 			else {
-				postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
-				postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
+				postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
+				postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
 			}
 			
 			conjLeftOuterNestedJoin = new Operator[]{postJoin};
 		}
 		else if(lonj.getPred() instanceof DisjunctivePredicate 
-				&& ((DisjunctivePredicate)lonj.getPred()).getConjunctivePreds().size() != 1) { // DISJ EQUI
-			// 1) create ReduceOperator for pre join processing
-			ReduceOperator.Builder preJoinBuilder = ReduceOperator.builder(PreJoinOperator.class)
-					.input(childPlan1)
-					.name("PreLNOJoin");
-			//Document ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getDocumentIDColumn())),
-					lonj.getDocumentIDColumn());
-			//Node ID column
-			KeyFactoryOperations.addKey(preJoinBuilder,
-					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getNodeIDColumn())),
-					lonj.getNodeIDColumn());
-			ReduceOperator preJoin = preJoinBuilder.build();
-
-			// preJoin configuration
-			// we need to create the new NRSMD for the right side
-			NestedMetadata nrsmdPreJoinRightSide = new NestedMetadata(1, new MetadataTypes[] {MetadataTypes.INTEGER_TYPE});
-			final NestedMetadata nrsmdPreJoin = NestedMetadataUtils.appendNRSMD(lonj.getLeft().getNRSMD(), nrsmdPreJoinRightSide);
-			final String encodedNRSMDPreJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPreJoin));
-			preJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
-						
-			// 2) create CoGroup contracts for join processing
+				&& ((DisjunctivePredicate)lonj.getPred()).getConjunctivePreds().size() != 1) { // DISJ EQUI						
+			// 1) create CoGroup contracts for join processing
 			// create CoGroup contracts for disjunctive equi join
 			DisjunctivePredicate disjPred = (DisjunctivePredicate) lonj.getPred();
 			final int[][] leftColumns = lonj.getPred().getLeftColumns();
 			final int[][] rightColumns = lonj.getPred().getRightColumns();
 			
 			//Parameters that will be used later for configuring each contract
+			final String encodedNRSMD1 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonj.getLeft().getNRSMD()));
 			final String encodedNRSMD2 = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonj.getRight().getNRSMD()));
-			
-			//Change the right side of the predicate to accommodate the new field on the left
-			Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-			for(int i=0; i<rightColumns.length; i++)
-				for(int j=0; j<rightColumns[i].length; j++)
-					map.put(rightColumns[i][j], rightColumns[i][j]+1);
-			disjPred = (DisjunctivePredicate) PushdownUtility.updatePredicate(disjPred, map);
 			final String encodedPredicate = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(disjPred));
 			
 			//We create the join with the number of contracts needed for evaluation
@@ -915,32 +792,32 @@ public class Logical2Pact {
 				if(withAggregation) {
 					conjEquiJoinBuilder = CoGroupOperator.builder (
 							DisjLNOEquiJoinWithAggregationOperator.class,
-							MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(leftColumns[i][0])),
+							MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(leftColumns[i][0])),
 							leftColumns[i][0],
 							rightColumns[i][0]-lonj.getLeft().getNRSMD().getColNo() );
-					conjEquiJoinBuilder.input1(preJoin).input2(childPlan2)
+					conjEquiJoinBuilder.input1(childPlan1).input2(childPlan2)
 							.name("LNOJoinEvalAgg(" + i + ")");
 				}
 				else {
 					conjEquiJoinBuilder = CoGroupOperator.builder (
 							DisjLNOEquiJoinOperator.class,
-							MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(leftColumns[i][0])),
+							MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(leftColumns[i][0])),
 							leftColumns[i][0],
 							rightColumns[i][0]-lonj.getLeft().getNRSMD().getColNo() );
-					conjEquiJoinBuilder.input1(preJoin).input2(childPlan2)
+					conjEquiJoinBuilder.input1(childPlan1).input2(childPlan2)
 							.name("LNOJoinEval(" + i + ")");
 				}	
 
 				for(int k=1; k<leftColumns[i].length; k++)
 					KeyFactoryOperations.addKey (
 							conjEquiJoinBuilder,
-							MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(leftColumns[i][k])),
+							MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(leftColumns[i][k])),
 							leftColumns[i][k],
 							rightColumns[i][k]-lonj.getLeft().getNRSMD().getColNo() );
 				
 				disjJoin[i] = conjEquiJoinBuilder.build();			
 				// join configuration
-				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPreJoin);
+				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD1);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.NRSMD2_BINARY.toString(), encodedNRSMD2);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.PRED_BINARY.toString(), encodedPredicate);
 				disjJoin[i].setParameter(PACTOperatorsConfiguration.PRED_INT.toString(), i);
@@ -956,7 +833,7 @@ public class Logical2Pact {
 				}
 			}
 			
-			// 3) create ReduceOperator for post join processing
+			// 2) create ReduceOperator for post join processing
 			ReduceOperator.Builder postJoinBuilder;
 			if(withAggregation)
 				postJoinBuilder = ReduceOperator.builder(PostLNOJoinWithAggregationOperator.class)
@@ -969,16 +846,14 @@ public class Logical2Pact {
 			
 			//Document ID column
 			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(lonj.getDocumentIDColumn())),
+					MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(lonj.getDocumentIDColumn())),
 					lonj.getDocumentIDColumn());
 			//Node ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(nrsmdPreJoin.getType(lonj.getNodeIDColumn())),
-					lonj.getNodeIDColumn());
-			//Record ID column
-			KeyFactoryOperations.addKey(postJoinBuilder,
-					MetadataTypesMapping.getKeyClass(MetadataTypes.INTEGER_TYPE),
-					lonj.getLeft().getNRSMD().getColNo());
+			for(int index: lonj.getNodeIDColumns()) {
+				KeyFactoryOperations.addKey(postJoinBuilder,
+						MetadataTypesMapping.getKeyClass(lonj.getLeft().getNRSMD().getType(index)),
+						index);
+			}
 			ReduceOperator postJoin = postJoinBuilder.build();
 
 			// postJoin configuration
@@ -986,16 +861,15 @@ public class Logical2Pact {
 			final NestedMetadata nrsmdPostJoin = lonj.getNRSMD();
 			final String encodedNRSMDPostJoin = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(nrsmdPostJoin));
 			postJoin.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMDPostJoin);
-			postJoin.setParameter(PACTOperatorsConfiguration.RECORD_IDENTIFIER_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
 			if(withAggregation) {
 				LeftOuterNestedJoinWithAggregation lonja = (LeftOuterNestedJoinWithAggregation) lonj;
 				
 				if(lonja.isExcludeNestedField())
-					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);					
+					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());					
 				else {
-					postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
-					postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
-					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+3);
+					postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
+					postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
+					postJoin.setParameter(PACTOperatorsConfiguration.COMBINATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
 				}
 
 				final String encodedAggregationType = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(lonja.getAggregationType()));
@@ -1004,8 +878,8 @@ public class Logical2Pact {
 				postJoin.setParameter(PACTOperatorsConfiguration.EXCLUDE_NESTED_FIELD_BOOLEAN.toString(), lonja.isExcludeNestedField());
 			}
 			else {
-				postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
-				postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+2);
+				postJoin.setParameter(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo());
+				postJoin.setParameter(PACTOperatorsConfiguration.EVALUATION_COLUMN_INT.toString(), lonj.getLeft().getNRSMD().getColNo()+1);
 			}
 			
 			conjLeftOuterNestedJoin = new Operator[]{postJoin};

@@ -45,7 +45,7 @@ public abstract class BasePostJoinOperator extends BaseReduceOperator {
 
 	
 	protected static void postJoin(NestedMetadata inputRecordsSignature, Iterator<Record> records, boolean outer, boolean nested,
-			int recordIdentifierColumn, int nestedRecordsColumn, int evaluationColumn, int combinationColumn,
+			int nestedRecordsColumn, int evaluationColumn, int combinationColumn,
 			AggregationType aggregationType, boolean excludeNestedField, Collector<Record> collector) {
 		//CREATING AGGREGATION IN CASE WE NEED IT
 		BaseAggregationOperation operation = null;
@@ -81,12 +81,7 @@ public abstract class BasePostJoinOperator extends BaseReduceOperator {
 				if(combinationColumn != -1)
 					operation.combineAggregation(record.getField(combinationColumn, StringValue.class));
 			} while(records.hasNext());
-			
-			int[] keepColumns = new int[recordIdentifierColumn];
-			for(int i=0; i<recordIdentifierColumn; i++)
-				keepColumns[i] = i;
-			
-			RecordOperations.project(record, keepColumns);
+
 			if(!excludeNestedField)
 				record.addField(newListNestedRecords);
 			if(combinationColumn != -1)
@@ -112,12 +107,6 @@ public abstract class BasePostJoinOperator extends BaseReduceOperator {
 			
 			if(!excludeNestedField && !evaluation)
 				newListNestedRecords = record.getField(nestedRecordsColumn, RecordList.class);
-			
-			int[] keepColumns = new int[recordIdentifierColumn];
-			for(int i=0; i<recordIdentifierColumn; i++)
-				keepColumns[i] = i;
-			
-			RecordOperations.project(record, keepColumns);
 			
 			if(nested) { //OUTER NESTED JOIN
 				if(!excludeNestedField)

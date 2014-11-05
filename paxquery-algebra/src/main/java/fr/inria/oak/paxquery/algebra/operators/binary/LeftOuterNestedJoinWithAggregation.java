@@ -39,9 +39,9 @@ public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 	
 	
 	public LeftOuterNestedJoinWithAggregation(BaseLogicalOperator left, BaseLogicalOperator right, BasePredicate pred,
-			int documentIDColumn, int nodeIDColumn, int aggregationColumn, AggregationType aggregationType,
+			int documentIDColumn, int[] nodeIDColumns, int aggregationColumn, AggregationType aggregationType,
 			boolean excludeNestedField) throws PAXQueryExecutionException {
-		super(left,right,pred, documentIDColumn, nodeIDColumn);
+		super(left,right,pred, documentIDColumn, nodeIDColumns);
 
 		this.aggregationColumn = aggregationColumn;
 		

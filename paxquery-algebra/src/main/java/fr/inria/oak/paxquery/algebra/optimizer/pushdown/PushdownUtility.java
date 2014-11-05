@@ -35,9 +35,9 @@ import fr.inria.oak.paxquery.algebra.operators.unary.Navigation;
 import fr.inria.oak.paxquery.algebra.operators.unary.Projection;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
+import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
-import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 
 /**
@@ -151,13 +151,13 @@ public class PushdownUtility {
 			else if ( op instanceof LeftOuterJoin ) {
 				LeftOuterJoin join = (LeftOuterJoin) op;
 				newOp = new LeftOuterJoin(left, right, updatePredicate(join.getPred(), oldColumnMap),
-						oldColumnMap.get(join.getDocumentIDColumn()), oldColumnMap.get(join.getNodeIDColumn()));
+						oldColumnMap.get(join.getDocumentIDColumn()), updateProjMask(join.getNodeIDColumns(),oldColumnMap));
 			}
 			else if ( op instanceof LeftOuterNestedJoin ) {
 				LeftOuterNestedJoin join = (LeftOuterNestedJoin) op;
 				
 				newOp = new LeftOuterNestedJoin(left, right, updatePredicate(join.getPred(), oldColumnMap),
-						oldColumnMap.get(join.getDocumentIDColumn()), oldColumnMap.get(join.getNodeIDColumn()));
+						oldColumnMap.get(join.getDocumentIDColumn()), updateProjMask(join.getNodeIDColumns(),oldColumnMap));
 			}
 			else
 				throw new PAXQueryExecutionException("The type of binary operator is not supported by PushDown utilities.");

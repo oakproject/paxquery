@@ -28,24 +28,24 @@ public class LeftOuterJoin extends BaseJoinOperator {
 	
 	private final int documentIDColumn;
 	
-	private final int nodeIDColumn;
+	private final int[] nodeIDColumns;
 	
 	
 	public LeftOuterJoin(BaseLogicalOperator left, BaseLogicalOperator right, BasePredicate pred,
-			int documentIDColumn, int nodeIDColumn) throws PAXQueryExecutionException {
+			int documentIDColumn, int[] nodeIDColumns) throws PAXQueryExecutionException {
 		super(left,right,pred);
 		this.ownName = "LeftOuterJoin";
 		this.visible = true;
 		this.documentIDColumn = documentIDColumn;
-		this.nodeIDColumn = nodeIDColumn;
+		this.nodeIDColumns = nodeIDColumns;
 	}
 	
 	public int getDocumentIDColumn() {
 		return this.documentIDColumn;
 	}
 
-	public int getNodeIDColumn() {
-		return this.nodeIDColumn;
+	public int[] getNodeIDColumns() {
+		return this.nodeIDColumns;
 	}
 	
 }

@@ -30,8 +30,6 @@ import fr.inria.oak.paxquery.pact.configuration.PACTOperatorsConfiguration;
  * 
  */
 public class PostLOJoinOperator extends BasePostJoinOperator {
-	
-	private int recordIdentifierColumn;
 
 	private int nestedRecordsColumn;
 
@@ -41,8 +39,6 @@ public class PostLOJoinOperator extends BasePostJoinOperator {
 	@Override
 	public void open(Configuration parameters) throws Exception {
 		super.open(parameters);
-				
-		this.recordIdentifierColumn = parameters.getInteger(PACTOperatorsConfiguration.RECORD_IDENTIFIER_COLUMN_INT.toString(), -1);
 
 		this.nestedRecordsColumn = parameters.getInteger(PACTOperatorsConfiguration.NESTED_RECORDS_COLUMN_INT.toString(), -1);
 
@@ -52,7 +48,7 @@ public class PostLOJoinOperator extends BasePostJoinOperator {
 	@Override
 	public void reduce(Iterator<Record> records, Collector<Record> collector) {
 		postLOJoin(this.inputRecordsSignature, records,
-				this.recordIdentifierColumn, this.nestedRecordsColumn, this.evaluationColumn, collector);
+				this.nestedRecordsColumn, this.evaluationColumn, collector);
 	}
 	
 	/**
@@ -67,8 +63,8 @@ public class PostLOJoinOperator extends BasePostJoinOperator {
 	 * @param collector
 	 */
 	public static void postLOJoin(NestedMetadata inputRecordsSignature, Iterator<Record> records,
-			int recordIdentifierColumn, int nestedRecordsColumn, int evaluationColumn, Collector<Record> collector) {
-		postJoin(inputRecordsSignature, records, true, false, recordIdentifierColumn, nestedRecordsColumn, 
+			int nestedRecordsColumn, int evaluationColumn, Collector<Record> collector) {
+		postJoin(inputRecordsSignature, records, true, false, nestedRecordsColumn, 
 				evaluationColumn, -1, null, false, collector);
 	}
 

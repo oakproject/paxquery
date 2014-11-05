@@ -59,7 +59,7 @@ public class PostLNOJoinWithAggregationOperator extends PostLNOJoinOperator {
 	@Override
 	public void reduce(Iterator<Record> records, Collector<Record> collector) {
 		postLNOJoinWithAggregation(this.inputRecordsSignature, records,
-				this.recordIdentifierColumn, this.nestedRecordsColumn, this.evaluationColumn,
+				this.nestedRecordsColumn, this.evaluationColumn,
 				this.combinationColumn, this.aggregationType, this.excludeNestedField, collector);
 	}
 	
@@ -77,9 +77,9 @@ public class PostLNOJoinWithAggregationOperator extends PostLNOJoinOperator {
 	 * @param collector
 	 */
 	public static void postLNOJoinWithAggregation(NestedMetadata inputRecordsSignature, Iterator<Record> records,
-			int recordIdentifierColumn, int nestedRecordsColumn, int evaluationColumn, int combinationColumn,
+			int nestedRecordsColumn, int evaluationColumn, int combinationColumn,
 			AggregationType aggregationType, boolean excludeNestedField, Collector<Record> collector) {
-		postJoin(inputRecordsSignature, records, true, true, recordIdentifierColumn, nestedRecordsColumn,
+		postJoin(inputRecordsSignature, records, true, true, nestedRecordsColumn,
 				evaluationColumn, combinationColumn, aggregationType, excludeNestedField, collector);
 	}
 
