@@ -2,7 +2,6 @@
 package fr.inria.oak.paxquery.common.xml.navigation.parser;
 
 import java.io.*;
-
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 
 public class TreePatternParser/*@bgen(jjtree)*/implements TreePatternParserTreeConstants, TreePatternParserConstants {/*@bgen(jjtree)*/

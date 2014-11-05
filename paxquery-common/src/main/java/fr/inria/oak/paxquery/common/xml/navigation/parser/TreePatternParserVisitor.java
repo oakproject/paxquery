@@ -37,4 +37,4 @@ public interface TreePatternParserVisitor
   public Object visit(ASTSemi node, Object data);
   public Object visit(ASTEdgeSpec node, Object data);
 }
-/* JavaCC - OriginalChecksum=3eba03b9c2cb982a38658603aed394b6 (do not edit this line) */
+/* JavaCC - OriginalChecksum=0be176fbdc05f53aef044ba390f2f786 (do not edit this line) */

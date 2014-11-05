@@ -74,4 +74,4 @@ public interface TreePatternParserTreeConstants
     "EdgeSpec",
   };
 }
-/* JavaCC - OriginalChecksum=21f84018802833ffa2764aad3e94254e (do not edit this line) */
+/* JavaCC - OriginalChecksum=4d62afbce569e7481c0115d1aa65d815 (do not edit this line) */

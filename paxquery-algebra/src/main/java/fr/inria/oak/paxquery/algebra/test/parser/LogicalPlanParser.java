@@ -108,7 +108,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
         BaseLogicalOperator tempRightLogOp;
         BasePredicate pred;
         int documentIDColumn = -1;
-        int nodeIDColumn = -1;
+        int[] nodeIDColumns = null;
         int aggregationColumn = -1;
         Token tempAggregationType = null;
         Token tempExcludeNestedField = null;
@@ -148,7 +148,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
         jj_consume_token(COMMA);
         documentIDColumn = ColumnDEF();
         jj_consume_token(COMMA);
-        nodeIDColumn = ColumnDEF();
+        nodeIDColumns = ColumnsDEF();
       } else {
         ;
       }
@@ -168,15 +168,15 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
                                         returnLogOp = new Join(tempLeftLogOp, tempRightLogOp, pred);
                                 else if (binaryOp.toString().equals("LeftOuterJoin"))
                                         returnLogOp = new LeftOuterJoin(tempLeftLogOp, tempRightLogOp, pred,
-                                                        documentIDColumn, nodeIDColumn);
+                                                        documentIDColumn, nodeIDColumns);
                                 else if (binaryOp.toString().equals("LeftOuterNestedJoin"))
                                         returnLogOp = new LeftOuterNestedJoin(tempLeftLogOp, tempRightLogOp, pred,
-                                                        documentIDColumn, nodeIDColumn);
+                                                        documentIDColumn, nodeIDColumns);
                                 else if (binaryOp.toString().equals("LeftOuterNestedJoinWithAggregation")) {
                                         AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
                                         boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
                                         returnLogOp = new LeftOuterNestedJoinWithAggregation(tempLeftLogOp, tempRightLogOp, pred,
-                                                        documentIDColumn, nodeIDColumn, aggregationColumn, aggregationType,
+                                                        documentIDColumn, nodeIDColumns, aggregationColumn, aggregationType,
                                                         excludeNestedField);
                                 }
                         } catch (Exception e) {
@@ -298,11 +298,11 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
                                 {
                                         AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
                                         boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
-                                        returnLogOp = new GroupByWithAggregation(tempChildLogOp, columns1, columns2,
+                                        returnLogOp = new GroupByWithAggregation(tempChildLogOp, columns1, columns1, columns2,
                                                         column, aggregationType, excludeNestedField);
                                 }
                                 else
-                                        returnLogOp = new GroupBy(tempChildLogOp, columns1, columns2);
+                                        returnLogOp = new GroupBy(tempChildLogOp, columns1, columns1, columns2);
                         } catch (Exception e) {
                                 logger.error("Exception: ",e);
                         }
@@ -973,7 +973,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
   private boolean jj_3_19() {
     if (jj_scan_token(XMLCONSTRUCT)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_12()) return true;
     return false;
@@ -984,7 +984,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     return false;
   }
 
-  private boolean jj_3R_10() {
+  private boolean jj_3R_11() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_1()) {
@@ -1055,7 +1055,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
   private boolean jj_3_25() {
     if (jj_scan_token(AGGREGATION)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
     if (jj_scan_token(AGGREGATIONTYPE)) return true;
     return false;
@@ -1112,7 +1112,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
   private boolean jj_3_24() {
     if (jj_scan_token(FLATTEN)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_17()) jj_scanpos = xsp;
@@ -1175,7 +1175,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_9()) return true;
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_9()) return true;
+    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -1206,7 +1206,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     return false;
   }
 
-  private boolean jj_3R_11() {
+  private boolean jj_3R_10() {
     if (jj_scan_token(LSBRACKET)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -1232,9 +1232,9 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     if (jj_3_15()) return true;
     }
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(COMMA)) return true;
     if (jj_3R_11()) return true;
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -1257,16 +1257,16 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     }
     }
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
   private boolean jj_3_22() {
     if (jj_scan_token(NAVIGATION)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_9()) return true;
     return false;
@@ -1281,7 +1281,7 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
   private boolean jj_3_21() {
     if (jj_scan_token(SELECTION)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_13()) return true;
     return false;
@@ -1295,15 +1295,15 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
   private boolean jj_3_10() {
     if (jj_scan_token(CARTESIANPRODUCT)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
   private boolean jj_3_17() {
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_11()) return true;
+    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -1348,9 +1348,9 @@ public class LogicalPlanParser implements LogicalPlanParserConstants {
     if (jj_3_13()) return true;
     }
     if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(COMMA)) return true;
     if (jj_3R_11()) return true;
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_10()) return true;
     return false;
   }
 

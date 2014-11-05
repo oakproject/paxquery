@@ -42,8 +42,8 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.common.xml.construction.ApplyConstruct;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePattern;
-import fr.inria.oak.paxquery.common.xml.treepattern.core.TreePatternUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternUtils;
 
 
 
@@ -183,7 +183,7 @@ BaseLogicalOperator BinaryOpDEF() :
 	BaseLogicalOperator tempRightLogOp;
 	BasePredicate pred;
 	int documentIDColumn = -1;
-	int nodeIDColumn = -1;
+	int[] nodeIDColumns = null;
 	int aggregationColumn = -1;
 	Token tempAggregationType = null;
 	Token tempExcludeNestedField = null;
@@ -211,7 +211,7 @@ BaseLogicalOperator BinaryOpDEF() :
 		  <COMMA> tempRightLogOp = OperatorDEF()
 		  <COMMA> pred = PredicateDEF()
 		  (<COMMA> documentIDColumn = ColumnDEF()
-		  <COMMA> nodeIDColumn = ColumnDEF())?
+		  <COMMA> nodeIDColumns = ColumnsDEF())?
 		  (<COMMA> tempAggregationType = <AGGREGATIONTYPE>
 		  <COMMA> aggregationColumn = ColumnDEF()
 		  <COMMA> tempExcludeNestedField = <NAME>)?
@@ -223,15 +223,15 @@ BaseLogicalOperator BinaryOpDEF() :
 					returnLogOp = new Join(tempLeftLogOp, tempRightLogOp, pred);
 			   	else if (binaryOp.toString().equals("LeftOuterJoin"))
 					returnLogOp = new LeftOuterJoin(tempLeftLogOp, tempRightLogOp, pred,
-							documentIDColumn, nodeIDColumn);
+							documentIDColumn, nodeIDColumns);
 			   	else if (binaryOp.toString().equals("LeftOuterNestedJoin"))
 					returnLogOp = new LeftOuterNestedJoin(tempLeftLogOp, tempRightLogOp, pred,
-							documentIDColumn, nodeIDColumn);
+							documentIDColumn, nodeIDColumns);
 				else if (binaryOp.toString().equals("LeftOuterNestedJoinWithAggregation")) {
 					AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
 					boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
 					returnLogOp = new LeftOuterNestedJoinWithAggregation(tempLeftLogOp, tempRightLogOp, pred,
-							documentIDColumn, nodeIDColumn, aggregationColumn, aggregationType,
+							documentIDColumn, nodeIDColumns, aggregationColumn, aggregationType,
 							excludeNestedField);
 				}
 			} catch (Exception e) {
@@ -291,7 +291,7 @@ BaseLogicalOperator UnaryOpDEF() :
 		|(<NAVIGATION> <LPAREN> tempChildLogOp = OperatorDEF() <COMMA> column = ColumnDEF() <COMMA> string = <TREEPATTERNSTRING> <RPAREN>)
 		{
 			try {
-				TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+				NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
                 		string.toString().replace("|","").replace("|",""),
                     	"ntp");
 				returnLogOp = new Navigation(tempChildLogOp, column, pat);
@@ -310,11 +310,11 @@ BaseLogicalOperator UnaryOpDEF() :
 				if (unaryOp.toString().equals("GroupByWithAggregation"))				{
 					AggregationType aggregationType = AggregationType.valueOf(tempAggregationType.image);
 					boolean excludeNestedField = Boolean.parseBoolean(tempExcludeNestedField.image);
-					returnLogOp = new GroupByWithAggregation(tempChildLogOp, columns1, columns2,
+					returnLogOp = new GroupByWithAggregation(tempChildLogOp, columns1, columns1, columns2,
 							column, aggregationType, excludeNestedField);
 				}
 				else
-					returnLogOp = new GroupBy(tempChildLogOp, columns1, columns2);
+					returnLogOp = new GroupBy(tempChildLogOp, columns1, columns1, columns2);
 			} catch (Exception e) {
 				logger.error("Exception: ",e);
 			}
@@ -368,7 +368,7 @@ BaseLogicalOperator LeafOpDEF() :
 		{
 			try {
 				if(string != null && listDocs != null) {
-					TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+					NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
 	                		string.toString().replace("|","").replace("|",""),
 	                    	name.toString());
 					returnLogOp = new XMLScan(
@@ -378,7 +378,7 @@ BaseLogicalOperator LeafOpDEF() :
 							listDocs);
 				}
 				else if(string != null) {
-					TreePattern pat  = TreePatternUtils.getTreePatternFromString(
+					NavigationTreePattern pat  = NavigationTreePatternUtils.getTreePatternFromString(
 	                		string.toString().replace("|","").replace("|",""),
 	                    	name.toString());
 					returnLogOp = new XMLScan(
