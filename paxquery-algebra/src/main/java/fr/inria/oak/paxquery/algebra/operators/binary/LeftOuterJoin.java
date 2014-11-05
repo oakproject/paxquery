@@ -16,7 +16,6 @@
 package fr.inria.oak.paxquery.algebra.operators.binary;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
-import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 

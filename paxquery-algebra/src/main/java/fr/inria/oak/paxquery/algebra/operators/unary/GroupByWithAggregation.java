@@ -36,9 +36,11 @@ public class GroupByWithAggregation extends GroupBy {
 	private boolean excludeNestedField;
 	
 
-	public GroupByWithAggregation(BaseLogicalOperator child, int[] groupByColumns, int[] nestColumns,
-			int aggregationColumn, AggregationType aggregationType, boolean excludeNestedField) throws PAXQueryExecutionException {
-		super(child, groupByColumns, nestColumns);
+	public GroupByWithAggregation(BaseLogicalOperator child, int[] reduceByColumns,
+			int[] groupByColumns, int[] nestColumns,
+			int aggregationColumn, AggregationType aggregationType, 
+			boolean excludeNestedField) throws PAXQueryExecutionException {
+		super(child, reduceByColumns, groupByColumns, nestColumns);
 		
 		this.aggregationColumn = aggregationColumn;
 		

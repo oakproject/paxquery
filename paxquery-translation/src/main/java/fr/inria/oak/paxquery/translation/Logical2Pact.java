@@ -294,7 +294,7 @@ public class Logical2Pact {
 			groupByBuilder = ReduceOperator.builder(GroupByOperator.class)
 				.input(childPlan)
 				.name("GroupBy");
-		for(int column: gb.getGroupByColumns())
+		for(int column: gb.getReduceByColumns())
 			KeyFactoryOperations.addKey(groupByBuilder, MetadataTypesMapping.getKeyClass(gb.getChild().getNRSMD().getType(column)), column);
 		ReduceOperator groupBy = groupByBuilder.build();
 

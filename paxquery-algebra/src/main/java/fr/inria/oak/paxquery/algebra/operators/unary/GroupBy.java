@@ -29,14 +29,16 @@ import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
  * 
  */
 public class GroupBy extends BaseUnaryOperator {
-	
+
 	private static final Log logger = LogFactory.getLog(GroupBy.class);
 
-	
+
+	private final int[] reduceByColumns;
+
 	private final int[] groupByColumns;
-	
+
 	private final int[] nestColumns;
-		
+
 
 	/**
 	 * 
@@ -46,11 +48,13 @@ public class GroupBy extends BaseUnaryOperator {
 	 *      ancestor path (int[]) as per the second constructor below
 	 * @throws XMLStratosphereExecutionException
 	 */
-	public GroupBy(BaseLogicalOperator child, int[] groupByColumns, int[] nestColumns) throws PAXQueryExecutionException {
+	public GroupBy(BaseLogicalOperator child, int[] reduceByColumns,
+			int[] groupByColumns, int[] nestColumns) throws PAXQueryExecutionException {
 		super(child);
 		
 		this.visible = true;
 		this.ownName = "GroupBy";
+		this.reduceByColumns = reduceByColumns;
 		this.groupByColumns = groupByColumns;
 		this.nestColumns = nestColumns;
 		
@@ -69,16 +73,20 @@ public class GroupBy extends BaseUnaryOperator {
 	
 	@Override
 	public void buildNRSMD() {
-		for(BaseLogicalOperator op : children)
+		for(BaseLogicalOperator op : this.children)
 			op.buildNRSMD();
 		//We keep only the columns that are useful at the highest level (the group-by columns,
 		//the aggregation columns and the nested column)
-		final NestedMetadata groupByNRSMD = NestedMetadataUtils.makeProjectRSMD(children.get(0).getNRSMD(), this.groupByColumns);
-		final NestedMetadata nestedNRSMD = NestedMetadataUtils.makeProjectRSMD(children.get(0).getNRSMD(), this.nestColumns);
+		final NestedMetadata groupByNRSMD = NestedMetadataUtils.makeProjectRSMD(this.children.get(0).getNRSMD(), this.groupByColumns);
+		final NestedMetadata nestedNRSMD = NestedMetadataUtils.makeProjectRSMD(this.children.get(0).getNRSMD(), this.nestColumns);
 		
 		this.nestedMetadata = NestedMetadataUtils.addNestedField(groupByNRSMD, nestedNRSMD);
 	}
 	
+	
+	public int[] getReduceByColumns() {
+		return this.reduceByColumns;
+	}
 
 	public int[] getGroupByColumns() {
 		return this.groupByColumns;
