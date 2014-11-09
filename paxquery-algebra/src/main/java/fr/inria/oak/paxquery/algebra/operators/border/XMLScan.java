@@ -39,7 +39,7 @@ public class XMLScan extends BaseLeafOperator {
 	
 	private NavigationTreePattern navigationTreePattern;
 	
-	private final boolean attachDocumentID;
+	private boolean attachDocumentID;
 	
 	
 	public XMLScan(boolean attachDocumentID, String pathDocuments) throws PAXQueryExecutionException {
@@ -84,6 +84,10 @@ public class XMLScan extends BaseLeafOperator {
 		ArrayList<NavigationTreePattern> navigationTreePatterns = new ArrayList<NavigationTreePattern>();
 		navigationTreePatterns.add(this.navigationTreePattern);
 		return navigationTreePatterns;
+	}
+	
+	public void setAttachDocumentID(boolean attachDocumentID) {
+		this.attachDocumentID = attachDocumentID;
 	}
 	
 	public boolean isAttachDocumentID() {

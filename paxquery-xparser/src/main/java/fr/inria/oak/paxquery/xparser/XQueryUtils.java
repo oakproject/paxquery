@@ -2,6 +2,7 @@ package fr.inria.oak.paxquery.xparser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
@@ -35,6 +36,20 @@ public class XQueryUtils {
 	}
 	
 	/**
+	 * Returns the index of the XMLScan operator in "scans" that contains the tree pattern "tp", or -1 if the tree pattern is not contained in any operator.
+	 * @param scans an ArrayList containing XMLScan operators
+	 * @param tp the tree pattern looked for
+	 * @return the index of the XMLScan operator in "scans" that contanis tree pattern "tp"
+	 */
+	public static int findTreePatternIndexInScans(ArrayList<XMLScan> scans, NavigationTreePattern tp) {
+		for(int i = 0; i < scans.size(); i++) {
+			if(tp == scans.get(i).getNavigationTreePattern())
+				return i;
+		}
+		return -1;
+	}
+	
+	/**
 	 * Returns a name for an auxiliar variable. The shape of the name is "auxVar"+auxVarCounter.
 	 * auxVarCounter is autoincremented after each call.
 	 */
@@ -58,5 +73,20 @@ public class XQueryUtils {
 			}
 		}
 		return inputString;
+	}
+	
+	/**
+	 * Converts a List<Integer> into a int[]
+	 * @param list
+	 * @return
+	 */
+	public static int[] IntegerListToIntArray(List<Integer> list) {
+		int[] array = null;
+		if(list != null) {
+			array = new int[list.size()];
+			for(int i = 0; i < list.size(); i++)
+				array[i] = list.get(i);
+		}
+		return array;
 	}
 }

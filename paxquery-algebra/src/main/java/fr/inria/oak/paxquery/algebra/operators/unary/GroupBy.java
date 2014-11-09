@@ -33,11 +33,11 @@ public class GroupBy extends BaseUnaryOperator {
 	private static final Log logger = LogFactory.getLog(GroupBy.class);
 
 
-	private final int[] reduceByColumns;
+	private int[] reduceByColumns;
 
-	private final int[] groupByColumns;
+	private int[] groupByColumns;
 
-	private final int[] nestColumns;
+	private int[] nestColumns;
 
 
 	/**
@@ -94,6 +94,18 @@ public class GroupBy extends BaseUnaryOperator {
 
 	public int[] getNestColumns() {
 		return this.nestColumns;
+	}
+	
+	public void setReduceByColumns(int[] reduceByColumns) {
+		this.reduceByColumns = reduceByColumns;
+	}
+	
+	public void setGroupByColumns(int[] groupByColumns) {
+		this.groupByColumns = groupByColumns;
+	}
+	
+	public void setNestColumns(int[] nestColumns) {
+		this.nestColumns = nestColumns;
 	}
 	
 }

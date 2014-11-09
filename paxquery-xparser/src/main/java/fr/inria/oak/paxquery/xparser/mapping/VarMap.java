@@ -1,7 +1,10 @@
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
@@ -20,6 +23,8 @@ public class VarMap {
 	 * Binds a variable name with its corresponding variable object
 	 */
 	public HashMap<String, Variable> variables;
+	
+	private ArrayList<Variable> subqueryOuterVariables;	//pointers to those variables in "variables" that contain a Subquery data type
 
 	/**
 	 * The temporary position in the tree pattern forest that a new variable will occupy
@@ -83,6 +88,18 @@ public class VarMap {
 	}
 	
 	/**
+	 * Adds a list of variables to the varmap by calling the addNewVariable(Variable) method for each one.
+	 * @param vars the list of variables
+	 */
+	public void addNewVariables(List<Variable> vars) {
+		if(vars == null)
+			return;
+		
+		for(Variable var : vars)
+			addNewVariable(var);
+	}
+	
+	/**
 	 * Removes the variable given by varName from all inner data structures
 	 * @param varName the name of the variable to remove
 	 */
@@ -123,10 +140,26 @@ public class VarMap {
 	public VariablePositionEquivalences calculateFinalPositions(ArrayList<XMLScan> scanOperators) {
 		VariablePositionEquivalences equivalences = new VariablePositionEquivalences();
 		int positionOffset = 0;
-		
-		for(XMLScan scan : scanOperators)
+
+		//find the variable which stores a subquery (if any)
+		buildSubqueryOuterVariables();	//find the variable that holds a subquery (if any)
+		for(int i = 0; i < scanOperators.size(); i++) {
+			XMLScan scan = scanOperators.get(i);
+			//add the variable storing the document ID (if needed)
+			if(scan.isAttachDocumentID() == true) {
+				Variable var = getVariable("IDTP-"+scan.getNavigationTreePattern().getName());
+				equivalences.addEquivalence(getTemporaryPositionByName(var.name), positionOffset);
+				positionOffset++;
+			}
+			//add the variables in the tree patterns
 			positionOffset = traverseTreePatternDFS(scan.getNavigationTreePattern().getRoot(), equivalences, positionOffset);
-		
+			//add the variable storing the subquery, if all scans on the left are marked as attaching a documentID and the next does not
+			if(i < scanOperators.size()-1 && scanOperators.get(i+1).isAttachDocumentID() == false 
+					&& subqueryOuterVariables != null && subqueryOuterVariables.size() > 0) {
+				equivalences.addEquivalence(getTemporaryPositionByName(subqueryOuterVariables.get(0).name), positionOffset);
+				//deliberatedly don't increase positionOffset
+			}
+		}
 		return equivalences;
 	}
 	
@@ -164,9 +197,14 @@ public class VarMap {
 		int posInTreeFirstVariable = -1;
 		
 		//save a position for the ID
-		if(node.storesID())
-			posInTree++;
-		
+		if(node.storesID()) {
+			ArrayList<Variable> vars = node.getMatchingVariablesStoringID();
+			if(vars != null && vars.size() > 0) {
+				equivalences.addEquivalence(getTemporaryPositionByName(vars.get(0).name), posInTree);
+				posInTree++;
+			}
+		}
+			
 		if(matchingVariables.size()!=0) {
 			Variable var;
 			//count variables storing value first
@@ -200,11 +238,64 @@ public class VarMap {
 		}
 		return posInTree;
 	}
+
 	
 	@Override 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("--TemporaryPositionsByName: "+temporaryPositionsByName.toString());
 		return sb.toString();
+	}
+	
+	/**
+	 * Prints final positions of the variables in VarMap in a sorted by ascending column position order
+	 * @param equivalences
+	 * @return
+	 */
+	public String printNamesFinals(VariablePositionEquivalences equivalences) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		ArrayList<Object[]> list = new ArrayList<Object[]>();
+		
+		String varName;
+		Iterator<String> iterator = temporaryPositionsByName.keySet().iterator();
+		while(iterator.hasNext()) {
+			try {
+				varName = iterator.next();
+				int eq = equivalences.getEquivalence(temporaryPositionsByName.get(varName));
+				Object[] couple = new Object[2];
+				couple[0] = varName;
+				couple[1] = new Integer(eq);
+				list.add(couple);
+			} catch(Exception e) {}
+		}
+		list.sort(new Comparator<Object[]>() { public int compare(Object[] a, Object[] b) {return ((Integer)a[1]).compareTo((Integer)b[1]);}});
+		Iterator<Object[]> iterator2 = list.iterator();
+		while(iterator2.hasNext()) {
+			Object[] couple = iterator2.next();
+			String name = (String)couple[0];
+			Integer column = (Integer)couple[1];
+			sb.append(name);
+			sb.append("=");
+			sb.append(column);
+			if(iterator2.hasNext())
+				sb.append(", ");
+		}
+		
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Returns an ArrayList<Variable> with pointers to those variables contained in the hashmap that contain a "Subquery" data type.
+	 * These list is not ordered because we are currently assuming there will only be one such "subquery" variable, but we should
+	 * order the list by order of occurrence if we plan to have more variables
+	 */
+	public void buildSubqueryOuterVariables() {
+		subqueryOuterVariables = new ArrayList<Variable>();
+		for(String varName : variables.keySet()) {
+			if(variables.get(varName).dataType == Variable.VariableDataType.Subquery)
+				subqueryOuterVariables.add(variables.get(varName));
+		}
 	}
 }

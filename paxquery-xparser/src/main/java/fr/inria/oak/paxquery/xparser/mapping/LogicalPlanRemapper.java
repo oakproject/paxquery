@@ -1,12 +1,14 @@
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
+import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
 import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
@@ -21,6 +23,7 @@ import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode
  * @author jalvaro
  */
 public class LogicalPlanRemapper {
+	public static boolean print = true;
 
 	/**
 	 * Goes through a logical plan and updates the positions of the columns used as data inputs.
@@ -53,18 +56,24 @@ public class LogicalPlanRemapper {
 	 * @param varMap a VarMap object containing the temporary positions of variables
 	 */
 	private static void visitLogicalOperator(BaseLogicalOperator operator, VarMap varMap) {
+		VariablePositionEquivalences equivalences = null;
 		if(operator instanceof XMLTreeConstruct)
-			visitLogicalOperator((XMLTreeConstruct) operator, varMap);
+			equivalences = visitLogicalOperator((XMLTreeConstruct) operator, varMap);
 		else if(operator instanceof DuplicateElimination)
-			visitLogicalOperator((DuplicateElimination) operator, varMap);
+			equivalences = visitLogicalOperator((DuplicateElimination) operator, varMap);
 		else if(operator instanceof Selection)
-			visitLogicalOperator((Selection) operator, varMap);
+			equivalences = visitLogicalOperator((Selection) operator, varMap);
+		else if(operator instanceof GroupBy)
+			equivalences = visitLogicalOperator((GroupBy) operator, varMap);
 		//nothing is done for XMLScan, CartesianProduct
 		else if(!(operator instanceof XMLScan) && !(operator instanceof CartesianProduct))
 			throw new PAXQueryExecutionException("Variable remapping not implemented for operator " + operator.getName());
+
+		if(print == true && equivalences != null)
+			System.out.println("VarMap for " + operator.getClass().getSimpleName() +" " + varMap.printNamesFinals(equivalences));
 	}
 	
-	private static void visitLogicalOperator(XMLTreeConstruct construct, VarMap varMap) {
+	private static VariablePositionEquivalences visitLogicalOperator(XMLTreeConstruct construct, VarMap varMap) {
 		//first find the XMLScan operators that hang from construct
 		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
 		findXMLScanDescendants(construct, scans);
@@ -72,6 +81,8 @@ public class LogicalPlanRemapper {
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
 		//then substitute
 		substituteVariablesInCTP(construct.getConstructionTreePattern().getRoot(), equivalences);
+		
+		return equivalences;
 	}
 	
 	private static void substituteVariablesInCTP(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
@@ -83,11 +94,19 @@ public class LogicalPlanRemapper {
 	}
 	
 	private static void substituteVariablesInCTPNode(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
-		if(node.getContentType() == ContentType.VARIABLE_PATH)
-			node.setVarPath(equivalences.getEquivalence(node.getVarPath()));
+		if(node.getContentType() == ContentType.VARIABLE_PATH) {
+			//node.setVarPath(equivalences.getEquivalence(node.getVarPath()));
+			List<Integer> varPath = node.getVarPath();
+			varPath.set(0, equivalences.getEquivalence(varPath.get(0)));
+			for(int i = 1; i < varPath.size(); i++) {
+				if(varPath.get(i) == -1)
+					varPath.set(i, equivalences.getEquivalence(varPath.get(i)));
+			}
+			node.setVarPath(varPath);
+		}
 	}
 
-	private static void visitLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 
+	private static VariablePositionEquivalences visitLogicalOperator(DuplicateElimination dupElim, VarMap varMap) { 
 		//first find the XMLScan operators that hang from dupElim
 		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
 		findXMLScanDescendants(dupElim, scans);
@@ -97,13 +116,15 @@ public class LogicalPlanRemapper {
 		for(int i = 0; i < dupElim.columns.length; i++)
 			dupElim.columns[i] = equivalences.getEquivalence(dupElim.columns[i]);
 		dupElim.buildOwnDetails();
+		
+		return equivalences;
 	}
 	
-	private static void visitLogicalOperator(Selection selection, VarMap varMap) {
+	private static VariablePositionEquivalences visitLogicalOperator(Selection selection, VarMap varMap) {
 		//first find the XMLScan operators that hang from selection
 		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
 		findXMLScanDescendants(selection, scans);
-		//them calculate the positions of the variables in those XMLScans relative to selection
+		//then calculate the positions of the variables in those XMLScans relative to selection
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
 		//now substitute
 		for(ConjunctivePredicate conjPred : ((DisjunctivePredicate) selection.getPred()).getConjunctivePreds()) {
@@ -115,6 +136,48 @@ public class LogicalPlanRemapper {
 			}
 		}		
 		selection.buildOwnDetails();
+		
+		return equivalences;
+	}
+	
+	private static VariablePositionEquivalences visitLogicalOperator(GroupBy groupBy, VarMap varMap) {
+		//first find the XMLScan operators that hang from groupBy
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(groupBy, scans);
+		//then calculate the positions of the variables in those XMLScans relative to groupBy
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//now substitute
+		int[] columns = groupBy.getGroupByColumns();
+		for(int i = 0; i < columns.length; i++)
+			columns[i] = equivalences.getEquivalence(columns[i]);
+		groupBy.setGroupByColumns(columns);
+		System.out.print("groupByColumns: { ");
+		for(int i = 0; i < columns.length-1; i++) {
+			System.out.print(columns[i] + ", ");
+		}
+		System.out.println(columns[columns.length-1]+" }");
+
+		columns = groupBy.getReduceByColumns();
+		for(int i = 0; i < columns.length; i++)
+			columns[i] = equivalences.getEquivalence(columns[i]);
+		groupBy.setReduceByColumns(columns);
+		System.out.println("reduceByColumns: { ");
+		for(int i = 0; i < columns.length-1; i++) {
+			System.out.print(columns[i] + ", ");
+		}
+		System.out.println(columns[columns.length-1]+" }");
+		
+		columns = groupBy.getNestColumns();
+		for(int i = 0; i < columns.length; i++)
+			columns[i] = equivalences.getEquivalence(columns[i]);
+		groupBy.setNestColumns(columns);
+		System.out.print("nestColumns: { ");
+		for(int i = 0; i < columns.length-1; i++) {
+			System.out.print(columns[i] + ", ");
+		}
+		System.out.println(columns[columns.length-1]+" }");
+		
+		return equivalences;
 	}
 	
 	/**

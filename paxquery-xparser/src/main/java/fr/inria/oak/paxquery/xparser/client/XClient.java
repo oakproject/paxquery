@@ -128,7 +128,7 @@ public class XClient implements Program, ProgramDescription {
 		//print output
 		System.out.println("Creating algebraic plan.");
 		//System.out.println("Original algebraic plan: ");
-		//printParseDetails(tree, parser, loader);
+		printParseDetails(tree, parser, loader);
 		//draw Logical Plan 
 		if(drawTrees) {
 			NavigationTreePattern.setGraphicsPath(graphsPath);
@@ -143,7 +143,7 @@ public class XClient implements Program, ProgramDescription {
 		System.out.println("Optimizing algebraic plan.");
 		(new Optimizer()).optimize(loader.logicalPlan);
 		//System.out.println("Optimized algebraic plan: ");
-		//printParseDetails(tree,parser,loader);
+		printParseDetails(tree,parser,loader);
 		//draw Logical Plan 
 		if(drawTrees) {
 			XMLScan.resetColorCounter();

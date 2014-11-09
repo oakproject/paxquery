@@ -972,11 +972,27 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 	public ArrayList<Variable> getMatchingVariables() {
 		return this.matchingVariables;
 	}
+	
+	/**
+	 * Returns those variables to which this node is assigned that are marked as storing the ID of the node.
+	 * That is, those variables "var" such that var.dataType == Variable.VariableDataType.NodeID
+	 * @return An arrayList<Variable> containing those variables this node is assigned to that are marked as storing the ID of the node.
+	 */
+	public ArrayList<Variable> getMatchingVariablesStoringID() {
+		ArrayList<Variable> list = new ArrayList<Variable>();
+		
+		for(Variable var : matchingVariables) {
+			if(var.dataType == Variable.VariableDataType.NodeID)
+				list.add(var);
+		}
+		
+		return list;
+	}
 
 	/**
 	 * Returns those variables to which this node is assigned that are marked as storing value.
 	 * That is, those variables "var" such that var.dataType == Variable.VariableDataType.Value
-	 * @return An ArrayList<String> containing those variables this node is assigned to that are marked as storing value.
+	 * @return An ArrayList<Variable> containing those variables this node is assigned to that are marked as storing value.
 	 */
 	public ArrayList<Variable> getMatchingVariablesStoringValue() {
 		ArrayList<Variable> list = new ArrayList<Variable>();
@@ -993,7 +1009,7 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 	/**
 	 * Returns those variables to which this node is assigned that are marked as storing content.
 	 * That is, those variables "var" such that var.dataType == Variable.VariableDataType.Content
-	 * @return An ArrayList<String> containing those variables to which this node is assigned that are marked as storing content.
+	 * @return An ArrayList<Variable> containing those variables to which this node is assigned that are marked as storing content.
 	 */
 	public ArrayList<Variable> getMatchingVariablesStoringContent() {
 		ArrayList<Variable> list = new ArrayList<Variable>();

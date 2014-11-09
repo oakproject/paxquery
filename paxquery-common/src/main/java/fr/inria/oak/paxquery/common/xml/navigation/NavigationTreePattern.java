@@ -224,54 +224,6 @@ public final class NavigationTreePattern implements Serializable {
 	 * @param query true if the pattern that we want to draw is a query or false otherwise.
 	 * Query nodes will be filled in yellow and view nodes will be filled in blue
 	 */
-	/*
-	public void draw(String imagesPath, String givenFilename, boolean query, String backgroundColor, String foregroundColor) 
-	{
-		String fileName;
-		Calendar cal = new GregorianCalendar();
-		if(givenFilename == null) {
-			if(query)
-				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND) + "-Query";
-			else
-				fileName = "xam-" + "-" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
-		} else {
-			if(query)
-				fileName = givenFilename + "-Query";
-			else
-				fileName = givenFilename;
-		}
-		
-		String sb = getDotString(fileName, backgroundColor, foregroundColor);
-		
-		try 
-		{
-			String fileNameDot =  new String(fileName + ".dot");
-			String fileNamePNG;
-			if(fileName.contains("/"))
-				fileNamePNG = new String(fileName + ".png");
-			else
-				fileNamePNG = new String(imagesPath + File.separator + fileName + ".png");
-			FileWriter file = new FileWriter(fileNameDot);
-			
-			// writing the  .dot file to disk
-			file.write(sb);
-			file.close();
-			
-			// calling GraphViz
-			Runtime r = Runtime.getRuntime();
-			String com = new String("/usr/local/bin/dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
-			Process p = r.exec(com);
-			p.waitFor();
-			// removing the .dot file
-			Process p2=r.exec("rm "+fileNameDot+"\n");
-			p2.waitFor();
-		}
-		catch (IOException e) {
-			logger.error("IOException: ",e);
-		} catch (InterruptedException e) {
-			logger.error("InterruptedException: ",e);
-		}
-	}*/
 	public void draw(String imagesPath, String givenFilename, boolean query, String backgroundColor, String foregroundColor) 
 	{		
 		String fileName;
@@ -645,4 +597,61 @@ public final class NavigationTreePattern implements Serializable {
 	public void parseUnrequiredData(String tagOfTuplesToKeep) {
 		this.root.parseUnrequiredData(tagOfTuplesToKeep);
 	}
+	
+	/**
+	 * Goes through the tree (depth-first) and calls NavigationTreePatternNode.setStoresID(true) on nodes storing content or value.
+	 * Returns a list of variables: each variable points to a "store ID" column for each node in the TP. These variables are added
+	 * to their corresponding node by calling the method NavigationTreePatternNode.addMatchingVariables(Variable...) on the node
+	 * Recursive.
+	 */
+	public ArrayList<Variable> markAsStoresIDWhereNeeded() {
+		ArrayList<Variable> newVariables = new ArrayList<Variable>();	//new variables added, they point to node IDs
+		markAsStoresIDWhereNeeded(root, newVariables);
+		return newVariables;
+	}
+	
+	private void markAsStoresIDWhereNeeded(NavigationTreePatternNode node, ArrayList<Variable> newVariables) {
+		if(node.getNestingDepth() == 0 && (node.storesContent() || node.storesValue())) {
+			node.setStoresID(true);
+			node.setIDType(false, false, true, false);
+			if(node.getMatchingVariablesSize() > 0) {
+				String newVarName = "IDNode-"+node.getMatchingVariables().get(0).name;
+				Variable newVar = new Variable(newVarName, Variable.VariableDataType.NodeID); 
+				node.addMatchingVariables(newVar);
+				newVariables.add(newVar);
+			}
+		}
+		ArrayList<NavigationTreePatternEdge> edges = node.getEdges();
+		if(edges != null) {
+			for(NavigationTreePatternEdge edge : edges) {
+					markAsStoresIDWhereNeeded(edge.n2, newVariables);
+			}
+		}		
+	}
+
+	
+	/** 
+	 * Returns a list with all the variables contained in this Tree Pattern.
+	 * The tree is gone through in pre-order, and for each node the sorting is done as {ID, Value, Cont}
+	 * @return
+	 */
+	public ArrayList<Variable> getAllVariables() {
+		ArrayList<Variable> variables = new ArrayList<Variable>();
+		getAllVariables(root, variables);
+		return variables;		
+	}
+	
+	private void getAllVariables(NavigationTreePatternNode node, ArrayList<Variable> variables) {
+		//visit this node
+		variables.addAll(node.getMatchingVariablesStoringID());
+		variables.addAll(node.getMatchingVariablesStoringValue());
+		variables.addAll(node.getMatchingVariablesStoringContent());
+		//visit children
+		ArrayList<NavigationTreePatternEdge> edges = node.getEdges();
+		if(edges != null) {
+			for(NavigationTreePatternEdge edge : edges)
+				getAllVariables(edge.n2, variables);
+		}
+	}
+	
 }

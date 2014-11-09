@@ -7,6 +7,8 @@ import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.BaseBinaryOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.BaseUnaryOperator;
+import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 /**
  * Describes a logical plan composed of algebraic operators.
@@ -15,7 +17,8 @@ import fr.inria.oak.paxquery.algebra.operators.unary.BaseUnaryOperator;
  */
 public class LogicalPlan {
 	
-	private XMLTreeConstruct root;
+	//private XMLTreeConstruct root;
+	private BaseLogicalOperator root;
 	private List<XMLScan> leaves;
 	
 	private boolean parentsAdjusted = false;
@@ -26,11 +29,11 @@ public class LogicalPlan {
 		leaves = new ArrayList<XMLScan>();
 	}
 	
-	public XMLTreeConstruct getRoot() {
+	public BaseLogicalOperator getRoot() {
 		return root;
 	}
 	
-	public void setRoot(XMLTreeConstruct root) {
+	public void setRoot(BaseLogicalOperator root) {
 		this.root = root;
 	}
 	
@@ -46,9 +49,46 @@ public class LogicalPlan {
 		return leaves.get(index);
 	}
 	
+	/**
+	 * Returns the XMLScan leaf associated to the tree pattern "tp", or null if "tp" is not associated to any leaf.
+	 * @param tp
+	 * @return
+	 */
+	public XMLScan getLeaf(NavigationTreePattern tp) {
+		for(XMLScan scan : leaves) {
+			if(scan.getNavigationTreePattern() == tp)
+				return scan;
+		}
+		return null;
+	}
+	
 	public void addLeaf(XMLScan scan) {
 		leaves.add(scan);
 	}
+	
+	/**
+	 * Climbs from the XMLScan leaf to the highest placed ancestor (this does not need to be the root of the tree, if this leaf is temporary not connected to the root by some reason)
+	 * @return
+	 */
+	public BaseLogicalOperator getTopFromLeaf(XMLScan leaf) {
+		BaseLogicalOperator currentTop = leaf;
+		
+		while(currentTop.getParent() != null)
+			currentTop = currentTop.getParent();
+		
+		return currentTop;
+	}
+
+	
+	/**
+	 * Climbs from the XMLScan leaf associated to the navigation tree pattern "tp" to the highest placed ancestor (this does not need to be the root of the tree, if this leaf is temporary not connected to the root by some reason)
+	 * @param tp
+	 * @return
+	 */
+	public BaseLogicalOperator getTopFromLeaf(NavigationTreePattern tp) {		
+		return getTopFromLeaf(getLeaf(tp));
+	}
+
 	
 	/**
 	 * Inserts newOperator as direct ancestor of referenceOperator. If referenceOperator had a different direct ancestor

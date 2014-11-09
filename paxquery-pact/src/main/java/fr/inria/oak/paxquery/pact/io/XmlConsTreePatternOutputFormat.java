@@ -113,6 +113,7 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 		
 		for(int i=0; i<listRecords.size(); i++) { //For each record
 			Record record = listRecords.get(i);
+
 			for(int j=0; j<ctps.length; j++) { //For each CTP
 				ConstructionTreePattern ctp = ctps[j];
 				ConstructionTreePatternNode ctpNode = ctp.getRoot();
