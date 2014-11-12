@@ -31,14 +31,9 @@ public class VariablePositionEquivalences {
 	 * @return the final position of the same variable
 	 */
 	public int getEquivalence(int temporalPosition) {
-		try {
-			if(temporalPosition == -1)
-				return 0;
-			return tempFinal.get(temporalPosition);
-		}
-		catch(Exception e) {
-			e.getMessage(); return 0;
-		}
+		if(temporalPosition == -1)
+			return 0;
+		return tempFinal.get(temporalPosition);
 	}	
 	
 	/**

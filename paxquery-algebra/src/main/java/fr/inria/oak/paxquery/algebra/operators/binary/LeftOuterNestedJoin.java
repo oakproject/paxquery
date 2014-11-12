@@ -26,9 +26,9 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate;
  */
 public class LeftOuterNestedJoin extends BaseJoinOperator {
 	
-	private final int documentIDColumn;
+	private int documentIDColumn;
 	
-	private final int[] nodeIDColumns;
+	private int[] nodeIDColumns;
 	
 
 	public LeftOuterNestedJoin(BaseLogicalOperator left, BaseLogicalOperator right, BasePredicate pred,
@@ -44,9 +44,16 @@ public class LeftOuterNestedJoin extends BaseJoinOperator {
 	public int getDocumentIDColumn() {
 		return this.documentIDColumn;
 	}
+	
+	public void setDocumentIDColumn(int documentIDColumn) {
+		this.documentIDColumn = documentIDColumn;
+	}
 
 	public int[] getNodeIDColumns() {
 		return this.nodeIDColumns;
 	}
-
+	
+	public void setNodeIDColumns(int[] nodeIDColumns) {
+		this.nodeIDColumns = nodeIDColumns;
+	}
 }

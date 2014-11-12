@@ -6,6 +6,7 @@ import java.util.List;
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
+import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoin;
 import fr.inria.oak.paxquery.algebra.operators.border.*;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
@@ -16,6 +17,7 @@ import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 /**
  * Goes through a logical plan and updates the positions of the columns used as data inputs.
@@ -65,6 +67,8 @@ public class LogicalPlanRemapper {
 			equivalences = visitLogicalOperator((Selection) operator, varMap);
 		else if(operator instanceof GroupBy)
 			equivalences = visitLogicalOperator((GroupBy) operator, varMap);
+		else if(operator instanceof LeftOuterNestedJoin)
+			equivalences = visitLogicalOperator((LeftOuterNestedJoin) operator, varMap);
 		//nothing is done for XMLScan, CartesianProduct
 		else if(!(operator instanceof XMLScan) && !(operator instanceof CartesianProduct))
 			throw new PAXQueryExecutionException("Variable remapping not implemented for operator " + operator.getName());
@@ -151,31 +155,74 @@ public class LogicalPlanRemapper {
 		for(int i = 0; i < columns.length; i++)
 			columns[i] = equivalences.getEquivalence(columns[i]);
 		groupBy.setGroupByColumns(columns);
-		System.out.print("groupByColumns: { ");
-		for(int i = 0; i < columns.length-1; i++) {
-			System.out.print(columns[i] + ", ");
+		if(print) {
+			System.out.print("groupByColumns: { ");
+			for(int i = 0; i < columns.length-1; i++) {
+				System.out.print(columns[i] + ", ");
+			}
+			System.out.println(columns[columns.length-1]+" }");
 		}
-		System.out.println(columns[columns.length-1]+" }");
 
 		columns = groupBy.getReduceByColumns();
 		for(int i = 0; i < columns.length; i++)
 			columns[i] = equivalences.getEquivalence(columns[i]);
 		groupBy.setReduceByColumns(columns);
-		System.out.println("reduceByColumns: { ");
-		for(int i = 0; i < columns.length-1; i++) {
-			System.out.print(columns[i] + ", ");
+		if(print) {
+			System.out.print("reduceByColumns: { ");
+			for(int i = 0; i < columns.length-1; i++) {
+				System.out.print(columns[i] + ", ");
+			}
+			System.out.println(columns[columns.length-1]+" }");
 		}
-		System.out.println(columns[columns.length-1]+" }");
-		
+
 		columns = groupBy.getNestColumns();
 		for(int i = 0; i < columns.length; i++)
 			columns[i] = equivalences.getEquivalence(columns[i]);
 		groupBy.setNestColumns(columns);
-		System.out.print("nestColumns: { ");
-		for(int i = 0; i < columns.length-1; i++) {
-			System.out.print(columns[i] + ", ");
+		if(print) {
+			System.out.print("nestColumns: { ");
+			for(int i = 0; i < columns.length-1; i++) {
+				System.out.print(columns[i] + ", ");
+			}
+			System.out.println(columns[columns.length-1]+" }");
 		}
-		System.out.println(columns[columns.length-1]+" }");
+		
+		return equivalences;
+	}
+		
+	private static VariablePositionEquivalences visitLogicalOperator(LeftOuterNestedJoin lonjoin, VarMap varMap) {
+		//remap documentIDColumn and nodeIDColumns
+		//first find the XMLScan operators that hang from groupBy
+		ArrayList<XMLScan> scans = new ArrayList<XMLScan>();
+		findXMLScanDescendants(lonjoin, scans);
+		//then calculate the positions of the variables in those XMLScans relative to lonjoin
+		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(scans);
+		//now substitute
+		lonjoin.setDocumentIDColumn(equivalences.getEquivalence(lonjoin.getDocumentIDColumn()));
+		if(print)
+			System.out.println("documentIDColumn: "+lonjoin.getDocumentIDColumn());
+		int[] nodeIDs = lonjoin.getNodeIDColumns();
+		for(int i = 0; i < nodeIDs.length; i++)
+			nodeIDs[i] = equivalences.getEquivalence(nodeIDs[i]);
+		lonjoin.setNodeIDColumns(nodeIDs);
+		if(print) {
+			System.out.print("nodeIDColumns: {");
+			for(int i = 0; i < nodeIDs.length-1; i++)
+				System.out.print(nodeIDs[i] + ", ");
+			System.out.println(nodeIDs[nodeIDs.length-1]+" }");
+		}
+
+		//now remap the predicate
+		for(ConjunctivePredicate conjPred : ((DisjunctivePredicate)lonjoin.getPred()).getConjunctivePreds()) {
+			for(SimplePredicate simplePred : conjPred.getSimplePreds()) {
+				if(simplePred.getVariable1() != null)
+					simplePred.setColumn1(equivalences.getEquivalence(simplePred.getColumn1()));
+				if(simplePred.getVariable2() != null)
+					simplePred.setColumn2(equivalences.getEquivalence(simplePred.getColumn2()));
+			}
+		}
+		if(print)
+			System.out.println("Predicate: "+lonjoin.getPred().toString());
 		
 		return equivalences;
 	}
@@ -195,5 +242,21 @@ public class LogicalPlanRemapper {
 			for(BaseLogicalOperator child : operator.getChildren())
 				findXMLScanDescendants(child, scansList);
 		}
+	}
+	
+	/**
+	 * Returns true if "var" points to a node of any of the TPs contained in "scans"; false otherwise
+	 * @param var the variable
+	 * @param scans the XMLScan objects that store TPs
+	 * @return true if "var" points to a node of any of the TPs contained in "scans"; false otherwise; false if "var" or "scans" are null.
+	 */
+	private static boolean isVariableInXMLScans(Variable var, ArrayList<XMLScan> scans) {
+		if(var == null || scans == null)
+			return false;
+		for(XMLScan scan : scans) {
+			if(var.getTreePattern() == scan.getNavigationTreePattern())
+				return true;
+		}
+		return false;
 	}
 }

@@ -276,9 +276,9 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		String var1name = this.variable1.name.startsWith("$") && this.variable1.name.length() > 1 ? this.variable1.name.substring(1) : this.variable1.name;
 		String var2name = null;
 		if(this.operation1 != null)
-			sb.append(var1name).append(" ").append(this.operation1.toString());
+			sb.append(var1name).append("(").append(this.column1).append(") ").append(this.operation1.toString());
 		else
-			sb.append(var1name).append(" ");
+			sb.append(var1name).append("(").append(this.column1).append(") ");
 		sb.append(this.predCode.toString()+" ");
 		if(this.stringConstant != null)
 			sb.append(this.stringConstant);
@@ -287,9 +287,9 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 		else {
 			var2name = this.variable2.name != null && this.variable2.name.startsWith("$") && this.variable2.name.length() > 1 ? this.variable2.name.substring(1) : this.variable2.name;
 			if(this.operation2 != null)
-				sb.append(" ").append(var2name).append(" ").append(this.operation2.toString());
+				sb.append(" ").append(var2name).append("(").append(this.column2).append(") ").append(this.operation2.toString());
 			else
-				sb.append(" ").append(var2name);
+				sb.append(" ").append(var2name).append("(").append(this.column2).append(")");
 		}
 		return sb.toString();
 	}

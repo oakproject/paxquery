@@ -24,6 +24,9 @@ import fr.inria.oak.paxquery.xparser.XQueryParser.AttInner2Context;
 import fr.inria.oak.paxquery.xparser.XQueryParser.AttInnerContext;
 import fr.inria.oak.paxquery.xparser.mapping.LogicalPlanRemapper;
 import fr.inria.oak.paxquery.xparser.mapping.VarMap;
+import fr.inria.oak.paxquery.xparser.subquery.BaseOperatorInfo;
+import fr.inria.oak.paxquery.xparser.subquery.GroupByInfo;
+import fr.inria.oak.paxquery.xparser.subquery.LeftOuterNestedJoinInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +82,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private StatementType currentStatement = StatementType.NONE;
 	private boolean doNesting = true;
 	private int subqueryLevel = -1;	//-1 implies no subquery found. The first subquery is subqueryLevel 0
-	private ArrayList<XQueryGroupByInfo> groupByInfoList;
+	private boolean subqueryWithWhere = false;
+	private ArrayList<BaseOperatorInfo> subqueryInfoList;
 	
 	
 	/**
@@ -94,7 +98,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		patternNodeMap = new HashMap<String, NavigationTreePatternNode>();
 		navigationTreePatterns = new ArrayList<NavigationTreePattern>();
 		navigationTreePatternsInsideSubquery = new ArrayList2Dims<NavigationTreePattern>(0);
-		groupByInfoList = new ArrayList<XQueryGroupByInfo>();
+		subqueryInfoList = new ArrayList<BaseOperatorInfo>();
 		whereStatementInSubqueryLevel = new ArrayList<Boolean>();
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
@@ -358,9 +362,14 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitWhere(XQueryParser.WhereContext ctx) { 				
 		visitChildren(ctx); 
 		
-		BasePredicate predicate = predicateStack.pop();
-		if(constructChild != null && predicate != null)
-			constructChild = new Selection(constructChild, predicate);
+		if(subqueryLevel == -1) {
+			//no subquery
+			BasePredicate predicate = predicateStack.pop();
+			if(constructChild != null && predicate != null)
+				constructChild = new Selection(constructChild, predicate);
+		}
+		else //subquery with where statement
+			subqueryWithWhere = true;
 		
 		return null;
 	}
@@ -441,26 +450,29 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			rightExpr = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
 			//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightExpr, predType);
 			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightExpr, predType);
-			if(constructChild == null)
-				constructChild = scans.get(patternTreeIndexLeft);
-			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
-				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
-			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
-			treePatternVisited.set(patternTreeIndexLeft, true);
+			if(subqueryLevel == -1) {
+				if(constructChild == null)
+					constructChild = scans.get(patternTreeIndexLeft);
+				else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+					constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+				//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+				treePatternVisited.set(patternTreeIndexLeft, true);
+			}
 		}
 		// VAR ARITH_OP op ('-')? numeric_literal, or
 		else if(ctx.numericLiteral() != null) {
 			rightExpr = ctx.OP_SUB()!=null ? ctx.OP_SUB().getText()+ctx.numericLiteral().getText() : ctx.numericLiteral().getText();
 			//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, Double.parseDouble(rightExpr), predType);
 			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, Double.parseDouble(rightExpr), predType);
-			
-			//build the operator
-			if(constructChild == null)
-				constructChild = scans.get(patternTreeIndexLeft);
-			else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
-				constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
-			//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
-			treePatternVisited.set(patternTreeIndexLeft, true);
+			if(subqueryLevel == -1) {
+				//build the operator
+				if(constructChild == null)
+					constructChild = scans.get(patternTreeIndexLeft);
+				else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+					constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+				//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+				treePatternVisited.set(patternTreeIndexLeft, true);
+			}
 		}
 		// VAR ARITH_OP op VAR ARITH_OP
 		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {   
@@ -470,35 +482,39 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					//TODO: i think this predicate can be erased, since a new predicate is built at the end of the method. This is probably an error.
 					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, varMap.getTemporaryPositionByName(rightExpr), rightExpr, predType);
 					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), predType);
-					if(constructChild == null)
-						constructChild = scans.get(patternTreeIndexLeft);
-					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
-						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
-					//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains both variables
-					treePatternVisited.set(patternTreeIndexLeft, true);
+					if(subqueryLevel == -1) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndexLeft);
+						else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+						//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains both variables
+						treePatternVisited.set(patternTreeIndexLeft, true);
+					}
 				}
 				else {
-					if(constructChild == null) {
-						if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
-							treePatternVisited.set(patternTreeIndexLeft, true);
-							treePatternVisited.set(patternTreeIndexRight, true);
-							constructChild = new CartesianProduct(scans.get(patternTreeIndexLeft),  scans.get(patternTreeIndexRight));
-						}						
-					}
-					else {
-						if(treePatternVisited.get(patternTreeIndexLeft) == true && treePatternVisited.get(patternTreeIndexRight) == false) {
-							treePatternVisited.set(patternTreeIndexRight, true);
-							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+					if(subqueryLevel == -1) {
+						if(constructChild == null) {
+							if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexLeft, true);
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(scans.get(patternTreeIndexLeft),  scans.get(patternTreeIndexRight));
+							}						
 						}
-						else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == true) {
-							constructChild = new CartesianProduct(scans.get(patternTreeIndexRight), constructChild);
-							treePatternVisited.set(patternTreeIndexLeft, true);
-						}
-						else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
-							treePatternVisited.set(patternTreeIndexLeft, true);
-							treePatternVisited.set(patternTreeIndexRight, true);
-							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
-							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+						else {
+							if(treePatternVisited.get(patternTreeIndexLeft) == true && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+							}
+							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == true) {
+								constructChild = new CartesianProduct(scans.get(patternTreeIndexRight), constructChild);
+								treePatternVisited.set(patternTreeIndexLeft, true);
+							}
+							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexLeft, true);
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+							}
 						}
 					}
 				}
@@ -896,10 +912,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			logicalPlan.setRoot(constructChild);
 			logicalPlan.adjustParents();
 		}
-		//prepare GroupBys
+		//prepare subquery-related operators
 		if(subqueryLevel == -1) {
-			for(XQueryGroupByInfo gb : groupByInfoList)
-				gb.updateState();
+			for(BaseOperatorInfo info : subqueryInfoList) {
+				try {
+					info.updateOperatorState();
+				} catch(PAXQueryExecutionException paxe) {
+					throw paxe;
+				}
+			}
 		}
 		
 		//manually visit the next rule
@@ -951,63 +972,108 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				else
 					throw new PAXQueryExecutionException("The variable "+ varName +" was not previously assigned.");
 			}
-			else {	//inside a subquery. So far we assume there is only one inner TP (one TP navigated in the subquery)
-				ArrayList<XMLScan> outerScans = new ArrayList<XMLScan>();
-				//BaseOperator rightChild = inner tree
-				NavigationTreePattern innerTP = null;
-				BaseLogicalOperator rightChild = null;
-				int tpIndex = -1;
-				if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) > 0) {
-					innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
-					if(innerTP != null) {
-						logicalPlan.setLeaves(scans);
-						rightChild = logicalPlan.getTopFromLeaf(innerTP);
-						tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
-						if(tpIndex != -1)
-							treePatternVisited.set(tpIndex, true);
+			else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
+				if(subqueryWithWhere == true) {
+					if(scans.size() != 2)
+						throw new PAXQueryExecutionException("Currently only one outer Tree Pattern and one inner Tree Pattern are supported in Left Nested Outer Joins.");
+					//get the inner TP
+					NavigationTreePattern innerTP = null;
+					BaseLogicalOperator rightChild = null;
+					int tpIndex = -1;
+					if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) == 1) {
+						innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+						if(innerTP != null) {
+							logicalPlan.setLeaves(scans);
+							rightChild = logicalPlan.getTopFromLeaf(innerTP);
+							tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+							if(tpIndex != -1)
+								treePatternVisited.set(tpIndex,  true);
+						}
 					}
-				}				
-				//for the other trees: create CPs if needed
-				//if constructChild == null, do CP with all outer XMLScans 
-				if(constructChild == null) {// && scans.size() > 1) {
-					if(scans.size() > 1) {
-						for(int i = 0; i < scans.size(); i++) {
-							if(scans.get(i) != rightChild) {
-								if(constructChild == null)
-									constructChild = scans.get(i);
-								else
-									constructChild = new CartesianProduct(constructChild, scans.get(i));
-								treePatternVisited.set(i, true);
-								outerScans.add(scans.get(i));
+					else 
+						throw new PAXQueryExecutionException("Currently only one inner Tree Pattern is supported in Left Nested Outer Joins.");
+					//get the single outer TP
+					ArrayList<XMLScan> outerScans = new ArrayList<XMLScan>();
+					for(int i = 0; i < scans.size(); i++) {
+						if(scans.get(i) != rightChild) {
+							if(constructChild == null)
+								constructChild = scans.get(i);
+							treePatternVisited.set(i, true);
+							outerScans.add(scans.get(i));
+						}	//remember we're currently accepting 2 TPs: one outer and one inner
+					}
+					//add the variable that contains the subquery
+					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					varMap.addNewVariable(outerVarObject);
+					//get the predicate
+					BasePredicate predicate = predicateStack.pop();
+					if(predicate == null)
+						throw new PAXQueryExecutionException("The predicate for the Left Outer Nested Join does not exist.");
+					//instantiate the LeftOuterNestedJoin operator
+					constructChild = new LeftOuterNestedJoin(constructChild, rightChild, predicate, -1, new int[0]);
+					//instantiate a LeftOuterNestedJoinInfo for later update of the GroupBy operator
+					subqueryInfoList.add(new LeftOuterNestedJoinInfo((LeftOuterNestedJoin)constructChild , outerScans, (XMLScan)rightChild, outerVarObject, varMap.getVariable(varName), varMap));
+					
+					subqueryWithWhere = false;
+				}
+				else {	//subquery without a where, we build a chain of Cartesian Products with a GroupBy on top
+					ArrayList<XMLScan> outerScans = new ArrayList<XMLScan>();
+					//BaseOperator rightChild = inner tree
+					NavigationTreePattern innerTP = null;
+					BaseLogicalOperator rightChild = null;
+					int tpIndex = -1;
+					if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) > 0) {
+						innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+						if(innerTP != null) {
+							logicalPlan.setLeaves(scans);
+							rightChild = logicalPlan.getTopFromLeaf(innerTP);		
+							tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+							if(tpIndex != -1)
+								treePatternVisited.set(tpIndex, true);
+						}
+					}				
+					//for the other trees: create CPs if needed
+					//if constructChild == null, do CP with all outer XMLScans 
+					if(constructChild == null) {// && scans.size() > 1) {
+						if(scans.size() > 1) {
+							for(int i = 0; i < scans.size(); i++) {
+								if(scans.get(i) != rightChild) {
+									if(constructChild == null)
+										constructChild = scans.get(i);
+									else
+										constructChild = new CartesianProduct(constructChild, scans.get(i));
+									treePatternVisited.set(i, true);
+									outerScans.add(scans.get(i));
+								}
 							}
+						}
+						else {
+							constructChild = scans.get(0);
+							treePatternVisited.set(0, true);
+							outerScans.add(scans.get(0));
 						}
 					}
 					else {
-						constructChild = scans.get(0);
-						treePatternVisited.set(0, true);
-						outerScans.add(scans.get(0));
-					}
-				}
-				else {
-					for(int i = 0; i < scans.size(); i++) {
-						if(scans.get(i) != rightChild) {
-							BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
-							if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
-								constructChild = new CartesianProduct(constructChild, topFromLeaf);
-							treePatternVisited.set(i,  true);
-							outerScans.add(scans.get(i));
+						for(int i = 0; i < scans.size(); i++) {
+							if(scans.get(i) != rightChild) {
+								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+								if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
+									constructChild = new CartesianProduct(constructChild, topFromLeaf);
+								treePatternVisited.set(i,  true);
+								outerScans.add(scans.get(i));
+							}
 						}
-					}
-				}				
-				//instantiate CP between the outer and the inner scans
-				constructChild = new CartesianProduct(constructChild, rightChild);
-				//add the variable that contains the subquery
-				Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
-				varMap.addNewVariable(outerVarObject);
-				//instantiate a temporary empty GroupBy operator
-				constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
-				//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
-				groupByInfoList.add(new XQueryGroupByInfo((GroupBy)constructChild, outerScans, scans.get(tpIndex), outerVarObject, varMap.getVariable(varName), varMap));
+					}				
+					//instantiate CP between the outer and the inner scans
+					constructChild = new CartesianProduct(constructChild, rightChild);
+					//add the variable that contains the subquery
+					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					varMap.addNewVariable(outerVarObject);
+					//instantiate a temporary empty GroupBy operator
+					constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
+					//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
+					subqueryInfoList.add(new GroupByInfo((GroupBy)constructChild, outerScans, scans.get(tpIndex), outerVarObject, varMap.getVariable(varName), varMap));
+				}
 			}
 		}		
 		insideReturn = false;

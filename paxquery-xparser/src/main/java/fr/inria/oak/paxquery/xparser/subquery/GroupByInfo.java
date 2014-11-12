@@ -1,4 +1,4 @@
-package fr.inria.oak.paxquery.xparser;
+package fr.inria.oak.paxquery.xparser.subquery;
 
 import java.util.ArrayList;
 
@@ -7,24 +7,15 @@ import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 import fr.inria.oak.paxquery.xparser.mapping.VarMap;
 
-public class XQueryGroupByInfo {
+public class GroupByInfo extends BaseOperatorInfo {
 	public GroupBy groupByOperator;
-	public ArrayList<XMLScan> outerXMLScans;	//TPs in these scans are used to build GroupBy.GroupByColumns
-	public XMLScan innerXMLScan;	//TPs in these scans are used to build GroupBy.nestColumns
-	public Variable outerVariable;
-	public Variable returnedVariable;
-	public VarMap varMap;
 	
-	public XQueryGroupByInfo(GroupBy groupByOperator, ArrayList<XMLScan> outerXMLScans, XMLScan innerXMLScan, Variable outerVariable, Variable returnedVariable, VarMap varMap) {
+	public GroupByInfo(GroupBy groupByOperator, ArrayList<XMLScan> outerXMLScans, XMLScan innerXMLScan, Variable outerVariable, Variable returnedVariable, VarMap varMap) {
+		super(outerXMLScans, innerXMLScan, outerVariable, returnedVariable, varMap);
 		this.groupByOperator = groupByOperator;
-		this.outerXMLScans = outerXMLScans;
-		this.innerXMLScan = innerXMLScan;
-		this.outerVariable = outerVariable;
-		this.returnedVariable = returnedVariable;
-		this.varMap = varMap;
 	}
 	
-	public void updateState() {
+	public void updateOperatorState() {
 		//prepare reduceByColumns for the GroupBy
 		ArrayList<Variable> idVars = new ArrayList<Variable>();
 		for(XMLScan scan : outerXMLScans) {
@@ -61,15 +52,11 @@ public class XQueryGroupByInfo {
 		for(int i = 0; i < innerVars.size(); i++) {
 			nestColumns[i] = varMap.getTemporaryPositionByName(innerVars.get(i).name);
 			if(innerVars.get(i).name.compareTo(returnedVariable.name) == 0)	//when we find the variable returned in this subquery we add it as a nested variable in the outer variable
-				//outerVarObject.addNestedVariable(outerVarObject, i);
 				outerVariable.addNestedVariable(returnedVariable, i);
 		}
 		//update the operator
-		//groupByOperator.groupByColumns = groupByColumns;
 		groupByOperator.setGroupByColumns(groupByColumns);
 		groupByOperator.setReduceByColumns(reduceByColumns);
-		//groupByOperator.nestColumns = nestColumns;
 		groupByOperator.setNestColumns(nestColumns);
-		//TODO: build and assign reduceByColumns
 	}
 }
