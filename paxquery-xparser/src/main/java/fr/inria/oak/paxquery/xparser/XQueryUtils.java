@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.common.aggregation.AggregationType;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 
@@ -88,5 +89,25 @@ public class XQueryUtils {
 				array[i] = list.get(i);
 		}
 		return array;
+	}
+	
+	/**
+	 * Parses a string into its corresponding AggregationType. The following strings are accepted as input: "count", "max", "min", "sum". Any other string will be parsed as "count".
+	 * @param string the string to parse
+	 * @return the corresponding AggregationType
+	 */
+	public static AggregationType StringToAggregationType(String string) {
+		switch(string) {
+		case "count":
+			return AggregationType.COUNT;
+		case "max":
+			return AggregationType.MAX;
+		case "min":
+			return AggregationType.MIN;
+		case "sum":
+			return AggregationType.SUM;
+		default:
+			return AggregationType.COUNT;	//return COUNT if any other function			
+		}
 	}
 }

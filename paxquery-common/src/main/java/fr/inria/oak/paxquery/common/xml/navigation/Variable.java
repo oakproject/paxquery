@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public class Variable implements Serializable {
-	public enum VariableDataType { None, Value, Content, NodeID, DocumentID, Subquery }
+	public enum VariableDataType { None, Value, Content, NodeID, DocumentID, Subquery, Aggregation }
 
 	/**
 	 * Name of the variable

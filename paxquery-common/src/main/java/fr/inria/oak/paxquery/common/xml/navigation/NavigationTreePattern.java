@@ -637,21 +637,38 @@ public final class NavigationTreePattern implements Serializable {
 	 */
 	public ArrayList<Variable> getAllVariables() {
 		ArrayList<Variable> variables = new ArrayList<Variable>();
-		getAllVariables(root, variables);
+		getVariables(root, variables, true, true, true);
 		return variables;		
 	}
 	
-	private void getAllVariables(NavigationTreePatternNode node, ArrayList<Variable> variables) {
+	/**
+	 * Returs a list with variables satisfying the criteria indicated by the params
+	 * @param includeIDVars vars with datatype Variable.VariableDataType.NodeID
+	 * @param includeValueVars vars with datatype Variable.VariableDataType.Value
+	 * @param includeContentVars vars with datatype Variable.VariabeDataType.Content
+	 * @return the list the variables that satisfy the criteria indicated by the params
+	 */
+	public ArrayList<Variable> getVariables(boolean includeIDVars, boolean includeValueVars, boolean includeContentVars) {
+		ArrayList<Variable> variables = new ArrayList<Variable>();
+		getVariables(root, variables, includeIDVars, includeValueVars, includeContentVars);
+		return variables;
+	}
+	
+	private void getVariables(NavigationTreePatternNode node, ArrayList<Variable> variables, boolean includeIDVars, boolean includeValueVars, boolean includeContentVars) {
 		//visit this node
-		variables.addAll(node.getMatchingVariablesStoringID());
-		variables.addAll(node.getMatchingVariablesStoringValue());
-		variables.addAll(node.getMatchingVariablesStoringContent());
+		if(includeIDVars)
+			variables.addAll(node.getMatchingVariablesStoringID());
+		if(includeValueVars)
+			variables.addAll(node.getMatchingVariablesStoringValue());
+		if(includeContentVars)
+			variables.addAll(node.getMatchingVariablesStoringContent());
 		//visit children
 		ArrayList<NavigationTreePatternEdge> edges = node.getEdges();
 		if(edges != null) {
 			for(NavigationTreePatternEdge edge : edges)
-				getAllVariables(edge.n2, variables);
+				getVariables(edge.n2, variables, includeIDVars, includeValueVars, includeContentVars);
 		}
 	}
+
 	
 }

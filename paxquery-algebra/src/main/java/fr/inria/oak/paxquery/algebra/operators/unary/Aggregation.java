@@ -23,6 +23,7 @@ import fr.inria.oak.paxquery.common.aggregation.AggregationType;
 import fr.inria.oak.paxquery.common.datamodel.metadata.MetadataTypes;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadata;
 import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
+import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 
 /**
@@ -40,6 +41,8 @@ public class Aggregation extends BaseUnaryOperator {
 	private boolean excludeNestedField;
 	
 	private int documentIDColumn;
+	
+	private Variable outerVariable;	//variable to which this aggregation is assigned to
 	
 
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType) {
@@ -63,6 +66,11 @@ public class Aggregation extends BaseUnaryOperator {
 		}
 		sb.append("]");
 		this.ownDetails = new String(sb);
+	}
+	
+	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType, Variable outerVariable) {
+		this(child, aggregationPath, aggregationType);
+		this.outerVariable = outerVariable;
 	}
 	
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType,
@@ -107,6 +115,10 @@ public class Aggregation extends BaseUnaryOperator {
 		return this.aggregationPath;
 	}
 	
+	public void setAggregationPath(int[] aggregationPath) {
+		this.aggregationPath = aggregationPath;
+	}
+	
 	public AggregationType getAggregationType() {
 		return this.aggregationType;
 	}
@@ -117,6 +129,14 @@ public class Aggregation extends BaseUnaryOperator {
 	
 	public int getDocumentIDColumn() {
 		return this.documentIDColumn;
+	}
+	
+	public Variable getOuterVariable() {
+		return this.outerVariable;
+	}
+	
+	public void setOuterVariable(Variable outerVariable) {
+		this.outerVariable = outerVariable;
 	}
 	
 }
