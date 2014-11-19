@@ -211,6 +211,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				constructChild = new CartesianProduct(constructChild, dupel);
 				treePatternVisited.set(patternTreeIndex, true);
 			}
+			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == true)
+				constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
 		}
 		
 		return null;
