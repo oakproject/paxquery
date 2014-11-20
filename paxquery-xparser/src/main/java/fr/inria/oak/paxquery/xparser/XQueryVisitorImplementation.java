@@ -613,7 +613,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * comparativeExpr_xp
 	 * comparativeExpr_xp : arithmeticExpr_xp ( ( EQ_S | NE_S | LT_S | GT_S | LE_S | GE_S) arithmeticExpr_xp)* ;
 	 */
-	public Void visitComparativeExpr_xp(XQueryParser.ComparativeExpr_xpContext ctx) {
+	/*public Void visitComparativeExpr_xp(XQueryParser.ComparativeExpr_xpContext ctx) {
 		if(insideXPathPredicate == false) {
 			visitChildren(ctx); 
 		}
@@ -708,6 +708,112 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		
 		return null;
+	}*/
+	public Void visitComparativeExpr_xp(XQueryParser.ComparativeExpr_xpContext ctx) {
+		if(insideXPathPredicate == false) {
+			visitChildren(ctx); 
+		}
+		else {
+			//check the xpath predicate has a given form 
+			if(ctx.arithmeticExpr_xp().size() != 2 || ctx.arithmeticExpr_xp(0).unaryExpr(0).valueExpr().pathExpr() == null)
+				throw new PAXQueryExecutionException("This type of XPath predicate is not supported yet: "+ctx.getText());
+			
+			SimplePredicate predicate = null;
+			PredicateType predType = PredicateType.parse(ctx.getChild(1).getText());
+			String leftExpr;
+			String rightExpr;
+			ArithmeticOperation arithOpLeft = null;
+			ArithmeticOperation arithOpRight = null;
+			Operation leftOp = null;
+			Operation rightOp = null;
+			double leftOperand = 0;
+			double rightOperand = 0;
+			Double rightDoubleLiteral = null;
+			String rightStringLiteral = null;
+			
+			//manually visit the left arithmetic expression (it should contain a valid xpath expression)
+			lastNodeInsideXPathPredicate = null;	//clear lastNodeInsideXPathPredicate
+			lastVarXPathPredicate = "";
+			visitChildren(ctx.arithmeticExpr_xp(0));
+			leftExpr = lastVarXPathPredicate;
+			//in case the left expression is a real arithmetic expression 
+			if(ctx.arithmeticExpr_xp(0).children.size() > 1) {
+				leftOp = Operation.parse(ctx.arithmeticExpr_xp(0).getChild(1).getText());
+				if(ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr() != null &&
+						ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal() != null &&	
+						ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null)  {
+					if(ctx.arithmeticExpr_xp(0).unaryExpr().size() > 1 && ctx.arithmeticExpr_xp(0).unaryExpr(1).OP_SUB().size() > 0)
+						leftOperand = Double.parseDouble("-"+ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					else
+						leftOperand = Double.parseDouble(ctx.arithmeticExpr_xp(0).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					arithOpLeft = new ArithmeticOperation(leftOp, leftOperand);
+				}
+				else
+					throw new PAXQueryExecutionException("This type of XPath predicate is not supported yet: "+ctx.getText());
+			}
+			//now visit the right arithmetic expression (it may contain only (1) double literal, or (3) string literal
+			//lastNodeInsideXPathPredicate = null;	//clear lastNodeInsideXPathPredicate
+			//lastVarXPathPredicate = "";	//clear lastVarXPathPredicate
+			//visitChildren(ctx.arithmeticExpr_xp(1));
+			//rightExpr = lastVarXPathPredicate;
+			//in case the right expression is a real arithmetic expression
+			//if(ctx.arithmeticExpr_xp(1).children.size() > 1) {
+			//	rightOp = Operation.parse(ctx.arithmeticExpr_xp(1).getChild(1).getText());
+			//	if(ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr() != null &&
+			//			ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal() != null &&
+			//					ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null) {
+			//		if(ctx.arithmeticExpr_xp(1).unaryExpr().size() > 1 && ctx.arithmeticExpr_xp(1).unaryExpr(1).OP_SUB().size() > 0)
+			//			rightOperand = Double.parseDouble("-"+ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+			//		else
+			//			rightOperand = Double.parseDouble(ctx.arithmeticExpr_xp(1).unaryExpr(1).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+			//		arithOpRight = new ArithmeticOperation(rightOp, rightOperand);
+			//	}
+			//} 
+			//else
+			if (ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr() != null &&
+					ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal() != null) {
+				//double literal case
+				if(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral() != null) {
+					if(ctx.arithmeticExpr_xp(1).unaryExpr(0).OP_SUB().size() == 0)	//positive number
+						rightDoubleLiteral = Double.parseDouble(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+					else //negative number
+						rightDoubleLiteral = Double.parseDouble("-"+ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().numericLiteral().getText());
+				}
+				//string literal case
+				else if(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().STRING_LITERAL() != null) {
+					rightStringLiteral = XQueryUtils.sanitizeStringLiteral(ctx.arithmeticExpr_xp(1).unaryExpr(0).valueExpr().filterExpr().primaryExpr().literal().STRING_LITERAL().getText());
+				}
+				
+			}
+
+			//int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans,  patternNodeMap,  leftExpr);
+			//now instantiate the predicate
+			//if(leftExpr.compareTo("") != 0) {
+				//if(rightExpr.compareTo("") != 0)
+				//	//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), rightExpr, arithOpRight, predType);
+				//	predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), arithOpRight, predType);
+					
+				//else 
+				if(rightStringLiteral != null) {
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightStringLiteral, predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightStringLiteral, predType);
+					lastNodeInsideXPathPredicate.setSelectOnValue(true, predType, rightStringLiteral);
+					//lastNodeInsideXPathPredicate.setStoresValue(true);
+				}
+				else if(rightDoubleLiteral != null) {
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftExpr, arithOpLeft, rightDoubleLiteral, predType);
+					//predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, rightDoubleLiteral, predType);
+					lastNodeInsideXPathPredicate.setSelectOnValue(true, predType, rightDoubleLiteral);
+					//lastNodeInsideXPathPredicate.setStoresValue(true);
+				}
+				//if(predicate != null)
+				//	predicateStack.push(predicate);
+				//lastTreePatternInsideXPathPredicateIndex = patternTreeIndexLeft;
+				//treePatternVisited.set(patternTreeIndexLeft, true);					
+			//}
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -735,7 +841,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * Create a pattern node, set it as content storage, attach it to the appropriate tree and store it in patternNodeMap
 	 * Xpath: whatever/node/whatever
 	 */
-	public Void visitNameTest(XQueryParser.NameTestContext ctx) { 
+	/*public Void visitNameTest(XQueryParser.NameTestContext ctx) { 
 		String tag = "";
 		if(ctx.qName() != null)
 			tag = ctx.qName().QNAME_TOKEN().getText();
@@ -837,6 +943,119 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			//update the affected variable so it points to this node
 			patternNodeMap.put(lastVarXPathPredicate, childNode);
 			lastNodeInsideXPathPredicate = childNode;
+		}
+		
+		if(subqueryLevel > -1)	//we're inside a subquery, add this tree pattern to the list of those tree patterns in the inner side of the subquery
+			navigationTreePatternsInsideSubquery.addElementIfNotContained(subqueryLevel, lastTreePattern);
+			
+		return null;
+	}*/
+	public Void visitNameTest(XQueryParser.NameTestContext ctx) { 
+		String tag = "";
+		if(ctx.qName() != null)
+			tag = ctx.qName().QNAME_TOKEN().getText();
+		else if(ctx.getChild(0).getText().compareTo("div") == 0)
+			tag = "div";
+		else if(ctx.getChild(0).getText().compareTo("mod") == 0)
+			tag = "mod";
+		
+		//check whether the node already exists, we need to consider the type of edge too
+		boolean parent = lastSlashToken == XQueryLexer.SLASH ? true : false;
+
+		int nodeCode = -1;
+		NavigationTreePatternNode childNode = null;
+				
+		//NOT IN A XPATH PREDICATE
+		if(insideXPathPredicate == false) {	
+			childNode = lastNode.getChild(tag, parent);
+			
+			//If the node child does not exist then create a new one
+			if(childNode == null) {
+				nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+				childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+				
+				if(doNesting) {
+					//handle let-nesting
+					if(currentStatement == StatementType.LET) {
+						lastNode.addEdge(childNode, parent, true, true);
+						currentStatement = StatementType.NONE;
+					}
+					else
+						lastNode.addEdge(childNode, parent, false, false); 		//parameters: addEdge(PatternNode child, boolean parent, boolean nested, boolean optional)
+				}
+				else
+					lastNode.addEdge(childNode, parent, false, false);	//don't handle let-nesting
+			}
+
+			lastNode.removeMatchingVariables(lastVarLeftSide);
+			varMap.removeVariable(lastVarLeftSide);
+			if(lastNode.checkAnyMatchingVariableStoresValue() == false)
+				lastNode.setStoresValue(false);
+			if(lastNode.checkAnyMatchingVariableStoresContent() == false)
+				lastNode.setStoresContent(false);
+			Variable newVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Content, childNode);
+			varMap.addNewVariable(newVar);
+			childNode.addMatchingVariables(newVar);
+			childNode.setStoresContent(true);
+			if(nextNodeIsAttribute) {
+				//attributes store values
+				newVar.dataType = Variable.VariableDataType.Value;
+				childNode.setAttribute(true);
+				childNode.setStoresValue(true);
+				childNode.setStoresContent(false);
+				nextNodeIsAttribute = false;
+			}
+			//update the affected variable so it points to this node
+			patternNodeMap.put(lastVarLeftSide, childNode);
+			lastNode = childNode;	//for further expansion				
+		}
+		//INSIDE AN XPATH PREDICATE
+		else {	
+			boolean nested = currentStatement == StatementType.LET ? true : false;
+			boolean optional = currentStatement == StatementType.LET ? true : false;
+			if(lastNodeInsideXPathPredicate == null) {
+				childNode = lastNode.getChild(tag, true);
+				if(childNode == null) {
+					nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+					childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+					lastNode.addEdge(childNode, true, false, false);
+					//lastNode.addEdge(childNode, true, nested, optional);
+				}				
+				if(lastVarXPathPredicate == "")
+					lastVarXPathPredicate = XQueryUtils.getNextAuxVariableName();
+			}
+			else {
+				childNode = lastNodeInsideXPathPredicate.getChild(tag, parent);
+				if(childNode == null) {
+					nodeCode = NavigationTreePatternNode.globalNodeCounter.getAndIncrement();
+					childNode = new NavigationTreePatternNode("", tag, nodeCode, "", "", lastTreePattern);
+					//lastNodeInsideXPathPredicate.addEdge(childNode, parent, false, false);
+					lastNodeInsideXPathPredicate.addEdge(childNode, parent, nested, optional);
+				}					
+				//remove the last variable from the last node inside the predicate
+				lastNodeInsideXPathPredicate.removeMatchingVariables(lastVarXPathPredicate);
+				varMap.removeVariable(lastVarXPathPredicate);
+				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresValue() == false)
+					lastNodeInsideXPathPredicate.setStoresValue(false);
+				if(lastNodeInsideXPathPredicate.checkAnyMatchingVariableStoresContent() == false)
+					lastNodeInsideXPathPredicate.setStoresContent(false);
+			}
+			
+			//add a new aux variable to the appropriate node
+			Variable newVar = new Variable(lastVarXPathPredicate, Variable.VariableDataType.Content, childNode);
+			varMap.addNewVariable(newVar);
+			childNode.addMatchingVariables(newVar);
+			childNode.setStoresContent(true);
+			if(nextNodeIsAttribute) {
+				//newVar.dataType = Variable.VariableDataType.Value;
+				childNode.setAttribute(true);
+				childNode.setStoresValue(true);
+				childNode.setStoresContent(false);
+				nextNodeIsAttribute = false;
+			}
+			//update the affected variable so it points to this node
+			//patternNodeMap.put(lastVarXPathPredicate, childNode);
+			lastNodeInsideXPathPredicate = childNode;		
 		}
 		
 		if(subqueryLevel > -1)	//we're inside a subquery, add this tree pattern to the list of those tree patterns in the inner side of the subquery
