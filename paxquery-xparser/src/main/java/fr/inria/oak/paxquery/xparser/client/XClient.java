@@ -89,7 +89,7 @@ public class XClient implements Program, ProgramDescription {
 			System.out.println("Translating algebraic plan to PACT plan.");
 			plan = Logical2Pact.planTranslate(op);
 			plan.setDefaultParallelism(noSubtasks);
-			System.out.println("Plans finished.");
+			//System.out.println("Plans finished.");
 			
 			if(drawTrees) {
 				//PACT drawing
@@ -127,7 +127,7 @@ public class XClient implements Program, ProgramDescription {
 
 		//print output
 		System.out.println("Creating algebraic plan.");
-		//System.out.println("Original algebraic plan: ");
+		System.out.println("Original algebraic plan: ");
 		printParseDetails(tree, parser, loader);
 		//draw Logical Plan 
 		if(drawTrees) {
@@ -142,7 +142,7 @@ public class XClient implements Program, ProgramDescription {
 		//optimized algebraic plan
 		System.out.println("Optimizing algebraic plan.");
 		(new Optimizer()).optimize(loader.logicalPlan);
-		//System.out.println("Optimized algebraic plan: ");
+		System.out.println("Optimized algebraic plan: ");
 		printParseDetails(tree,parser,loader);
 		//draw Logical Plan 
 		if(drawTrees) {
@@ -294,11 +294,11 @@ public class XClient implements Program, ProgramDescription {
 				(new java.io.File(path)).delete();
 			}
 	
-			System.out.println("Creating plan");
+			//System.out.println("Creating plan");
 			Plan plan = client.getPlan(args);
 			
 			
-			System.out.println("Plan created");
+			//System.out.println("Plan created");
 			LocalExecutor.execute(plan);
 		} catch(Exception e) {
 			e.printStackTrace();

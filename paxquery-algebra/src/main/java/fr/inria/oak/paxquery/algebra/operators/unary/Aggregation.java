@@ -43,6 +43,7 @@ public class Aggregation extends BaseUnaryOperator {
 	private int documentIDColumn;
 	
 	private Variable outerVariable;	//variable to which this aggregation is assigned to
+	private Variable innerVariable;	//varaible being aggregated
 	
 
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType) {
@@ -68,9 +69,14 @@ public class Aggregation extends BaseUnaryOperator {
 		this.ownDetails = new String(sb);
 	}
 	
-	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType, Variable outerVariable) {
+	/*public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType, Variable outerVariable) {
 		this(child, aggregationPath, aggregationType);
 		this.outerVariable = outerVariable;
+	}*/
+	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType, Variable outerVariable, Variable innerVariable) {
+		this(child, aggregationPath, aggregationType);
+		this.outerVariable = outerVariable;
+		this.innerVariable = innerVariable;
 	}
 	
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType,
@@ -137,6 +143,14 @@ public class Aggregation extends BaseUnaryOperator {
 	
 	public void setOuterVariable(Variable outerVariable) {
 		this.outerVariable = outerVariable;
+	}
+	
+	public Variable getInnerVariable() {
+		return this.innerVariable;
+	}
+	
+	public void setInnerVariable(Variable innerVariable) {
+		this.innerVariable = innerVariable;
 	}
 	
 }

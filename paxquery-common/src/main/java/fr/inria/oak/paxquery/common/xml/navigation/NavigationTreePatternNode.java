@@ -1747,7 +1747,11 @@ public final class NavigationTreePatternNode implements Serializable, Comparable
 			sb.append("V");
 		}
 		if (this.selectOnValue) {
-			sb.append(" {=" + this.stringValue + "} ");
+			if(this.stringValue != null)
+				sb.append(" {=" + this.stringValue + "} ");
+			else {
+				sb.append(" {"); sb.append(this.selectOnValuePredicate); sb.append(this.doubleValue); sb.append("}");
+			}
 		}
 		return new String(sb);
 	}

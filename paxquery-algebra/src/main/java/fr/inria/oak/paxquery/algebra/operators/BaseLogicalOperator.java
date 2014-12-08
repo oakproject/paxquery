@@ -71,6 +71,10 @@ public abstract class BaseLogicalOperator {
 	 * CLASS METHODS. 
 	 */
 	public void draw(String folder, String givenFileName) {
+		//System.out.println("BaseLogicalOperator:");
+		//System.out.println("\tfolder: "+folder);
+		//System.out.println("\tgivenFileName: "+givenFileName);
+		
 		StringBuffer sb = new StringBuffer();
 		sb.append("digraph  g{\n edge [dir=\"back\"]\n");
 		recursiveDotString(sb, 0, 100);
@@ -89,6 +93,7 @@ public abstract class BaseLogicalOperator {
 			String fileNameDot =  new String(folder+File.separator+givenFileName + "-LogPlan.dot");
 			String fileNamePNG = new String(folder + File.separator + givenFileName + "-LogPlan.png");
 			
+			//System.out.println("fileNameDot: "+fileNameDot);
 			FileWriter file = new FileWriter(fileNameDot);
 			file.write(new String(sb));
 			file.write("}\n");
@@ -97,6 +102,7 @@ public abstract class BaseLogicalOperator {
 			String com = new String("/usr/local/bin/dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
 			Process p = r.exec(com);
 			p.waitFor();
+			//System.out.println("Logical plan drawn.");
 			logger.debug("Logical plan drawn.");
 		} catch (Exception e) {
 			logger.error("Exception: ",e);

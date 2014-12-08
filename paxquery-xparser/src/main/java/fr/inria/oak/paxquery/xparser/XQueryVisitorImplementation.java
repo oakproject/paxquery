@@ -424,7 +424,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * pred
 	 * Builds an XQuery predicate
 	 */
-	public Void visitPred(XQueryParser.PredContext ctx) {
+	/*public Void visitPred(XQueryParser.PredContext ctx) {
 		SimplePredicate predicate = null;
 		PredicateType predType = PredicateType.parse(ctx.vcmp().getText());
 		String leftExpr = ctx.arithmeticExpr_xq(0).VAR().getText();
@@ -534,6 +534,153 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		predicateStack.push(predicate);
 		
 		return null;
+	}*/
+	public Void visitPred(XQueryParser.PredContext ctx) {
+		SimplePredicate predicate = null;
+		PredicateType predType = PredicateType.parse(ctx.vcmp().getText());
+		String leftExpr = ctx.arithmeticExpr_xq(0).VAR().getText();
+		String rightExpr = "";
+		ArithmeticOperation arithOpLeft = null;
+		ArithmeticOperation arithOpRight = null;
+				
+		int patternTreeIndexLeft = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, leftExpr);
+		//left arith-expr, if any
+		if(ctx.arithmeticExpr_xq(0).numericLiteral()!=null) {
+			//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
+			String arithOp = ctx.arithmeticExpr_xq(0).children.get(1).getText();
+			String operand_string = ctx.arithmeticExpr_xq(0).numericLiteral().getText();
+			arithOpLeft = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
+		}
+		
+		int patternTreeIndexRight = -1;
+		if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {
+			rightExpr = ctx.arithmeticExpr_xq(1).VAR().getText();
+			patternTreeIndexRight = XQueryUtils.findVarInPatternTree(scans,  patternNodeMap, rightExpr);
+		}
+		
+		//We build the predicate now, it can be...
+		// VAR ARITH_OP op string_literal,
+		if(ctx.STRING_LITERAL() != null) {
+			rightExpr = XQueryUtils.sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
+			Variable leftVar = varMap.getVariable(leftExpr);
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftVar, arithOpLeft, rightExpr, predType);
+			if(leftVar.dataType != Variable.VariableDataType.Aggregation) {
+				if(subqueryLevel == -1) {
+					if(constructChild == null)
+						constructChild = scans.get(patternTreeIndexLeft);
+					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+					//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+					treePatternVisited.set(patternTreeIndexLeft, true);
+				}
+			}
+		}
+		// VAR ARITH_OP op ('-')? numeric_literal, or
+		else if(ctx.numericLiteral() != null) {
+			rightExpr = ctx.OP_SUB()!=null ? ctx.OP_SUB().getText()+ctx.numericLiteral().getText() : ctx.numericLiteral().getText();
+			Variable leftVar = varMap.getVariable(leftExpr);
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), leftVar, arithOpLeft, Double.parseDouble(rightExpr), predType);
+			if(leftVar.dataType != Variable.VariableDataType.Aggregation) {
+				if(subqueryLevel == -1) {
+					//build the operator
+					if(constructChild == null)
+						constructChild = scans.get(patternTreeIndexLeft);
+					else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+					//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains the left variable
+					treePatternVisited.set(patternTreeIndexLeft, true);
+				}
+			}
+		}
+		// VAR ARITH_OP op VAR ARITH_OP
+		else if(ctx.arithmeticExpr_xq(1) != null && ctx.arithmeticExpr_xq(1).VAR() != null) {   
+			//right arith-expr, if any
+			if(ctx.arithmeticExpr_xq(1).numericLiteral() != null) {
+				//the arithmetic operator is in the 1-th position of the arithmeticExpr_xq child
+				String arithOp = ctx.arithmeticExpr_xq(1).children.get(1).getText();
+				String operand_string = ctx.arithmeticExpr_xq(1).numericLiteral().getText();
+				arithOpRight = new ArithmeticOperation(Operation.parse(arithOp), Double.parseDouble(operand_string));
+			}
+
+			//if needed, pile cartesian products up to include all variables in the algebraic tree
+			if(patternTreeIndexRight != -1) {
+				if(patternTreeIndexRight == patternTreeIndexLeft) {
+					//TODO: i think this predicate can be erased, since a new predicate is built at the end of the method. This is probably an error.
+					predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), predType);
+					if(subqueryLevel == -1) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndexLeft);
+						else if(constructChild != null && treePatternVisited.get(patternTreeIndexLeft) == false)
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+						//in case constructChild != null $$ treePatternVisited.get(patternTreeIndexLeft) == true do nothing since constructChild already contains both variables
+						treePatternVisited.set(patternTreeIndexLeft, true);
+					}
+				}
+				else {
+					if(subqueryLevel == -1) {
+						if(constructChild == null) {
+							if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexLeft, true);
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(scans.get(patternTreeIndexLeft),  scans.get(patternTreeIndexRight));
+							}						
+						}
+						else {
+							if(treePatternVisited.get(patternTreeIndexLeft) == true && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+							}
+							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == true) {
+								constructChild = new CartesianProduct(scans.get(patternTreeIndexRight), constructChild);
+								treePatternVisited.set(patternTreeIndexLeft, true);
+							}
+							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
+								treePatternVisited.set(patternTreeIndexLeft, true);
+								treePatternVisited.set(patternTreeIndexRight, true);
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexLeft));
+								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
+							}
+						}
+					}
+					else {
+						//we're in a subquery, check that the left var belongs to the outer tree and the right var belongs to the inner tree and switch if needed
+						NavigationTreePattern innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+						//adjustLeftRightInSubqueryPredicate(varMap.getVariable(leftExpr), varMap.getVariable(rightExpr), innerTP);
+						if(varMap.getVariable(leftExpr).getTreePattern() != varMap.getVariable(rightExpr).getTreePattern() && varMap.getVariable(leftExpr).getTreePattern() == innerTP) {
+							String auxExpr = leftExpr;
+							leftExpr = rightExpr;
+							rightExpr = auxExpr;
+							predType = complementaryPredType(predType);
+							ArithmeticOperation auxArithOp = arithOpLeft;
+							arithOpLeft = arithOpRight;
+							arithOpRight = auxArithOp;
+						}
+					}
+				}
+			}			
+			
+			predicate = new SimplePredicate(varMap.getTemporaryPositionByName(leftExpr), varMap.getVariable(leftExpr), arithOpLeft, varMap.getTemporaryPositionByName(rightExpr), varMap.getVariable(rightExpr), arithOpRight, predType);
+		}
+	
+		//insert the new predicate in the predicate stack
+		predicateStack.push(predicate);
+		
+		return null;
+	}
+	
+	private PredicateType complementaryPredType(PredicateType predType) {
+		switch(predType) {
+		case PREDICATE_SMALLEROREQUALTHAN:
+			return PredicateType.PREDICATE_GREATEROREQUALTHAN;
+		case PREDICATE_SMALLERTHAN:
+			return PredicateType.PREDICATE_GREATERTHAN;
+		case PREDICATE_GREATEROREQUALTHAN:
+			return PredicateType.PREDICATE_SMALLEROREQUALTHAN;
+		case PREDICATE_GREATERTHAN:
+			return PredicateType.PREDICATE_SMALLERTHAN;
+		default:
+			return predType;
+		}
 	}
 
 	/**
@@ -1190,6 +1337,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						varMap.addNewVariable(aggrVar);						
 						Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
 						aggregation.setOuterVariable(aggrVar);
+						aggregation.setInnerVariable(var);
 						constructChild = aggregation;
 						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
 					}
@@ -1406,6 +1554,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					varMap.addNewVariable(aggrVar);						
 					Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
 					aggregation.setOuterVariable(aggrVar);
+					aggregation.setInnerVariable(var);
 					constructChild = aggregation;
 					varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
 				}
@@ -1440,14 +1589,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				}
 				Variable aggrVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Aggregation);
 				varMap.addNewVariable(aggrVar);
-				constructChild = new Aggregation(constructChild, varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar);
+				constructChild = new Aggregation(constructChild, varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar, var);
+				
 			}
 			else {
 				//inside a subquery, we don't build upon constructChild
 				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
 				Variable aggrVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Aggregation);
 				varMap.addNewVariable(aggrVar);
-				Aggregation aggrOperator = new Aggregation(scans.get(patternTreeIndex), varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar);
+				Aggregation aggrOperator = new Aggregation(scans.get(patternTreeIndex), varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar, var);
 				scans.get(patternTreeIndex).setParent(aggrOperator);
 				treePatternVisited.set(patternTreeIndex, true);
 			}
@@ -1521,6 +1671,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					varMap.addNewVariable(aggrVar);						
 					Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
 					aggregation.setOuterVariable(aggrVar);
+					aggregation.setInnerVariable(var);
 					constructChild = aggregation;
 					varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
 				}

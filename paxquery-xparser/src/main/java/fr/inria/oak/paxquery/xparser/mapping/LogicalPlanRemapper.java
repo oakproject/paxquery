@@ -304,6 +304,23 @@ public class LogicalPlanRemapper {
 		if(operator instanceof XMLScan || operator instanceof Aggregation)
 			variableHoldersList.add(operator);
 	}
+	/*private static void findVariableHolderDescendants(BaseLogicalOperator operator, ArrayList<BaseLogicalOperator> variableHoldersList) {
+		if(variableHoldersList == null)
+			variableHoldersList = new ArrayList<BaseLogicalOperator>();
+		
+		if(operator.getChildren() != null) {
+			if(operator instanceof LeftOuterNestedJoin)
+				findVariableHolderDescendants(((LeftOuterNestedJoin) operator).getLeft(), variableHoldersList);
+			else {
+				for(BaseLogicalOperator child : operator.getChildren())
+					findVariableHolderDescendants(child, variableHoldersList);
+			}
+		}
+		
+		if(operator instanceof XMLScan || operator instanceof Aggregation)
+			variableHoldersList.add(operator);
+	}*/
+
 	
 	/**
 	 * Returns true if "var" points to a node of any of the TPs contained in "scans"; false otherwise

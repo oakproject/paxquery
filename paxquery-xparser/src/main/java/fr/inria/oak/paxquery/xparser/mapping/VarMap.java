@@ -143,6 +143,56 @@ public class VarMap {
 	 * NOTE: the final positions returned are for operator only. Other operators may use different final position values.
 	 * @return a VariablePositionEquivalences object that contains the equivalence between the temporal positions and the final positions of variables 
 	 */
+	/*public VariablePositionEquivalences calculateFinalPositions(ArrayList<BaseLogicalOperator> scanOperators) {
+		VariablePositionEquivalences equivalences = new VariablePositionEquivalences();
+		int positionOffset = 0;
+		int specialPositionOffset = 0;	//for variables not related to XMLScans: those related to groupBy, LONJoin, Aggregations...
+		boolean considerSpecial = false;
+
+		//find the variable which stores a subquery (if any)
+		buildSubqueryOuterVariables();	//find the variable that holds a subquery (if any)
+		for(int i = 0; i < scanOperators.size(); i++) {
+			if(scanOperators.get(i) instanceof XMLScan) {
+				XMLScan scan = (XMLScan) scanOperators.get(i);
+				//add the variable storing the document ID (if needed)
+				if(scan.isAttachDocumentID() == true) {
+					considerSpecial = true;
+					Variable var = getVariable("IDTP-"+scan.getNavigationTreePattern().getName());
+					equivalences.addEquivalence(getTemporaryPositionByName(var.name), positionOffset);
+					positionOffset++;
+					specialPositionOffset++;
+				}
+				else
+					considerSpecial = false;
+				//add the variables in the tree patterns
+				if(positionOffset < specialPositionOffset)
+					positionOffset = specialPositionOffset-1;
+				int newPositionOffset = traverseTreePatternDFS(scan.getNavigationTreePattern().getRoot(), equivalences, positionOffset);
+				if(scan.isAttachDocumentID())
+					specialPositionOffset += (newPositionOffset - positionOffset);
+				positionOffset = newPositionOffset;
+			}
+			else if(scanOperators.get(i) instanceof Aggregation) {
+				Aggregation aggr = (Aggregation) scanOperators.get(i);
+				if(considerSpecial) {
+					equivalences.addEquivalence(getTemporaryPositionByName(aggr.getOuterVariable().name), specialPositionOffset);
+					specialPositionOffset++;
+				}
+				else {
+					equivalences.addEquivalence(getTemporaryPositionByName(aggr.getOuterVariable().name), positionOffset);
+					positionOffset++;
+				}
+			}
+			//add the variable storing the subquery, if all scans on the left are marked as attaching a documentID and the next does not
+			if(i < scanOperators.size()-1 && scanOperators.get(i+1) instanceof XMLScan && ((XMLScan)scanOperators.get(i+1)).isAttachDocumentID() == false 
+					&& subqueryOuterVariables != null && subqueryOuterVariables.size() > 0) {
+				equivalences.addEquivalence(getTemporaryPositionByName(subqueryOuterVariables.get(0).name), specialPositionOffset);
+				specialPositionOffset++;
+				//deliberatedly don't increase positionOffset
+			}
+		}
+		return equivalences;
+	}*/
 	public VariablePositionEquivalences calculateFinalPositions(ArrayList<BaseLogicalOperator> scanOperators) {
 		VariablePositionEquivalences equivalences = new VariablePositionEquivalences();
 		int positionOffset = 0;
@@ -174,6 +224,9 @@ public class VarMap {
 			}
 			else if(scanOperators.get(i) instanceof Aggregation) {
 				Aggregation aggr = (Aggregation) scanOperators.get(i);
+				Variable innerVar = aggr.getInnerVariable();
+				if(innerVar.dataType == Variable.VariableDataType.Subquery)
+					considerSpecial = true;				
 				if(considerSpecial) {
 					equivalences.addEquivalence(getTemporaryPositionByName(aggr.getOuterVariable().name), specialPositionOffset);
 					specialPositionOffset++;
