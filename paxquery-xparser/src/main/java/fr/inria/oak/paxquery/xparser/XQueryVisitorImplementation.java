@@ -349,14 +349,43 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * Retrieves the appropriate tree and node for further expansion in the following case: another_var := VAR/whatever
 	 * TODO: merge with visitPathExprInner_xq_doc and visitPathExprInner_xq_collection
 	 */
-	public Void visitPathExprInner_xq_VAR(XQueryParser.PathExprInner_xq_VARContext ctx) {
+	/*public Void visitPathExprInner_xq_VAR(XQueryParser.PathExprInner_xq_VARContext ctx) {
 		String var_to_expand = ctx.VAR().getText();
 		lastNode = varMap.getVariable(var_to_expand).node;
 		
 		lastTreePattern = lastNode.getTreePattern();
 		
 		return null;
+	}*/
+	public Void visitPathExprInner_xq_VAR(XQueryParser.PathExprInner_xq_VARContext ctx) {
+		String var_to_expand = ctx.VAR().getText();
+		lastNode = varMap.getVariable(var_to_expand).node;
+		lastTreePattern = lastNode.getTreePattern();
+
+		//if the same tree is accessed outside and inside the subquery then we need to clone it
+		if(subqueryLevel > -1 && navigationTreePatternsInsideSubquery.containsElement(subqueryLevel, lastTreePattern) == false ) {
+			//newTreePattern = clone(lastTreePattern)
+			//NavigationTreePattern.deepCopy() does not copy references to Variables, this is ok since we don't want them in the new tree 
+			NavigationTreePattern newTreePattern = lastTreePattern.deepCopy();
+			//lastNode = findNodeInTP(lastNode, newTreePattern)
+			int nodeCode = lastNode.getNodeCode();
+			NavigationTreePatternNode newNode = newTreePattern.getRoot().locate(nodeCode);	//obtain the node VAR is pointing to, this time in the new tree
+			//lastNode = newTreePattern.getRoot().locate(nodeCode);	//obtain the node VAR is pointing to, this time in the new tree
+			newTreePattern.getRoot().pruneAllButPathTo(newNode);	//prune the rest of the tree, since we don't need that in the new tree
+			//navigationTreePatternsInsideSubquery.add(newTreePattern)
+			navigationTreePatternsInsideSubquery.addElement(subqueryLevel, newTreePattern);
+			//scans.add(new XMLScan(newTreePattern))
+			int tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, lastTreePattern);
+			scans.add(new XMLScan(false, newTreePattern, scans.get(tpIndex).getPathDocuments()));
+			treePatternVisited.add(false);
+			//lastTreePattern = newTreePattern
+			lastNode = newNode;
+			lastTreePattern = newTreePattern;
+		}
+		
+		return null;
 	}
+
 	
 	/**
 	 * where
@@ -631,7 +660,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 								constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndexRight));
 							}
 							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == true) {
-								constructChild = new CartesianProduct(scans.get(patternTreeIndexRight), constructChild);
+								constructChild = new CartesianProduct(scans.get(patternTreeIndexLeft), constructChild);
 								treePatternVisited.set(patternTreeIndexLeft, true);
 							}
 							else if(treePatternVisited.get(patternTreeIndexLeft) == false && treePatternVisited.get(patternTreeIndexRight) == false) {
