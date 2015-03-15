@@ -103,6 +103,14 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 		this.wrt.append(sb);
 	}
 	
+	private void printRecord(Record record) {
+		System.out.println("RECORD: ");
+		for(int i = 0; i < record.getNumFields(); i++) {
+			System.out.print(i+": "+record.getField(i, StringValue.class));
+		}
+		System.out.println();
+	}
+	
 	private StringBuilder[][] writeRecord(RecordList listRecords, NestedMetadata signature, ConstructionTreePattern[] ctps, AtomicBoolean[] nullResults) throws IOException {
 		StringBuilder[][] result = new StringBuilder[listRecords.size()][ctps.length];
 		for(int i=0; i<listRecords.size(); i++) {
@@ -113,6 +121,8 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 		
 		for(int i=0; i<listRecords.size(); i++) { //For each record
 			Record record = listRecords.get(i);
+			
+			//printRecord(record);
 
 			for(int j=0; j<ctps.length; j++) { //For each CTP
 				ConstructionTreePattern ctp = ctps[j];

@@ -95,6 +95,11 @@ public class LogicalPlanRemapper {
 		//then substitute
 		substituteVariablesInCTP(construct.getConstructionTreePattern().getRoot(), equivalences);
 		
+		if(print == true && equivalences != null) {
+			System.out.println("VarMap for " + construct.getClass().getSimpleName() +" " + varMap.printNamesFinals(equivalences));
+			System.out.println("Output tuple length for "+construct.getClass().getSimpleName() + ": "+(sublengths.get(0)+1));
+		}
+		
 		return sublengths.get(0);
 	}
 	
@@ -230,7 +235,8 @@ public class LogicalPlanRemapper {
 			System.out.print("nodeIDColumns: {");
 			for(int i = 0; i < nodeIDs.length-1; i++)
 				System.out.print(nodeIDs[i] + ", ");
-			System.out.println(nodeIDs[nodeIDs.length-1]+" }");
+			if(nodeIDs.length > 0)
+				System.out.println(nodeIDs[nodeIDs.length-1]+" }");
 		}
 
 		//now remap the predicate
