@@ -60,9 +60,13 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public ArrayList<NavigationTreePattern> navigationTreePatterns;	//the list of all TreePattern objects built for a given query
 	public ArrayList2Dims<NavigationTreePattern> navigationTreePatternsInsideSubquery;	//rows: subquery level (0: first subquery)
 	public ArrayList<Boolean> whereStatementInSubqueryLevel;	//if whereStatementInSubqueryLevel.get(0) == true means that the first subquery level contains a "where" statement
+	public ArrayList<Boolean> operatorsProcessedInSubqueryLevel;//if operatorsProcessedInSubqueryLevel.get(0) == true means that the operators containing the affected Navigation Trees have already been included in the main algebraic operator tree (this is useful when processin the return statement in a subquery: if we have included the affected operators when processing an attribute, then we should not include them again when processing a subsequent eleConstInner, for example) 
 	
 	public ConstructionTreePattern constructionTreePattern;	//holds the XML tree indicated in the return statement. To be used with the XMLConstruct operator
 	public ConstructionTreePatternNode lastConstructionTreePatternNode;		
+	public ConstructionTreePattern subqueryConstructionTreePattern;
+	public ConstructionTreePatternNode lastSubqueryConstructionTreePatternNode;
+	
 	
 	/**
 	 * State variables for parsing
@@ -85,8 +89,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean doNesting = true;
 	private int subqueryLevel = -1;	//-1 implies no subquery found. The first subquery is subqueryLevel 0
 	private boolean subqueryWithWhere = false;
+	private boolean operatorsProcessedInSubquery = false;
 	private ArrayList<BaseNestingOperatorInfo> subqueryInfoList;
 	private boolean notOccurrence = false;
+	
 	
 	
 	/**
@@ -103,6 +109,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		navigationTreePatternsInsideSubquery = new ArrayList2Dims<NavigationTreePattern>(0);
 		subqueryInfoList = new ArrayList<BaseNestingOperatorInfo>();
 		whereStatementInSubqueryLevel = new ArrayList<Boolean>();
+		operatorsProcessedInSubqueryLevel = new ArrayList<Boolean>();
 		lastSlashToken = 0;
 		nextNodeIsAttribute = false;
 		insideReturn = false;
@@ -183,6 +190,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			subqueryLevel++;
 			navigationTreePatternsInsideSubquery.addRow();
 			whereStatementInSubqueryLevel.add(false);
+			operatorsProcessedInSubqueryLevel.add(false);
 		}
 		
 		visitChildren(ctx); 
@@ -1378,199 +1386,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * Terminates the program when an attribute is used as an XML value in the input query
 	 * i.e.: <item>@attrib</item> rather than <item attrib="@attrib"></item>
 	 */
-	/*public Void visitReturnStat(XQueryParser.ReturnStatContext ctx) {
-		insideReturn = true;
-		//adjust parents
-		if(constructChild != null) {
-			logicalPlan.setRoot(constructChild);
-			logicalPlan.adjustParents();
-		}
-		//prepare subquery-related operators
-		if(subqueryLevel == -1) {
-			for(BaseNestingOperatorInfo info : subqueryInfoList) {
-				try {
-					info.updateOperatorState();
-				} catch(PAXQueryExecutionException paxe) {
-					throw paxe;
-				}
-			}
-		}
-		
-		//manually visit the next rule
-		if(ctx.eleConst()!=null)
-			visit(ctx.eleConst());
-		//if not, we have an aggrExpr or a VAR
-		else if(ctx.aggrExpr() != null || ctx.VAR() != null) {
-			String varName;
-			if(ctx.aggrExpr() != null)	//we have an aggrExpr
-				varName = ctx.aggrExpr().VAR().getText();			 
-			else	//we have a VAR
-				varName = ctx.VAR().getText();
-
-			Variable var = varMap.getVariable(varName);
-			if(subqueryLevel == -1){	//not in a subquery
-				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
-				if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery || var.dataType == Variable.VariableDataType.Aggregation)) {
-					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
-					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
-					if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-						if(constructChild == null)
-							constructChild = scans.get(patternTreeIndex);
-						else
-							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-						treePatternVisited.set(patternTreeIndex, true);
-					}
-					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
-					int[] varpath = null; 
-					if(var.dataType == Variable.VariableDataType.Subquery && var.hasNestedVariables()) {
-						//subquery
-						ArrayList<Integer> list = new ArrayList<Integer>();
-						list.add(varMap.getTemporaryPositionByName(varName));
-						list.add(var.nestedPaths.get(0));
-						boolean nested = (var.nestedVariables.get(0).dataType != Variable.VariableDataType.Aggregation) && (var.nestedVariables.get(0).node.getNestingDepth() > 0);
-						if(nested == true)
-							list.add(-1);		
-						varpath = XQueryUtils.IntegerListToIntArray(list);
-					}
-					else if(var.node != null && var.node.getNestingDepth() > 0) {
-						//nested let
-						varpath = new int[2];
-						varpath[0] = varMap.getTemporaryPositionByName(varName);
-						varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
-					}
-					else	//for or non-nested let
-						varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
-					
-					if(ctx.aggrExpr() != null) {
-						//instantiate an Aggregation operator
-						AggregationType aggrType = XQueryUtils.StringToAggregationType(ctx.aggrExpr().AGGR_FUNCT().getText());
-						Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
-						varMap.addNewVariable(aggrVar);						
-						Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
-						aggregation.setOuterVariable(aggrVar);
-						aggregation.setInnerVariable(var);
-						constructChild = aggregation;
-						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
-					}
-					
-					ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
-					constructionTreePattern = new ConstructionTreePattern(root);
-					root.setConstructionTreePattern(constructionTreePattern);
-					lastConstructionTreePatternNode = root;
-				}	
-				else
-					throw new PAXQueryExecutionException("The variable "+ varName +" was not previously assigned.");
-			}
-			else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
-				if(subqueryWithWhere == true) {
-					if(scans.size() != 2)
-						throw new PAXQueryExecutionException("Currently only one outer Tree Pattern and one inner Tree Pattern are supported in Left Nested Outer Joins.");
-					//get the inner TP
-					NavigationTreePattern innerTP = null;
-					BaseLogicalOperator rightChild = null;
-					int tpIndex = -1;
-					if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) == 1) {
-						innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
-						if(innerTP != null) {
-							logicalPlan.setLeaves(scans);
-							rightChild = logicalPlan.getTopFromLeaf(innerTP);
-							tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
-							if(tpIndex != -1)
-								treePatternVisited.set(tpIndex,  true);
-						}
-					}
-					else 
-						throw new PAXQueryExecutionException("Currently only one inner Tree Pattern is supported in Left Nested Outer Joins.");
-					//get the single outer TP
-					ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
-					for(int i = 0; i < scans.size(); i++) {
-						if(logicalPlan.getTopFromLeaf(scans.get(i)) != rightChild) {
-							if(constructChild == null)
-								constructChild = scans.get(i);
-							treePatternVisited.set(i, true);
-							outerScans.add(scans.get(i));
-						}	//remember we're currently accepting 2 TPs: one outer and one inner
-					}
-					//add the variable that contains the subquery
-					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
-					varMap.addNewVariable(outerVarObject);
-					//get the predicate
-					BasePredicate predicate = predicateStack.pop();
-					if(predicate == null)
-						throw new PAXQueryExecutionException("The predicate for the Left Outer Nested Join does not exist.");
-					//instantiate the LeftOuterNestedJoin operator
-					constructChild = new LeftOuterNestedJoin(constructChild, rightChild, predicate, -1, new int[0]);
-					//instantiate a LeftOuterNestedJoinInfo for later update of the GroupBy operator
-					subqueryInfoList.add(new LeftOuterNestedJoinInfo((LeftOuterNestedJoin)constructChild , outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
-					
-					subqueryWithWhere = false;
-				}
-				else {	//subquery without a where, we build a chain of Cartesian Products with a GroupBy on top
-					ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
-					//BaseOperator rightChild = inner tree
-					NavigationTreePattern innerTP = null;
-					BaseLogicalOperator rightChild = null;
-					int tpIndex = -1;
-					if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) > 0) {
-						innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
-						if(innerTP != null) {
-							logicalPlan.setLeaves(scans);
-							rightChild = logicalPlan.getTopFromLeaf(innerTP);		
-							tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
-							if(tpIndex != -1)
-								treePatternVisited.set(tpIndex, true);
-						}
-					}				
-					//for the other trees: create CPs if needed
-					//if constructChild == null, do CP with all outer XMLScans 
-					if(constructChild == null) {// && scans.size() > 1) {
-						if(scans.size() > 1) {
-							for(int i = 0; i < scans.size(); i++) {
-								if(logicalPlan.getTopFromLeaf(scans.get(i)) != rightChild) {
-									if(constructChild == null)
-										constructChild = scans.get(i);
-									else
-										constructChild = new CartesianProduct(constructChild, scans.get(i));
-									treePatternVisited.set(i, true);
-									outerScans.add(scans.get(i));
-								}
-							}
-						}
-						else {
-							constructChild = scans.get(0);
-							treePatternVisited.set(0, true);
-							outerScans.add(scans.get(0));
-						}
-					}
-					else {
-						for(int i = 0; i < scans.size(); i++) {
-							if(scans.get(i) != rightChild) {
-								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
-								if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
-									constructChild = new CartesianProduct(constructChild, topFromLeaf);
-								treePatternVisited.set(i,  true);
-								outerScans.add(scans.get(i));
-							}
-						}
-					}				
-					//instantiate CP between the outer and the inner scans
-					constructChild = new CartesianProduct(constructChild, rightChild);
-					//add the variable that contains the subquery
-					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
-					varMap.addNewVariable(outerVarObject);
-					//instantiate a temporary empty GroupBy operator
-					constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
-					//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
-					subqueryInfoList.add(new GroupByInfo((GroupBy)constructChild, outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
-				}
-			}
-		}		
-		insideReturn = false;
-
-		return null;
-	}*/
 	public Void visitReturnStat(XQueryParser.ReturnStatContext ctx) {
 		insideReturn = true;
+		operatorsProcessedInSubquery = false;
 		//adjust parents
 		if(constructChild != null) {
 			logicalPlan.setRoot(constructChild);
@@ -1586,10 +1404,16 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				}
 			}
 		}
-		
 		//manually visit the next rule
-		if(ctx.eleConst()!=null)
+		if(ctx.eleConst()!=null) {
 			visit(ctx.eleConst());
+
+			//update all varpaths in the nested ctp with the position of the outer variable
+			if(subqueryLevel > -1) {
+				Variable outerVarObject = varMap.getVariable(outerVarSubquery);
+				outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+			}
+		}
 		//if not, we have an aggrExpr or a VAR
 		else if(ctx.aggrExpr() != null || ctx.VAR() != null) {
 			String varName;
@@ -1599,7 +1423,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				varName = ctx.VAR().getText();
 
 			Variable var = varMap.getVariable(varName);
-			if(subqueryLevel == -1){	//not in a subquery
+			if(subqueryLevel == -1) {	//not in a subquery
+				boolean buildConstructionTreePattern = true;
+				ConstructionTreePatternNode root = null;
 				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
 				if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery || var.dataType == Variable.VariableDataType.Aggregation)) {
 					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
@@ -1613,26 +1439,33 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					}
 					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
 					int[] varpath = null; 
-					if(var.dataType == Variable.VariableDataType.Subquery && var.hasNestedVariables()) {
-						//subquery
-						ArrayList<Integer> list = new ArrayList<Integer>();
-						list.add(varMap.getTemporaryPositionByName(varName));
-						list.add(var.nestedPaths.get(0));
-						boolean nested = (var.nestedVariables.get(0).dataType != Variable.VariableDataType.Aggregation) && (var.nestedVariables.get(0).node.getNestingDepth() > 0);
-						if(nested == true)
-							list.add(-1);		
-						varpath = XQueryUtils.IntegerListToIntArray(list);
+					if(var.dataType == Variable.VariableDataType.Subquery && var.nestedCTPRoot != null) {
+						//root = var.nestedCTPRoot;
+						//constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, var.nestedCTPRoot);
+						root = ConstructionTreePattern.deepCopySubtreeDuplicateVarpaths(var.nestedCTPRoot).getRoot();
+						constructionTreePattern = root.getConstructionTreePattern();
+						lastConstructionTreePatternNode = root;
+						buildConstructionTreePattern = false;
 					}
-					else if(var.node != null && var.node.getNestingDepth() > 0) {
-						//nested let
-						varpath = new int[2];
-						varpath[0] = varMap.getTemporaryPositionByName(varName);
-						varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+					else {
+						if(var.node != null && var.node.getNestingDepth() > 0) {
+							//nested let
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+						else	//for or non-nested let
+							varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+						root = new ConstructionTreePatternNode(null,ContentType.VARIABLE_PATH, varpath, false);
 					}
-					else	//for or non-nested let
-						varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
 					
 					if(ctx.aggrExpr() != null) {
+						if(varpath == null) {
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+						//REDO: for the case of subqueries, we need to check if aggregationtype is COUNT. In that case, calculate the varpath and input it to the Aggregation operator. If not COUNT, then Exception("you can not SUM,MAX,AVG,etc XML nodes!)
 						//instantiate an Aggregation operator
 						AggregationType aggrType = XQueryUtils.StringToAggregationType(ctx.aggrExpr().AGGR_FUNCT().getText());
 						Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
@@ -1642,16 +1475,21 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						aggregation.setInnerVariable(var);
 						constructChild = aggregation;
 						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
+						root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+						buildConstructionTreePattern = true;
 					}
 					
-					ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
-					constructionTreePattern = new ConstructionTreePattern(root);
-					root.setConstructionTreePattern(constructionTreePattern);
-					lastConstructionTreePatternNode = root;
+					//if(constructionTreePattern == null) {
+					if(buildConstructionTreePattern) {
+						//ConstructionTreePatternNode root = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+						constructionTreePattern = new ConstructionTreePattern(root);
+						root.setConstructionTreePattern(constructionTreePattern);
+						lastConstructionTreePatternNode = root;
+					}
 				}	
 				else
 					throw new PAXQueryExecutionException("The variable "+ varName +" was not previously assigned.");
-			}
+			}	
 			else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
 				if(subqueryWithWhere == true) {
 					//if(scans.size() != 2)
@@ -1673,16 +1511,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					else 
 						throw new PAXQueryExecutionException("Currently only one inner Tree Pattern is supported in Left Nested Outer Joins.");
 					
-					/*//get the single outer TP
-					ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
-					for(int i = 0; i < scans.size(); i++) {
-						if(logicalPlan.getTopFromLeaf(scans.get(i)) != rightChild) {
-							if(constructChild == null)
-								constructChild = scans.get(i);
-							treePatternVisited.set(i, true);
-							outerScans.add(scans.get(i));
-						}	//remember we're currently accepting 2 TPs: one outer and one inner
-					}*/
 					//for the other trees: create CPs if needed
 					//if constructChild == null, do CP with all outer XMLScans 
 					ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
@@ -1717,9 +1545,21 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 					}		
 					
+					ArrayList<Integer> list = new ArrayList<Integer>();
+					list.add(varMap.getTemporaryPositionByName(varName));
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
+					if(nested == true)
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+
+					//crate a CTPNode with a varpath for the innervariable of the outervariable
+					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
 					//add the variable that contains the subquery
 					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					//connect the new variable to the new CTP
+					outerVarObject.setNestedCTP(ctpnode);
 					varMap.addNewVariable(outerVarObject);
+					outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 					//get the predicate
 					BasePredicate predicate = predicateStack.pop();
 					if(predicate == null)
@@ -1781,9 +1621,23 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					}				
 					//instantiate CP between the outer and the inner scans
 					constructChild = new CartesianProduct(constructChild, rightChild);
+					
+					ArrayList<Integer> list = new ArrayList<Integer>();
+					list.add(varMap.getTemporaryPositionByName(varName));
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
+					if(nested == true)
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+					
+					//crate a CTPNode with a varpath for the innervariable of the outervariable
+					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+					
 					//add the variable that contains the subquery
 					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					//connect the new variable to the new CTP
+					outerVarObject.setNestedCTP(ctpnode);
 					varMap.addNewVariable(outerVarObject);
+					outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 					//instantiate a temporary empty GroupBy operator
 					constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
 					//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
@@ -1791,6 +1645,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				}
 			}
 		}		
+		operatorsProcessedInSubquery = false;
 		insideReturn = false;
 
 		return null;
@@ -1803,31 +1658,59 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitEleConst(XQueryParser.EleConstContext ctx) {
 		String tag = ctx.eaName(0).getText();
 		ConstructionTreePatternNode node = new ConstructionTreePatternNode(ContentType.ELEMENT, tag, false);
-		if(constructionTreePattern == null)
-			constructionTreePattern = new ConstructionTreePattern(node);
-		else {
-			constructionTreePattern.addChild(lastConstructionTreePatternNode, node);
-			node.setConstructionTreePattern(constructionTreePattern);
+		if(subqueryLevel == -1) {	//not in a sub-query
+			if(constructionTreePattern == null)
+				constructionTreePattern = new ConstructionTreePattern(node);
+			else {
+				constructionTreePattern.addChild(lastConstructionTreePatternNode, node);
+				node.setConstructionTreePattern(constructionTreePattern);
+			}
+			lastConstructionTreePatternNode = node;
 		}
-		lastConstructionTreePatternNode = node;
+		else {	//inside a sub-query
+			if(subqueryConstructionTreePattern == null)
+				subqueryConstructionTreePattern = new ConstructionTreePattern(node);
+			else {
+				subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, node);
+				node.setConstructionTreePattern(subqueryConstructionTreePattern);
+			}
+			lastSubqueryConstructionTreePatternNode = node;
+		}
 		
 		//manually visit all attributes
 		for(int i = 0; i < ctx.att().size(); i++)
 			visit(ctx.att(i));
 		//if "eleConst : LT_S eaName att* CLOSE_OPENING_TAG" then we're done
 
-		//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
-		if(ctx.GT_S().size() > 0) {
-			for(int i = 0; i < ctx.children.size(); i++) {
-				lastConstructionTreePatternNode = node;
-				//we find an eleConst rule
-				if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
-						ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
-					visit(ctx.getChild(i));
+		if(subqueryLevel == -1) {	//not inside a sub-query
+			//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
+			if(ctx.GT_S().size() > 0) {
+				for(int i = 0; i < ctx.children.size(); i++) {
+					lastConstructionTreePatternNode = node;
+					//we find an eleConst rule
+					if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
+							ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
+						visit(ctx.getChild(i));
+					}
 				}
+				lastConstructionTreePatternNode = node.getParent();					
 			}
-			lastConstructionTreePatternNode = node.getParent();					
 		}
+		else {	//inside a sub-query
+			//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
+			if(ctx.GT_S().size() > 0) {
+				for(int i = 0; i < ctx.children.size(); i++) {
+					lastSubqueryConstructionTreePatternNode = node;
+					//we find an eleConst rule
+					if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
+							ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
+						visit(ctx.getChild(i));
+					}
+				}
+				lastSubqueryConstructionTreePatternNode = node.getParent();					
+			}
+		}
+		
 		return null;
 	}
 
@@ -1837,68 +1720,266 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitAtt(XQueryParser.AttContext ctx) {
 		//ConstructionTreePatternNode auxNode;
 		ConstructionTreePatternNode attNode; 
-		//XML node for the attribute itself
-		attNode = new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE, ctx.eaName().getText(), false);
-		constructionTreePattern.addChild(lastConstructionTreePatternNode, attNode);
-		//XML node for the attribute content
-		AttInnerContext attInner = ctx.attInner();
-		if(attInner.attInner2() == null) 	//then we have attInner : STRING_LITERAL
-			constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE_VALUE, attInner.STRING_LITERAL().getText(), false));
-		else {
-			AttInner2Context attInner2 = attInner.attInner2();
-			String varName;
-			if(attInner2.aggrExpr() != null)
-				varName = attInner2.aggrExpr().VAR().getText();
-			else
-				varName = attInner2.VAR().getText();
-			Variable var = varMap.getVariable(varName);
-			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
-			if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery) || var.dataType == Variable.VariableDataType.Aggregation) {
-				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
-				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
-				if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-					if(constructChild == null)
-						constructChild = scans.get(patternTreeIndex);
-					else
-						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-					treePatternVisited.set(patternTreeIndex, true);
+		if(subqueryLevel == -1) {	//not in a sub-query
+			//XML node for the attribute itself
+			attNode = new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE, ctx.eaName().getText(), false);
+			constructionTreePattern.addChild(lastConstructionTreePatternNode, attNode);
+			lastConstructionTreePatternNode = attNode;
+			//XML node for the attribute content
+			AttInnerContext attInner = ctx.attInner();
+			if(attInner.attInner2() == null) 	//then we have attInner : STRING_LITERAL
+				constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE_VALUE, attInner.STRING_LITERAL().getText(), false));
+			else {
+				AttInner2Context attInner2 = attInner.attInner2();
+				String varName;
+				if(attInner2.aggrExpr() != null)
+					varName = attInner2.aggrExpr().VAR().getText();
+				else
+					varName = attInner2.VAR().getText();
+				Variable var = varMap.getVariable(varName);
+				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+				if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery) || var.dataType == Variable.VariableDataType.Aggregation) {
+					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+					if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndex);
+						else
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
+						treePatternVisited.set(patternTreeIndex, true);
+					}
+					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+					int[] varpath = null; 
+					ConstructionTreePatternNode ctpNodeToAdd = null;
+					if(var.dataType == Variable.VariableDataType.Subquery && var.nestedCTPRoot != null) {
+						var.nestedCTPRoot.setCTPFromHere(constructionTreePattern);
+						ctpNodeToAdd = var.nestedCTPRoot;
+					}
+					else {
+						if(var.node != null && var.node.getNestingDepth() > 0) {
+							//we have a nested let
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+							
+						}
+						else	//for or non-nested let
+							varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					}				
+					if(attInner2.aggrExpr() != null) {
+						//varpath for the Aggregation operator
+						if(varpath == null) {
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+						//REDO: for the case of subqueries, we need to check if aggregationtype is COUNT. In that case, calculate the varpath and input it to the Aggregation operator. If not COUNT, then Exception("you can not SUM,MAX,AVG,etc XML nodes!)
+						//instantiate an Aggregation operator
+						AggregationType aggrType = XQueryUtils.StringToAggregationType(attInner2.aggrExpr().AGGR_FUNCT().getText());
+						Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
+						varMap.addNewVariable(aggrVar);						
+						Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
+						aggregation.setOuterVariable(aggrVar);
+						aggregation.setInnerVariable(var);
+						constructChild = aggregation;
+						//varpath for the CTPNode
+						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
+						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					}
+					
+					constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, ctpNodeToAdd);
 				}
-				//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
-				int[] varpath = null; 
-				if(var.dataType == Variable.VariableDataType.Subquery && var.hasNestedVariables()) {
-					//subquery
+			}
+		}
+		else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
+			//XML node for the attribute itself
+			attNode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE, ctx.eaName().getText(), false);
+			subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, attNode);
+			lastSubqueryConstructionTreePatternNode = attNode;
+			//XML node for the attribute content
+			AttInnerContext attInner = ctx.attInner();
+			if(attInner.attInner2() == null) 	//then we have attInner : STRING_LITERAL
+				subqueryConstructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE_VALUE, attInner.STRING_LITERAL().getText(), false));
+			else {
+				AttInner2Context attInner2 = attInner.attInner2();
+				String varName;
+				if(attInner2.aggrExpr() != null)
+					varName = attInner2.aggrExpr().VAR().getText();
+				else
+					varName = attInner2.VAR().getText();
+
+				Variable var = varMap.getVariable(varName);
+				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+
+				ConstructionTreePatternNode ctpnode = null;
+				Variable outerVarObject = null;
+				//if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
+				if(subqueryWithWhere == true) {
+					if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
+						//get the inner TP
+						NavigationTreePattern innerTP = null;
+						BaseLogicalOperator rightChild = null;
+						int tpIndex = -1;
+						if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) == 1) {
+							innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+							if(innerTP != null) {
+								logicalPlan.setLeaves(scans);
+								rightChild = logicalPlan.getTopFromLeaf(innerTP);
+								tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+								if(tpIndex != -1)
+									treePatternVisited.set(tpIndex,  true);
+							}
+						}
+						else 
+							throw new PAXQueryExecutionException("Currently only one inner Tree Pattern is supported in Left Nested Outer Joins.");
+						
+						//for the other trees: create CPs if needed
+						//if constructChild == null, do CP with all outer XMLScans 
+						ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
+						if(constructChild == null) {// && scans.size() > 1) {
+							if(scans.size() > 1) {
+								for(int i = 0; i < scans.size(); i++) {
+									if(logicalPlan.getTopFromLeaf(scans.get(i)) != rightChild) {
+										if(constructChild == null)
+											constructChild = scans.get(i);
+										else
+											constructChild = new CartesianProduct(constructChild, scans.get(i));
+										treePatternVisited.set(i, true);
+										outerScans.add(scans.get(i));
+									}
+								}
+							}
+							else {
+								constructChild = scans.get(0);
+								treePatternVisited.set(0, true);
+								outerScans.add(scans.get(0));
+							}
+						}
+						else {
+							for(int i = 0; i < scans.size(); i++) {
+								if(scans.get(i) != rightChild) {
+									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
+										constructChild = new CartesianProduct(constructChild, topFromLeaf);
+									treePatternVisited.set(i,  true);
+									outerScans.add(scans.get(i));
+								}
+							}
+						}	
+						
+						//add the variable that contains the subquery
+						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);					
+						//subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
+						//outerVarObject.setNestedCTP(lastSubqueryConstructionTreePatternNode);
+						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
+						//outerVarObject.nestedCTPRoot = ctpnode;
+						varMap.addNewVariable(outerVarObject);
+						//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+						
+						//get the predicate
+						BasePredicate predicate = predicateStack.pop();
+						if(predicate == null)
+							throw new PAXQueryExecutionException("The predicate for the Left Outer Nested Join does not exist.");
+
+						//instantiate the LeftOuterNestedJoin operator
+						constructChild = new LeftOuterNestedJoin(constructChild, rightChild, predicate, -1, new int[0]);
+						//instantiate a LeftOuterNestedJoinInfo for later update of the GroupBy operator
+						subqueryInfoList.add(new LeftOuterNestedJoinInfo((LeftOuterNestedJoin)constructChild , outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
+						
+						operatorsProcessedInSubquery = true;
+					}
+					
 					ArrayList<Integer> list = new ArrayList<Integer>();
 					list.add(varMap.getTemporaryPositionByName(varName));
-					list.add(var.nestedPaths.get(0));
-					boolean nested = (var.nestedVariables.get(0).dataType != Variable.VariableDataType.Aggregation) && (var.nestedVariables.get(0).node.getNestingDepth() > 0);
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
 					if(nested == true)
-						list.add(-1);		
-					varpath = XQueryUtils.IntegerListToIntArray(list);
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+					//create a CTPNode with a varpath for the innervariable of the outervariable
+					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
+					lastSubqueryConstructionTreePatternNode = lastSubqueryConstructionTreePatternNode.getParent();
 				}
-				else if(var.node != null && var.node.getNestingDepth() > 0) {
-					//we have a nested let
-					varpath = new int[2];
-					varpath[0] = varMap.getTemporaryPositionByName(varName);
-					varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+				else {	//subquery without a where, we build a chain of Cartesian Products with a GroupBy on top
+					if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
+						ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
+						//BaseOperator rightChild = inner tree
+						NavigationTreePattern innerTP = null;
+						BaseLogicalOperator rightChild = null;
+						int tpIndex = -1;
+						if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) > 0) {
+							innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+							if(innerTP != null) {
+								logicalPlan.setLeaves(scans);
+								rightChild = logicalPlan.getTopFromLeaf(innerTP);		
+								tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+								if(tpIndex != -1)
+									treePatternVisited.set(tpIndex, true);
+							}
+						}				
+						//for the other trees: create CPs if needed
+						//if constructChild == null, do CP with all outer XMLScans 
+						if(constructChild == null) {// && scans.size() > 1) {
+							if(scans.size() > 1) {
+								for(int i = 0; i < scans.size(); i++) {
+									if(logicalPlan.getTopFromLeaf(scans.get(i)) != rightChild) {
+										if(constructChild == null)
+											constructChild = scans.get(i);
+										else
+											constructChild = new CartesianProduct(constructChild, scans.get(i));
+										treePatternVisited.set(i, true);
+										outerScans.add(scans.get(i));
+									}
+								}
+							}
+							else {
+								constructChild = scans.get(0);
+								treePatternVisited.set(0, true);
+								outerScans.add(scans.get(0));
+							}
+						}
+						else {
+							for(int i = 0; i < scans.size(); i++) {
+								if(scans.get(i) != rightChild) {
+									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
+										constructChild = new CartesianProduct(constructChild, topFromLeaf);
+									treePatternVisited.set(i,  true);
+									outerScans.add(scans.get(i));
+								}
+							}
+						}				
+						//instantiate CP between the outer and the inner scans
+						constructChild = new CartesianProduct(constructChild, rightChild);
+						
+						//add the variable that contains the subquery
+						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+						//connect the new variable to the new CTP
+						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
+						varMap.addNewVariable(outerVarObject);
+						//instantiate a temporary empty GroupBy operator
+						constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
+						//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
+						subqueryInfoList.add(new GroupByInfo((GroupBy)constructChild, outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
+						
+						operatorsProcessedInSubquery = true;
+					}
+					
+					ArrayList<Integer> list = new ArrayList<Integer>();
+					list.add(varMap.getTemporaryPositionByName(varName));
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
+					if(nested == true)
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+					
+					//create a CTPNode with a varpath for the innervariable of the outervariable
+					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
+					lastSubqueryConstructionTreePatternNode = lastSubqueryConstructionTreePatternNode.getParent();
 				}
-				else	//for or non-nested let
-					varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
-				
-				if(attInner2.aggrExpr() != null) {
-					//instantiate an Aggregation operator
-					AggregationType aggrType = XQueryUtils.StringToAggregationType(attInner2.aggrExpr().AGGR_FUNCT().getText());
-					Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
-					varMap.addNewVariable(aggrVar);						
-					Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
-					aggregation.setOuterVariable(aggrVar);
-					aggregation.setInnerVariable(var);
-					constructChild = aggregation;
-					varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
-				}
-				
-				constructionTreePattern.addChild(attNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false));
 			}
-		}	
+		}
 		return null;
 	}
 
@@ -1957,6 +2038,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	public Void visitEleConstInner(XQueryParser.EleConstInnerContext ctx) {
 		String varName;
 		boolean isAggrExpr = false;
+		Variable outerVarObject = null;
 		for(int i = 0; i < ctx.children.size(); i++) {
 			varName = null;
 			ParseTree child = ctx.getChild(i);
@@ -1968,53 +2050,226 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 				varName = ((XQueryParser.AggrExprContext)child).VAR().getText();
 			else
 				varName = child.getText();
+			if(varName.startsWith("$") == false)
+				continue;
 			Variable var = varMap.getVariable(varName);
 			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
-			if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery || var.dataType == Variable.VariableDataType.Aggregation)) {
-				//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
-				//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
-				if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
-					if(constructChild == null)
-						constructChild = scans.get(patternTreeIndex);
-					else
-						constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
-					treePatternVisited.set(patternTreeIndex, true);
-				}
-				//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
-				int[] varpath = null; 
-				if(var.dataType == Variable.VariableDataType.Subquery && var.hasNestedVariables()) {
-					//subquery
+			
+			if(subqueryLevel == -1) {	//not in a subquery
+				if(var != null && (patternTreeIndex != -1 || var.dataType == Variable.VariableDataType.Subquery || var.dataType == Variable.VariableDataType.Aggregation)) {
+					//for the case treePatternVisited.get(patternTreeIndex)==true the XMLScan associated to the returned variable is already in the algebraic tree, so we do nothing
+					//for the case treePatternVisited.get(patternTreeIndex)==false the XMLScan associated to the returned variable has not been included in the algebraic tree, hence we plug the XMLScan to constructChild
+					if(patternTreeIndex != -1 && treePatternVisited.get(patternTreeIndex) == false) {
+						if(constructChild == null)
+							constructChild = scans.get(patternTreeIndex);
+						else
+							constructChild = new CartesianProduct(constructChild, scans.get(patternTreeIndex));
+						treePatternVisited.set(patternTreeIndex, true);
+					}
+					//create the root ConstructionTreePatternNode and instantiate the ConstructionTreePattern
+					int[] varpath = null; 
+					ConstructionTreePatternNode ctpNodeToAdd = null;
+					if(var.dataType == Variable.VariableDataType.Subquery && var.nestedCTPRoot != null) {
+						ctpNodeToAdd = var.nestedCTPRoot;
+					}
+					else {
+						if(var.node != null && var.node.getNestingDepth() > 0) {
+							//we have a nested let
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+						else	//for or non-nested let
+							varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
+						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					}
+					
+					if(isAggrExpr) {
+						//varpath for the Aggregation operator
+						if(varpath == null) {
+							varpath = new int[2];
+							varpath[0] = varMap.getTemporaryPositionByName(varName);
+							varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+						}
+						//REDO: for the case of subqueries, we need to check if aggregationtype is COUNT. In that case, calculate the varpath and input it to the Aggregation operator. If not COUNT, then Exception("you can not SUM,MAX,AVG,etc XML nodes!)
+						//instantiate an Aggregation operator
+						AggregationType aggrType = XQueryUtils.StringToAggregationType(((XQueryParser.AggrExprContext)child).AGGR_FUNCT().getText());
+						Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
+						varMap.addNewVariable(aggrVar);						
+						Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
+						aggregation.setOuterVariable(aggrVar);
+						aggregation.setInnerVariable(var);
+						constructChild = aggregation;
+						//varpath for the CTPNode
+						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
+						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					}
+
+					constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, ctpNodeToAdd);
+				}	
+			}
+			else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
+				ConstructionTreePatternNode ctpnode = null;
+				if(subqueryWithWhere == true) {
+					if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
+						//get the inner TP
+						NavigationTreePattern innerTP = null;
+						BaseLogicalOperator rightChild = null;
+						int tpIndex = -1;
+						if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) == 1) {
+							innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+							if(innerTP != null) {
+								logicalPlan.setLeaves(scans);
+								rightChild = logicalPlan.getTopFromLeaf(innerTP);
+								tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+								if(tpIndex != -1)
+									treePatternVisited.set(tpIndex,  true);
+							}
+						}
+						else 
+							throw new PAXQueryExecutionException("Currently only one inner Tree Pattern is supported in Left Nested Outer Joins.");
+						
+						//for the other trees: create CPs if needed
+						//if constructChild == null, do CP with all outer XMLScans 
+						ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
+						if(constructChild == null) {// && scans.size() > 1) {
+							if(scans.size() > 1) {
+								for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
+									if(logicalPlan.getTopFromLeaf(scans.get(scan_index)) != rightChild) {
+										if(constructChild == null)
+											constructChild = scans.get(scan_index);
+										else
+											constructChild = new CartesianProduct(constructChild, scans.get(scan_index));
+										treePatternVisited.set(scan_index, true);
+										outerScans.add(scans.get(scan_index));
+									}
+								}
+							}
+							else {
+								constructChild = scans.get(0);
+								treePatternVisited.set(0, true);
+								outerScans.add(scans.get(0));
+							}
+						}
+						else {
+							for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
+								if(scans.get(scan_index) != rightChild) {
+									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index)); 
+									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
+										constructChild = new CartesianProduct(constructChild, topFromLeaf);
+									treePatternVisited.set(scan_index,  true);
+									outerScans.add(scans.get(scan_index));
+								}
+							}
+						}		
+						
+						//instantiate the outer variable
+						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
+						varMap.addNewVariable(outerVarObject);
+						//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+						
+						//process the predicate
+						BasePredicate predicate = predicateStack.pop();
+						if(predicate == null)
+							throw new PAXQueryExecutionException("The predicate for the Left Outer Nested Join does not exist.");
+						
+						//instantiate the LeftOuterNestedJoin operator
+						constructChild = new LeftOuterNestedJoin(constructChild, rightChild, predicate, -1, new int[0]);
+						//instantiate a LeftOuterNestedJoinInfo for later update of the GroupBy operator
+						subqueryInfoList.add(new LeftOuterNestedJoinInfo((LeftOuterNestedJoin)constructChild , outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
+						
+						operatorsProcessedInSubquery = true;
+					}
+						
+
 					ArrayList<Integer> list = new ArrayList<Integer>();
 					list.add(varMap.getTemporaryPositionByName(varName));
-					list.add(var.nestedPaths.get(0));
-					boolean nested = (var.nestedVariables.get(0).dataType != Variable.VariableDataType.Aggregation) && (var.nestedVariables.get(0).node.getNestingDepth() > 0);
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
 					if(nested == true)
-						list.add(-1);		
-					varpath = XQueryUtils.IntegerListToIntArray(list);
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+					//create a CTPNode with a varpath for the innervariable of the outervariable
+					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 				}
-				else if(var.node != null && var.node.getNestingDepth() > 0) {
-					//we have a nested let
-					varpath = new int[2];
-					varpath[0] = varMap.getTemporaryPositionByName(varName);
-					varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+				else {	//subquery without a where, we build a chain of Cartesian Products with a GroupBy on top
+					if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
+						ArrayList<BaseLogicalOperator> outerScans = new ArrayList<BaseLogicalOperator>();
+						//BaseOperator rightChild = inner tree
+						NavigationTreePattern innerTP = null;
+						BaseLogicalOperator rightChild = null;
+						int tpIndex = -1;
+						if(navigationTreePatternsInsideSubquery.numCols(subqueryLevel) > 0) {
+							innerTP = navigationTreePatternsInsideSubquery.getElement(subqueryLevel, 0);
+							if(innerTP != null) {
+								logicalPlan.setLeaves(scans);
+								rightChild = logicalPlan.getTopFromLeaf(innerTP);		
+								tpIndex = XQueryUtils.findTreePatternIndexInScans(scans, innerTP);
+								if(tpIndex != -1)
+									treePatternVisited.set(tpIndex, true);
+							}
+						}				
+						//for the other trees: create CPs if needed
+						//if constructChild == null, do CP with all outer XMLScans 
+						if(constructChild == null) {// && scans.size() > 1) {
+							if(scans.size() > 1) {
+								for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
+									if(logicalPlan.getTopFromLeaf(scans.get(scan_index)) != rightChild) {
+										if(constructChild == null)
+											constructChild = scans.get(scan_index);
+										else
+											constructChild = new CartesianProduct(constructChild, scans.get(scan_index));
+										treePatternVisited.set(scan_index, true);
+										outerScans.add(scans.get(scan_index));
+									}
+								}
+							}
+							else {
+								constructChild = scans.get(0);
+								treePatternVisited.set(0, true);
+								outerScans.add(scans.get(0));
+							}
+						}
+						else {
+							for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
+								if(scans.get(scan_index) != rightChild) {
+									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index)); 
+									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
+										constructChild = new CartesianProduct(constructChild, topFromLeaf);
+									treePatternVisited.set(scan_index,  true);
+									outerScans.add(scans.get(scan_index));
+								}
+							}
+						}				
+						//instantiate CP between the outer and the inner scans
+						constructChild = new CartesianProduct(constructChild, rightChild);
+						
+						//add the variable that contains the subquery
+						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
+						varMap.addNewVariable(outerVarObject);
+						outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+						
+						//instantiate a temporary empty GroupBy operator
+						constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
+						//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
+						subqueryInfoList.add(new GroupByInfo((GroupBy)constructChild, outerScans, rightChild, outerVarObject, varMap.getVariable(varName), varMap));
+						
+						operatorsProcessedInSubquery = true;
+					}
+					
+					ArrayList<Integer> list = new ArrayList<Integer>();
+					list.add(varMap.getTemporaryPositionByName(varName));
+					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
+					if(nested == true)
+						list.add(-1);
+					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
+					//create a CTPNode with a varpath for the innervariable of the outervariable
+					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 				}
-				else	//for or non-nested let
-					varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
-				
-				if(isAggrExpr) {
-					//instantiate an Aggregation operator
-					AggregationType aggrType = XQueryUtils.StringToAggregationType(((XQueryParser.AggrExprContext)child).AGGR_FUNCT().getText());
-					Variable aggrVar = new Variable(XQueryUtils.getNextAuxVariableName(), Variable.VariableDataType.Aggregation);
-					varMap.addNewVariable(aggrVar);						
-					Aggregation aggregation = new Aggregation(constructChild, varpath, aggrType);
-					aggregation.setOuterVariable(aggrVar);
-					aggregation.setInnerVariable(var);
-					constructChild = aggregation;
-					varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
-				}
-				
-				constructionTreePattern.addChild(lastConstructionTreePatternNode, new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false));					
-			}	
+			}
 		}
 
 		return null;

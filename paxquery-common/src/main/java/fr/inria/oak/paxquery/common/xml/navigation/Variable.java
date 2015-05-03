@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePattern;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
+
 
 
 public class Variable implements Serializable {
@@ -24,7 +28,8 @@ public class Variable implements Serializable {
 	 */
 	public NavigationTreePatternNode node;	
 	
-	public ArrayList<Variable> nestedVariables;
+	//public ArrayList<Variable> nestedVariables;
+	public ConstructionTreePatternNode nestedCTPRoot;
 	
 	public ArrayList<Integer> nestedPaths;
 
@@ -37,7 +42,8 @@ public class Variable implements Serializable {
 		this.name = name;
 		this.dataType = dataType;
 		this.node = null;
-		this.nestedVariables = new ArrayList<Variable>();
+		//this.nestedVariables = new ArrayList<Variable>();
+		this.nestedCTPRoot = null;
 		this.nestedPaths = new ArrayList<Integer>();
 		this.positionInForest = -1;
 	}
@@ -46,7 +52,8 @@ public class Variable implements Serializable {
 		this.name = name;
 		this.dataType = dataType;
 		this.node = node;
-		this.nestedVariables = new ArrayList<Variable>();
+		//this.nestedVariables = new ArrayList<Variable>();
+		this.nestedCTPRoot = null;
 		this.nestedPaths = new ArrayList<Integer>();
 		this.positionInForest = -1;
 	}
@@ -55,7 +62,8 @@ public class Variable implements Serializable {
 		this.name = name;
 		this.dataType = dataType;
 		this.node = node;
-		this.nestedVariables = new ArrayList<Variable>();
+		//this.nestedVariables = new ArrayList<Variable>();
+		this.nestedCTPRoot = null;
 		this.nestedPaths = new ArrayList<Integer>();
 		this.positionInForest = positionInForest;
 	}
@@ -64,7 +72,7 @@ public class Variable implements Serializable {
 	 * Adds the variables indicated as input to nestedVariables and their paths (the columns inside the outer variable)
 	 * @param variables the new variables to be added to the existing ones
 	 */
-	public void addNestedVariables(List<Variable> variables, List<Integer> paths) {
+	/*public void addNestedVariables(List<Variable> variables, List<Integer> paths) {
 		for(Variable var : variables)
 			nestedVariables.add(var);
 		for(Integer path : paths)
@@ -74,25 +82,43 @@ public class Variable implements Serializable {
 	public void addNestedVariable(Variable var, int path) {
 		nestedVariables.add(var);
 		nestedPaths.add(path);
+	}*/
+	public void setNestedCTP(ConstructionTreePatternNode ctpRoot) {
+		this.nestedCTPRoot = ctpRoot;
 	}
-
+	
+	public void updateNestedCTPWithVarPosition(int position) {
+		updateNestedCTPWithVarPositionRecursive(position, this.nestedCTPRoot);
+	}
+	
+	public void updateNestedCTPWithVarPositionRecursive(int position, ConstructionTreePatternNode node) {
+		if(node.getContentType() == ContentType.VARIABLE_PATH) {
+			List<Integer> new_varpath = node.getVarPath();
+			new_varpath.add(0, position);
+			node.setVarPath(new_varpath);
+		}
+				
+		for(ConstructionTreePatternNode child : node.getChildren()) {
+			updateNestedCTPWithVarPositionRecursive(position, child);
+		}
+	}
 	
 	/**
 	 * Replaces the previous content of nestedVariables by the new variables indicated as input and their paths (the columns inside the outer variable)
 	 * One should only add here the variables (and their paths) that are returned in the return statement of a subquery
 	 * @param variables the new variables to replace the existing ones
 	 */
-	public void setNestedVariables(List<Variable> variables, List<Integer> paths) {
+	/*public void setNestedVariables(List<Variable> variables, List<Integer> paths) {
 		nestedVariables.clear();
 		nestedPaths.clear();
 		addNestedVariables(variables, paths);
-	}
+	}*/
 	
 	/**
 	 * Tells whether this variable contains any nested variables.
 	 * @return true is nestedVariables contains any variable, false if nestedVariables is empty
 	 */
-	public boolean hasNestedVariables() {
+	/*public boolean hasNestedVariables() {
 		return nestedVariables.size() != 0;
 	}
 	
@@ -102,7 +128,7 @@ public class Variable implements Serializable {
 	
 	public void addNestedPath(int path) {
 		nestedPaths.add(path);
-	}
+	}*/
 		
 	/**
 	 * Returns the TreePattern (if any) this variable's node is assigned to.

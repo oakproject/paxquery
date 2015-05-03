@@ -1,7 +1,9 @@
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
@@ -112,7 +114,9 @@ public class LogicalPlanRemapper {
 	}
 	
 	private static void substituteVariablesInCTPNode(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
-		if(node.getContentType() == ContentType.VARIABLE_PATH) {
+		if(node.getContentType() == ContentType.VARIABLE_PATH && node.isVariablePathRemaped() == false) {
+			//alreadyVisitedVarpaths.add(node);
+			System.out.println("CTPN: "+node+" hash: "+node.hashCode());
 			List<Integer> varPath = node.getVarPath();
 			varPath.set(0, equivalences.getEquivalence(varPath.get(0)));
 			for(int i = 1; i < varPath.size(); i++) {
@@ -120,6 +124,7 @@ public class LogicalPlanRemapper {
 					varPath.set(i, equivalences.getEquivalence(varPath.get(i)));
 			}
 			node.setVarPath(varPath);
+			node.setVariablePathRemapped(true);
 		}
 	}
 

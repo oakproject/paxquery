@@ -41,7 +41,7 @@ public final class ConstructionTreePatternNode implements Serializable {
 	private List<Integer> varPath; 		// Path with variable positions
 	private String value;				// Either XML node tag, XML attribute tag, XML content (if literal) or attribute content (if literal)
 	private boolean optional;			// Is it an optional node?
-	
+	private boolean variablePathRemapped;// Has the varmap been remapped?
 	
 	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, String value, boolean optional) {
 		this(ctp, contentType, null, value, optional);
@@ -100,7 +100,7 @@ public final class ConstructionTreePatternNode implements Serializable {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+		
 	public ContentType getContentType() {
 		return this.contentType;
 	}
@@ -116,6 +116,15 @@ public final class ConstructionTreePatternNode implements Serializable {
 	public void setOptional(boolean isOptional) {
 		this.optional = isOptional;
 	}
+
+	public boolean isVariablePathRemaped() {
+		return variablePathRemapped;
+	}
+	
+	public void setVariablePathRemapped(boolean value) {
+		variablePathRemapped = true;
+	}
+
 	
 	public ConstructionTreePatternNode getParent() {
 		if(ctp == null)
@@ -146,5 +155,23 @@ public final class ConstructionTreePatternNode implements Serializable {
 		else
 			output = optional ? contentType + " " + value + " optional" : contentType + " " + value; 
 		return output;
+	}
+	
+	/*
+	 * Sets this.ctp = ctp, and does the same for this' children
+	 * Recursive method
+	 */
+	/*public void setCTPFromHere(ConstructionTreePattern anotherCTP) {
+		this.ctp = anotherCTP;
+		
+		for(ConstructionTreePatternNode child : this.getChildren()){
+			child.setCTPFromHere(anotherCTP);
+		}		
+	}*/
+	public void setCTPFromHere(ConstructionTreePattern anotherCTP) {
+		for(ConstructionTreePatternNode child : this.getChildren()){
+			child.setCTPFromHere(anotherCTP);
+		}		
+		this.ctp = anotherCTP;
 	}
 }

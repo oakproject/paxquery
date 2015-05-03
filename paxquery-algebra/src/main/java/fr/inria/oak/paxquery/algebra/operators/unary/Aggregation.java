@@ -43,7 +43,7 @@ public class Aggregation extends BaseUnaryOperator {
 	private int documentIDColumn;
 	
 	private Variable outerVariable;	//variable to which this aggregation is assigned to
-	private Variable innerVariable;	//varaible being aggregated
+	private Variable innerVariable;	//variable being aggregated
 	
 
 	public Aggregation(BaseLogicalOperator child, int[] aggregationPath, AggregationType aggregationType) {
