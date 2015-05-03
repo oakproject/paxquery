@@ -83,7 +83,7 @@ public class ConstructionTreePattern implements Serializable {
 	 * @param parent parent node of the new subtree
 	 * @param root root node of the subtree to add under parent
 	 */
-	public void moveSubtree(ConstructionTreePatternNode parent, ConstructionTreePatternNode root) {
+	/*public void moveSubtree(ConstructionTreePatternNode parent, ConstructionTreePatternNode root) {
 		//Pass to assign nodes to this tree
 		Deque<ConstructionTreePatternNode> stack = new ArrayDeque<ConstructionTreePatternNode>();
 		stack.push(null);
@@ -116,6 +116,55 @@ public class ConstructionTreePattern implements Serializable {
 			//New top
 			top = stack.pop();
 		}
+	}*/
+	public void moveSubtree(ConstructionTreePatternNode parent, ConstructionTreePatternNode root) {
+		//Pass to assign nodes to this tree
+		Deque<ConstructionTreePatternNode> stack = new ArrayDeque<ConstructionTreePatternNode>();
+		//stack.push(null);
+		ConstructionTreePattern rootCtp = root.getConstructionTreePattern();
+		ConstructionTreePatternNode top = root;
+		//while(top != null) {
+		boolean end = false;
+		do {
+			//Add node to this tree and remove from old tree
+			this.nodes.add(top);
+			rootCtp.nodes.remove(top);
+			
+			//Connect parent and remove edge from old tree
+			if(top == root) { //If we are at the root of the subtree
+				ConstructionTreePatternEdge edge = new ConstructionTreePatternEdge(parent, root);
+				//this.parentEdges.put(top, new ConstructionTreePatternEdge(parent, root));
+				//this.childrenEdges.put(parent, new ConstructionTreePatternEdge(root, parent));
+				this.parentEdges.put(top, edge);
+				this.childrenEdges.put(parent, edge);
+			}
+			else {
+				ConstructionTreePatternEdge edge = new ConstructionTreePatternEdge(rootCtp.getParentEdges().get(top).getParent(), rootCtp.getParentEdges().get(top).getChild());
+				//this.parentEdges.put(top, rootCtp.getParentEdges().get(top));
+				this.parentEdges.put(edge.getChild(), edge);
+				this.childrenEdges.put(edge.getParent(), edge);
+				
+			}
+			//rootCtp.parentEdges.remove(top);
+			
+			//Connect children and remove edges from old tree
+			List<ConstructionTreePatternEdge> children = rootCtp.childrenEdges.get(top);
+			if(children != null) {
+				for(ConstructionTreePatternEdge edge: children) {
+					//this.childrenEdges.put(top, edge);
+					this.parentEdges.put(edge.getChild(), edge);
+					this.parentEdges.put(edge.getParent(), edge);
+					stack.push(edge.getChild());
+				}
+				//rootCtp.childrenEdges.removeAll(top);
+			}
+			
+			//New top
+			if(stack.isEmpty() == false)
+				top = stack.pop();
+			else
+				end = true;
+		} while(end == false);
 	}
 	
 	/**
@@ -129,6 +178,13 @@ public class ConstructionTreePattern implements Serializable {
 		ConstructionTreePattern deepCopySubtree = deepCopySubtree(root);
 		this.moveSubtree(parent, deepCopySubtree.getRoot());
 	}
+	
+	public void addDeepCopySubtreeDuplicateVarpaths(ConstructionTreePatternNode parent, ConstructionTreePatternNode root) {
+		//ConstructionTreePattern deepCopySubtree = deepCopySubtree(root);
+		ConstructionTreePattern deepCopySubtree = deepCopySubtreeDuplicateVarpaths(root);
+		this.moveSubtree(parent, deepCopySubtree.getRoot());
+	}
+	
 	
 	/**
 	 * Deep copy of a subtree.
@@ -175,6 +231,59 @@ public class ConstructionTreePattern implements Serializable {
 		
 		return newCtp;
 	}
+	
+	public static ConstructionTreePattern deepCopySubtreeDuplicateVarpaths(ConstructionTreePatternNode root) {
+		ConstructionTreePattern newCtp = new ConstructionTreePattern();
+		
+		Map<ConstructionTreePatternNode,ConstructionTreePatternNode> oldToNew = 
+				new HashMap<ConstructionTreePatternNode,ConstructionTreePatternNode>();
+		
+		//Pass to assign nodes to this tree
+		Deque<ConstructionTreePatternNode> stack = new ArrayDeque<ConstructionTreePatternNode>();
+		ConstructionTreePattern rootCtp = root.getConstructionTreePattern();
+		ConstructionTreePatternNode top = root;
+		while(top != null) {
+			List<Integer> varPath = top.getVarPath();
+			List<Integer> duplicatedVarPath = null;
+			if(varPath != null) {
+				duplicatedVarPath = new ArrayList<Integer>();
+				for(Integer integer : varPath)
+					duplicatedVarPath.add(integer);
+			}
+				
+			//ConstructionTreePatternNode topCopy = new ConstructionTreePatternNode(
+			//		newCtp, top.getContentType(), top.getVarPath(), top.getValue(), top.isOptional());
+			ConstructionTreePatternNode topCopy = new ConstructionTreePatternNode(
+					newCtp, top.getContentType(), duplicatedVarPath, top.getValue(), top.isOptional());
+			newCtp.nodes.add(topCopy);
+			
+			if(top == root) {
+				newCtp.root = topCopy;
+			}
+			else {
+				newCtp.connect(oldToNew.get(rootCtp.parentEdges.get(top).getParent()), topCopy);
+			}
+			
+			oldToNew.put(top, topCopy);
+			
+			//Add children
+			List<ConstructionTreePatternEdge> children = rootCtp.childrenEdges.get(top);
+			if(children != null) {
+				for(int i = children.size()-1; i >= 0; i--)
+					stack.push(children.get(i).getChild());
+			}
+			
+			//New top
+			if(stack.isEmpty())
+				top = null;
+			else
+				top = stack.pop();
+		}
+		
+		return newCtp;
+		
+	}
+
 
 	public Set<ConstructionTreePatternNode> getNodes() {
 		return this.nodes;

@@ -24,6 +24,14 @@ public abstract class BaseNestingOperatorInfo {
 		this.varMap = varMap;
 	}
 	
+	public BaseNestingOperatorInfo(ArrayList<BaseLogicalOperator> outerXMLScans, BaseLogicalOperator innerVariableHolderOperatorsRoot, Variable outerVariable, VarMap varMap) {
+		this.outerVariableHolderOperators = outerXMLScans;
+		this.innerVariableHolderOperatorsRoot = innerVariableHolderOperatorsRoot;
+		this.outerVariable = outerVariable;
+		//this.returnedVariable = returnedVariable;
+		this.varMap = varMap;
+	}
+	
 	/**
 	 * Updates the internal state of a BaseLogicalOperator. The operator itself is declared in inheriting classes.
 	 */
