@@ -2082,6 +2082,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						else	//for or non-nested let
 							varpath = new int[] {varMap.getTemporaryPositionByName(varName)};
 						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+						
+						//check whether the varpath belongs to an attribute in the source document: in that case, make it hang from an new attribute node in the output
+						//if(var.node != null && var.node.isAttribute() == true)
+						//	artificialAttributeNodeName = var.node.getTag();
 					}
 					
 					if(isAggrExpr) {
@@ -2104,8 +2108,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						varpath = new int[] {varMap.getTemporaryPositionByName(aggrVar.name)};
 						ctpNodeToAdd = new ConstructionTreePatternNode(constructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
 					}
-
-					constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, ctpNodeToAdd);
+					
+					if(var.node != null && var.node.isAttribute() == true && isAggrExpr == false)	{ //create the artificial attribute node in the output
+						ConstructionTreePatternNode artificialAttributeNode = new ConstructionTreePatternNode(constructionTreePattern, ContentType.ATTRIBUTE, var.node.getTag(), false);
+						//artificialAttributeNode.set
+						constructionTreePattern.addChild(lastConstructionTreePatternNode, artificialAttributeNode);
+						constructionTreePattern.addChild(artificialAttributeNode, ctpNodeToAdd);
+					}
+					else
+						constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, ctpNodeToAdd);
 				}	
 			}
 			else {	//inside a subquery. So far we assume there is only one inner TP (one TP being navigated in the subquery and nowhere else)
@@ -2191,7 +2202,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
-					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
+					
+					if(var.node != null && var.node.isAttribute() == true && isAggrExpr == false)	{ //create the artificial attribute node in the output
+						ConstructionTreePatternNode artificialAttributeNode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE, var.node.getTag(), false);
+						//artificialAttributeNode.set
+						subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, artificialAttributeNode);
+						subqueryConstructionTreePattern.addChild(artificialAttributeNode, ctpnode);
+					}
+					else
+						subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 				}
 				else {	//subquery without a where, we build a chain of Cartesian Products with a GroupBy on top
 					if(operatorsProcessedInSubquery == false) {	//we need to process the operators in this subquery
@@ -2267,7 +2286,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
-					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
+					
+					if(var.node != null && var.node.isAttribute() == true && isAggrExpr == false)	{ //create the artificial attribute node in the output
+						ConstructionTreePatternNode artificialAttributeNode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE, var.node.getTag(), false);
+						//artificialAttributeNode.set
+						subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, artificialAttributeNode);
+						subqueryConstructionTreePattern.addChild(artificialAttributeNode, ctpnode);
+					}
+					else
+						subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 				}
 			}
 		}
