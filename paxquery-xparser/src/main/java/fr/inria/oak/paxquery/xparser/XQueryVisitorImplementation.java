@@ -1789,6 +1789,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					}
 					
 					constructionTreePattern.addDeepCopySubtreeDuplicateVarpaths(lastConstructionTreePatternNode, ctpNodeToAdd);
+					lastConstructionTreePatternNode = lastConstructionTreePatternNode.getParent();
 				}
 			}
 		}
