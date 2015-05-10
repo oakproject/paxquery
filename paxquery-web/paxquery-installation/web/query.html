@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="EN" lang="EN" dir="ltr">
+<head profile="http://gmpg.org/xfn/11">
+<title>PAXQuery GUI</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="imagetoolbar" content="no" />
+<link rel="stylesheet" href="styles/layout.css" type="text/css" />
+</head>
+<body id="top">
+<div class="wrapper col1">
+  <div id="header">
+    <div id="topnav">
+      <ul>
+        <li class="last"><a href="pact.html">PACT plan</a><span> </span></li>
+        <li><a href="opt-algebra.html">Optimized algebra</a><span></span></li>
+        <li><a href="algebra.html">Algebra</a><span> </span></li>
+        <li class="last"><a href="treepatterns.html">Tree Patterns</a>
+        </li>
+        <!--<li><a href="index.html">XML output</a><span> </span></li>-->
+        <li class="active"><a href="query.html">Query</a><span> </span></li>
+      </ul>
+    </div>
+    <div class="fl_left">
+      <h1><a href="index.html">PAXQuery</a></h1>
+      <p>Massively parallel XML queries</p>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<div id="content_holder">
+  <span class="Centerer"></span>
+  <div class="Centered">
+    <div class="scroll_text_box">
+      for $person in collection("file:///Users/jalvaro/XML/helsinki/sintetic/People")/site//person, <br>  $personid in $person/@id, $personname in $person/name/text()<br>let $cap :=<br>  for $cauction in collection("file:///Users/jalvaro/XML/helsinki/sintetic/ClosedAuctions")/site//closed_auction,<br>  $buyer in $cauction/buyer/@person, <br>  $item in $cauction/itemref<br>  where $personid = $buyer<br>  return $item<br>let $numitems := count($cap)<br>where $numitems > 0<br>return &lt;res personid="{$personid}" name="{$personname}" numitems="{$numitems}">{$cap}&lt;/res><br>
+ </div>
+  </div>
+</div>
+</body>
+</html>

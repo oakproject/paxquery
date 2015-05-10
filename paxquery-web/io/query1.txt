@@ -1,0 +1,5 @@
+for $post in collection("file:///Users/jalvaro/XML/helsinki/dataset/dataset13.xhtml")/sites/html/body/div[@class="body_wrapper"]/div[@style="margin-right:170px;"]/div[@id="postlist"]/ol/li/div[@class="postdetails"], 
+	$username in $post/div/div/div/a/strong/text(),
+	$content in $post//div[@class="postbody"]/div[@class="postrow"]/div[@class="content"]
+where $username = "LWaB"
+return <res user="{$username}">{$content}</res>

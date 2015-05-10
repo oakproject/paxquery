@@ -1,0 +1,10 @@
+for $p in collection('file:///Users/jalvaro/XML/helsinki/sintetic/People')//person[profile/age/text() > 30], 
+	$pid in $p/@id, 
+	$pname in $p/name/text()
+for $cas in collection('file:///Users/jalvaro/XML/helsinki/sintetic/ClosedAuctions')//closed_auction, 
+	$bid in $cas//buyer/@person, 
+	$iref in $cas//itemref/@item
+for $item in collection('file:///Users/jalvaro/XML/helsinki/sintetic/Items')//item, 
+	$itemid in $item/@id
+where $pid = $bid and $iref = $itemid
+return <res><person id="{$pid}" name="{$pname}"></person>{$item}</res>

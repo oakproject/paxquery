@@ -1,0 +1,14 @@
+digraph PACT {
+size ="4,4"
+N4 [label="Data Source" color="#ffcfbf" style="filled" fillcolor="#ff9999" shape=box];
+N5 [label="Data Source" color="#99ff99" style="filled" fillcolor="#cfffbf" shape=box];
+N3 [label="CoGroup (LNOJoinConcat)" shape=box];
+N3 -> N4 [dir=back];
+N3 -> N5 [dir=back];
+N2 [label="Map (Aggr)" shape=box];
+N2 -> N3 [dir=back];
+N1 [label="Map (Select)" shape=box];
+N1 -> N2 [dir=back];
+N0 [label="Data Sink" shape=box];
+N0 -> N1 [dir=back];
+}

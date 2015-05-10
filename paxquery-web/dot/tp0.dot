@@ -1,0 +1,9 @@
+graph  tp0{
+graph[label="file0.xml" fontsize=22 labeljust=center]
+node [fontname="LucidaGrande" fontsize=18 color="white"]
+-422250493 [ fontname="Lucida Grande" fontcolor="white" ] ; 
+2 [ color="#ffcfbf"  label="site" ] ; 
+-422250493 -- 2 ; 
+3 [ shape="trapezium" color="#ffcfbf" style="filled" fillcolor="#ff9999"  label="closed_auctions" ] ; 
+2 -- 3 ; 
+}

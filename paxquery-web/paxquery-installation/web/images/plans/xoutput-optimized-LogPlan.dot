@@ -1,0 +1,16 @@
+digraph  g{
+ edge [dir="back"]
+100 [label="XMLTreeConstruct"] ; 
+101 [label="Select\n(numitems(8) > 0.0)"] ; 
+100 -> 101 ; 
+102 [label="Aggregation\n[11.-1]"] ; 
+101 -> 102 ; 
+103 [label="LeftOuterNestedJoin\n(personid(4) =  buyer(8))"] ; 
+102 -> 103 ; 
+104 [color="#ffcfbf" style="filled" fillcolor="#ff9999" label="XMLCollectionNav(0)
+'People'"] ; 
+103 -> 104
+105 [color="#99ff99" style="filled" fillcolor="#cfffbf" label="XMLCollectionNav(1)
+'ClosedAuctions'"] ; 
+103 -> 105
+}

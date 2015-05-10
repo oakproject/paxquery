@@ -1,0 +1,48 @@
+/*
+Template Name: Gallerised
+File: Tables CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>
+*/
+
+table{
+	width:100%;
+	border-collapse:collapse;
+	table-layout:auto;
+	vertical-align:top;
+	margin-bottom:15px;
+	border:1px solid #999999;
+	}
+
+table thead th{
+	color:#FFFFFF;
+	background-color:#000000;
+	border:1px solid #999999;
+	border-collapse:collapse;
+	text-align:center;
+	table-layout:auto;
+	vertical-align:middle;
+	}
+
+table tbody td{
+	vertical-align:top;
+	border-collapse:collapse;
+	border-left:1px solid #999999;
+	border-right:1px solid #999999;
+	}
+	
+table thead th, table tbody td{
+	padding:5px;
+	border-collapse:collapse;
+	}
+
+table tbody tr.light{
+	color:#CCCCCC;
+	background-color:#333333;
+	}
+
+table tbody tr.dark{
+	color:#CCCCCC;
+	background-color:#1E1E1E;
+	}

@@ -1,0 +1,6 @@
+digraph PACT {
+size ="4,4"
+N1 [label="Data Source" color="#ffcfbf" style="filled" fillcolor="#ff9999" shape=box];
+N0 [label="Data Sink" shape=box];
+N0 -> N1 [dir=back];
+}

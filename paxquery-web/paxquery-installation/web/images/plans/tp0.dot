@@ -1,0 +1,14 @@
+graph  tp0{
+graph[label="People" fontsize=22 labeljust=center]
+node [fontname="LucidaGrande" fontsize=18 color="white"]
+-1007653873 [ fontname="Lucida Grande" fontcolor="white" ] ; 
+2 [ color="#ffcfbf"  label="site" ] ; 
+-1007653873 -- 2 ; 
+3 [ shape="trapezium" color="#ffcfbf" style="filled" fillcolor="#ff9999"  label="person &bull;" ] ; 
+2 -- 3 ; 
+2 -- 3 ; 
+4 [ color="#ffcfbf" style="filled" fillcolor="#ff9999"  label="@id &bull;" ] ; 
+3 -- 4 ; 
+5 [ color="#ffcfbf" style="filled" fillcolor="#ff9999"  label="name &bull;" ] ; 
+3 -- 5 ; 
+}

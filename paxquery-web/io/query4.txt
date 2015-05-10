@@ -1,0 +1,11 @@
+for $person in collection("file:///Users/jalvaro/XML/helsinki/sintetic/People")/site//person, 
+  $personid in $person/@id, $personname in $person/name/text()
+let $cap :=
+  for $cauction in collection("file:///Users/jalvaro/XML/helsinki/sintetic/ClosedAuctions")/site//closed_auction,
+  $buyer in $cauction/buyer/@person, 
+  $item in $cauction/itemref
+  where $personid = $buyer
+  return $item
+let $numitems := count($cap)
+where $numitems > 0
+return <res personid="{$personid}" name="{$personname}" numitems="{$numitems}">{$cap}</res>

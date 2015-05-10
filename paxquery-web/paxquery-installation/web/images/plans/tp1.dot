@@ -1,0 +1,16 @@
+graph  tp1{
+graph[label="ClosedAuctions" fontsize=22 labeljust=center]
+node [fontname="LucidaGrande" fontsize=18 color="white"]
+-1899073220 [ fontname="Lucida Grande" fontcolor="white" ] ; 
+7 [ color="#99ff99"  label="site" ] ; 
+-1899073220 -- 7 ; 
+8 [ shape="trapezium" color="#99ff99" style="filled" fillcolor="#cfffbf"  label="closed_auction" ] ; 
+7 -- 8 ; 
+7 -- 8 ; 
+9 [ color="#99ff99"  label="buyer" ] ; 
+8 -- 9 ; 
+10 [ color="#99ff99" style="filled" fillcolor="#cfffbf"  label="@person" ] ; 
+9 -- 10 ; 
+11 [ shape="trapezium" color="#99ff99" style="filled" fillcolor="#cfffbf"  label="itemref" ] ; 
+8 -- 11 ; 
+}

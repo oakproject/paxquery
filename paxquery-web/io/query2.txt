@@ -1,0 +1,5 @@
+for $post in collection("file:///Users/jalvaro/XML/helsinki/dataset/dataset13.xhtml")/sites/html/body/div[@class="body_wrapper"]/div[@style="margin-right:170px;"]/div[@id="postlist"]/ol/li/div[@class="postdetails"], 
+	$username in distinct-values($post/div/div/div/a/strong/text()),
+	$numposts in $post/div[@class="userinfo"]/dl/dd[@id="numposts"]/text()
+where $numposts > 100
+return <res user="{$username}"></res>
