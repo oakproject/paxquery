@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -92,6 +91,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	private boolean operatorsProcessedInSubquery = false;
 	private ArrayList<BaseNestingOperatorInfo> subqueryInfoList;
 	private boolean notOccurrence = false;
+	private HashMap<String, DuplicateElimination> dupelimNavigationTreePatterns;	//list of NavigationTreePattern.getName() that have a DuplicateElimination on its way to the root
 	
 	
 	
@@ -118,6 +118,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		predicateStack = new Stack<BasePredicate>();
 		constructionTreePattern = null;	//instantiated at visitReturnStat
 		treePatternNameCounter = 0;
+		dupelimNavigationTreePatterns = new HashMap<String, DuplicateElimination>();
 	}
 	
 	/**
@@ -205,7 +206,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	/**
 	 * visitPathExpr_xq
 	 */
-	public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
+	/*public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
 		//by visiting the children we build the tree pattern and set up the XMLScan algop
 		visitChildren(ctx); 
 
@@ -223,6 +224,60 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			}
 			else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == true)
 				constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+		}
+		
+		return null;
+	}*/
+	public Void visitPathExpr_xq(XQueryParser.PathExpr_xqContext ctx) { 
+		//by visiting the children we build the tree pattern and set up the XMLScan algop
+		visitChildren(ctx); 
+
+		if(ctx.getText().startsWith("distinct-values")) {
+			int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, lastVarLeftSide);
+			Variable var = varMap.getVariable(lastVarLeftSide);
+			//NavigationTreePattern affectedTP = patternNodeMap.get(patternTreeIndex).getTreePattern();
+			//DuplicateElimination affectedDupElim = dupelimNavigationTreePatterns.get(affectedTP.getName());
+
+			//in case the dupelim already exists
+			if(var.getTreePattern() != null && dupelimNavigationTreePatterns.get(var.getTreePattern().getName()) != null) {
+				DuplicateElimination affectedDupElim = dupelimNavigationTreePatterns.get(var.getTreePattern().getName());
+				int[] oldColumns = affectedDupElim.columns;
+				int[] newColumns = new int[oldColumns.length+1];
+				for(int i = 0; i < oldColumns.length; i++)
+					newColumns[i] = oldColumns[i];
+				newColumns[newColumns.length-1] = varMap.getTemporaryPositionByName(lastVarLeftSide);
+				affectedDupElim.columns = newColumns;
+			}
+			else {
+				DuplicateElimination dupel = null;
+				if(constructChild == null) {
+					//constructChild = scans.get(patternTreeIndex);
+					//constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					//dupel = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					//constructChild.setParent(dupel);
+					scans.get(patternTreeIndex).setParent(dupel);
+					if(subqueryLevel == -1)
+						constructChild = dupel;
+					treePatternVisited.set(patternTreeIndex, true);
+				}
+				else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == false) {
+					//DuplicateElimination dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					dupel = new DuplicateElimination(scans.get(patternTreeIndex), new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					scans.get(patternTreeIndex).setParent(dupel);
+					if(subqueryLevel == -1)
+						constructChild = new CartesianProduct(constructChild, dupel);
+					treePatternVisited.set(patternTreeIndex, true);
+				}
+				else if(constructChild != null && treePatternVisited.get(patternTreeIndex) == true) {
+					//constructChild = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					dupel = new DuplicateElimination(constructChild, new int[] {varMap.getTemporaryPositionByName(lastVarLeftSide)});
+					if(subqueryLevel == -1)
+						constructChild = dupel;
+				}
+				if(var.getTreePattern() != null)
+					dupelimNavigationTreePatterns.put(var.getTreePattern().getName(), dupel);
+			}
 		}
 		
 		return null;
@@ -1859,8 +1914,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 						else {
 							for(int i = 0; i < scans.size(); i++) {
-								if(scans.get(i) != rightChild) {
-									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+								if(topFromLeaf != rightChild) {
 									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 										constructChild = new CartesianProduct(constructChild, topFromLeaf);
 									treePatternVisited.set(i,  true);
@@ -1871,12 +1926,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						
 						//add the variable that contains the subquery
 						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);					
-						//subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
-						//outerVarObject.setNestedCTP(lastSubqueryConstructionTreePatternNode);
 						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
-						//outerVarObject.nestedCTPRoot = ctpnode;
 						varMap.addNewVariable(outerVarObject);
-						//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 						
 						//get the predicate
 						BasePredicate predicate = predicateStack.pop();
@@ -1942,8 +1993,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 						else {
 							for(int i = 0; i < scans.size(); i++) {
-								if(scans.get(i) != rightChild) {
-									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i));
+								if(topFromLeaf != rightChild) {
+								//if(scans.get(i) != rightChild) {
+									//BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
 									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 										constructChild = new CartesianProduct(constructChild, topFromLeaf);
 									treePatternVisited.set(i,  true);
@@ -2165,8 +2218,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 						else {
 							for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
-								if(scans.get(scan_index) != rightChild) {
-									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index)); 
+								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index)); 
+								if(topFromLeaf != rightChild) {
 									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 										constructChild = new CartesianProduct(constructChild, topFromLeaf);
 									treePatternVisited.set(scan_index,  true);
@@ -2179,7 +2232,6 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
 						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
 						varMap.addNewVariable(outerVarObject);
-						//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 						
 						//process the predicate
 						BasePredicate predicate = predicateStack.pop();
@@ -2253,8 +2305,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 						else {
 							for(int scan_index = 0; scan_index < scans.size(); scan_index++) {
-								if(scans.get(scan_index) != rightChild) {
-									BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index)); 
+								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(scan_index));
+								if(topFromLeaf != rightChild) {
 									if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 										constructChild = new CartesianProduct(constructChild, topFromLeaf);
 									treePatternVisited.set(scan_index,  true);
