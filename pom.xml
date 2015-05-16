@@ -51,8 +51,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<core.version>0.6-incubating</core.version>
-		<stratosphere-testing.version>0.6-incubating</stratosphere-testing.version>
+		<core.version>0.7.0-incubating</core.version>
+		<stratosphere-testing.version>0.7.0-incubating</stratosphere-testing.version>
 	</properties>
 
 	<dependencies>
