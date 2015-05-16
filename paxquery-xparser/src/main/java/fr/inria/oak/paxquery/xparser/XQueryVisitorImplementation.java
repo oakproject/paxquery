@@ -1590,14 +1590,15 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					}
 					else {
 						for(int i = 0; i < scans.size(); i++) {
-							if(scans.get(i) != rightChild) {
-								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+							BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i));
+							if(topFromLeaf != rightChild) {
 								if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 									constructChild = new CartesianProduct(constructChild, topFromLeaf);
 								treePatternVisited.set(i,  true);
 								outerScans.add(scans.get(i));
 							}
 						}
+						
 					}		
 					
 					ArrayList<Integer> list = new ArrayList<Integer>();
@@ -1608,7 +1609,11 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 
 					//crate a CTPNode with a varpath for the innervariable of the outervariable
+					//ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
 					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+					//instantiate the inner construction tree pattern
+					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
+					ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);
 					//add the variable that contains the subquery
 					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
 					//connect the new variable to the new CTP
@@ -1665,8 +1670,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					}
 					else {
 						for(int i = 0; i < scans.size(); i++) {
-							if(scans.get(i) != rightChild) {
-								BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i)); 
+							BaseLogicalOperator topFromLeaf = logicalPlan.getTopFromLeaf(scans.get(i));
+							if(topFromLeaf != rightChild) {
 								if(constructChild != topFromLeaf)	//if the i-th scan is not in the main logical tree then do a cartesian product between both trees
 									constructChild = new CartesianProduct(constructChild, topFromLeaf);
 								treePatternVisited.set(i,  true);
@@ -1686,6 +1691,8 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					
 					//crate a CTPNode with a varpath for the innervariable of the outervariable
 					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
+					ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);
 					
 					//add the variable that contains the subquery
 					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
