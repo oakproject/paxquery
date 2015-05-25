@@ -10,14 +10,27 @@
         $queryresult = '';
 
         if (($_POST['dataset'] == "forum") && ($_POST['queries_forum'] == "Q1")) {
-           $queryFileName = "query1.txt";
+           $queryFileName = "query01.txt";
         } else if (($_POST['dataset'] == "forum") && ($_POST['queries_forum'] == "Q2")) {
-           $queryFileName = "query2.txt";
+           $queryFileName = "query02.txt";
         } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q1")) {
-           $queryFileName = "query3.txt";
+           $queryFileName = "query11.txt";
         } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q2")) {
-           $queryFileName = "query4.txt";
+           $queryFileName = "query12.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q3")) {
+           $queryFileName = "query13.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q4")) {
+           $queryFileName = "query14.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q5")) {
+           $queryFileName = "query15.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q6")) {
+           $queryFileName = "query16.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q7")) {
+           $queryFileName = "query17.txt";
+        } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q8")) {
+           $queryFileName = "query18.txt";
         }
+
         $queryresult = shell_exec('export DYLD_LIBRARY_PATH=\"\"; /Applications/XAMPP/xamppfiles/htdocs/paxquery/paxquery-installation/scripts/paxquery-run.sh /Applications/XAMPP/xamppfiles/htdocs/paxquery/io/' . $queryFileName . ' /Applications/XAMPP/xamppfiles/htdocs/paxquery/io/xoutput.xml 1 drawtrees');
         print $queryFileName;
         $querysubmitted = TRUE;
@@ -94,6 +107,12 @@
         <option value="NULL">Synthetic predefined queries</option>
         <option value="Q1" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q1") ? 'selected' : '' ?>>Q1 - Return all purchases and their corresponding item descriptions for which the buyer is older than 30</option>
         <option value="Q2" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q2") ? 'selected' : '' ?>>Q2 - Return the number of purchases (if any) and their corresponding item references for every buyer</option>
+        <option value="Q3" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q3") ? 'selected' : '' ?>>Q3 - Return the name of the person with id "person0"</option>
+        <option value="Q4" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q4") ? 'selected' : '' ?>>Q4 - Return the names of all items whose description contains the word "gold"</option>
+        <option value="Q5" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q5") ? 'selected' : '' ?>>Q5 - How many sold items cost more than 40?</option>
+        <option value="Q6" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q6") ? 'selected' : '' ?>>Q6 - List all persons according to their interest</option>
+        <option value="Q7" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q7") ? 'selected' : '' ?>>Q7 - List the names of persons and the number of items they bought</option>
+        <option value="Q8" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q8") ? 'selected' : '' ?>>Q8 - List the name of users in United States and the items that they bought or sold in an auction</option>
       </select>
       <!--<p><textarea class="form-control" rows="11" id="query" style="width: 100%"></textarea><p>-->
       <p><div class="queryfield" id="query" style="width: 100%; height: 320px;"></div></p>

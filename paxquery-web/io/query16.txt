@@ -1,0 +1,9 @@
+let $pc := collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site
+for $i in distinct-values($pc/people/person/profile/interest/@category)
+let $p :=
+	for $t in $pc/people/person,
+		$c in $t/profile/interest/@category,
+		$n in $t/name/text()
+	where $c = $i 
+return <name>{$n}</name>
+return <category><id>{$i}</id>{$p}</category>

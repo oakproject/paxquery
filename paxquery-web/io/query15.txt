@@ -1,0 +1,6 @@
+let $cc := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")/site
+let $p :=
+  for $i in $cc/closed_auctions/closed_auction[price/text() > 40]
+  return $i
+let $c := count($p)
+return $c

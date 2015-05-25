@@ -1,0 +1,5 @@
+let $ic := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkItems/file0.xml")/site
+for $i in $ic//item, $d in $i/description/text/text()
+let $n := $i/name/text()
+where contains($d, "gold")
+return $n

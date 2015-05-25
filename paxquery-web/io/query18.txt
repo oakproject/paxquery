@@ -1,0 +1,10 @@
+let $pc := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml")/site, $cc := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")/site
+for $p in $pc/people/person, $i in $p/@id, $ad in $p/address/country/text()
+  let $a :=
+    for $c in $cc//closed_auction, $b in $c/buyer/@person, $s in $c/seller/@person
+    let $ir := $c/itemref 
+    where $i = $b or $i = $s 
+    return $ir
+  let $n := $p/name
+  where $ad = 'United States'
+return <res>{$n,$a}</res>

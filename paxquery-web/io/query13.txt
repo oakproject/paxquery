@@ -1,0 +1,4 @@
+let $pc := collection('file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml')/site
+for $p in $pc/people/person[@id="person0"]
+let $n := $p/name/text()
+return $n

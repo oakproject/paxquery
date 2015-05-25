@@ -1,0 +1,9 @@
+let $pc := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkPeople/file0.xml")/site,
+$cc := collection("file:///Users/jalvaro/XML/XMarkDocs/XMarkClosedAuctions/file0.xml")/site
+for $p in $pc/people/person, $n in $p/name/text(), $i in $p/@id
+let $a :=
+  for $t in $cc/closed_auctions/closed_auction, $b in $t/buyer/@person
+  where $b = $i
+  return $t
+let $c := count($a)
+return <item person="{$n}">{$c}</item>
