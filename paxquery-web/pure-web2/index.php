@@ -29,6 +29,12 @@
            $queryFileName = "query17.txt";
         } else if (($_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q8")) {
            $queryFileName = "query18.txt";
+        } else if ($_POST['dataset'] == "custom") {
+           $queryFileName = "custom.txt";
+           $query_text = ($_POST['query_text']);
+           $query_file = fopen("/Applications/XAMPP/xamppfiles/htdocs/paxquery/io/" . $queryFileName, "w") or die("Unable to open file!");
+           fwrite($query_file, $query_text);
+           fclose($query_file);
         }
 
         $queryresult = shell_exec('export DYLD_LIBRARY_PATH=\"\"; /Applications/XAMPP/xamppfiles/htdocs/paxquery/paxquery-installation/scripts/paxquery-run.sh /Applications/XAMPP/xamppfiles/htdocs/paxquery/io/' . $queryFileName . ' /Applications/XAMPP/xamppfiles/htdocs/paxquery/io/xoutput.xml 1 drawtrees');
@@ -94,6 +100,7 @@
       <select class="form-control" id="dataset" name="dataset" style="width: 100%">
         <option value="forum" <?= ($querysubmitted && $_POST['dataset'] == "forum") ? 'selected' : '' ?>>Forum</option>
         <option value="synthetic" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") ? 'selected' : '' ?>>Synthetic</option>
+        <option value="custom" <?= ($querysubmitted && $_POST['dataset'] == "custom") ? 'selected' : '' ?>>Custom</option>
       </select>
     <!--</div>-->
     <div class="form-group">
@@ -114,8 +121,12 @@
         <option value="Q7" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q7") ? 'selected' : '' ?>>Q7 - List the names of persons and the number of items they bought</option>
         <option value="Q8" <?= ($querysubmitted && $_POST['dataset'] == "synthetic") && ($_POST['queries_synthetic'] == "Q8") ? 'selected' : '' ?>>Q8 - List the name of users in United States and the items that they bought or sold in an auction</option>
       </select>
-      <!--<p><textarea class="form-control" rows="11" id="query" style="width: 100%"></textarea><p>-->
-      <p><div class="queryfield" id="query" style="width: 100%; height: 320px;"></div></p>
+      <select class="form-control" id="queries_custom" name="queries_custom" style="width: 100%">
+        <option value="NULL">Enter your query</option>
+      </select>
+            <p><label id="debug" name="debug"><?php echo $query_text?></label></p>
+      <p><div class="queryfield" id="query" contenteditable="false" style="<?php echo ($_POST['query_text']=='') ? 'width: 100%; height: 320px; display: block' : 'width: 100%; height: 320px; display: none' ?>"></div></p>
+      <p><textarea class="queryfield" id="query_text" name="query_text" style="<?php echo ($_POST['query_text']=='') ? 'width: 100%; height: 320px; display: none' : 'width: 100%; height: 320px; display: inline' ?>"><?php echo isset($_POST['query_text']) ? $_POST['query_text'] : ''; ?></textarea><p>
     </div>
     <p><input id="submit" name="submit1" type="submit" value="Submit" class="pure-button pure-button-primary" style="float: right"><p>
     <br>
@@ -142,9 +153,11 @@
       <?php 
       if ($querysubmitted)
         echo "document.getElementById('query').innerHTML = ". (($_POST['dataset'] == "forum") ? "queries_forum['" . $_POST['queries_forum'] : "queries_synthetic['" . $_POST['queries_synthetic']) ."'];\n";
+
       ?>
       $("#queries_forum").<?= (!$querysubmitted || ($_POST['dataset'] == "forum")) ? 'show' : 'hide' ?>();
       $("#queries_synthetic").<?= ($querysubmitted && ($_POST['dataset'] == "synthetic")) ? 'show' : 'hide' ?>();
+      $("#queries_custom").<?= ($querysubmitted && ($_POST['dataset'] == "custom")) ? 'show' : 'hide' ?>(); 
 
     });
 
@@ -155,12 +168,21 @@
         $("#queries_forum").show();
         $("#queries_forum").prop("selectedIndex", 0);
         $("#queries_synthetic").hide();
+        $("#queries_custom").hide();
         break;
     case "synthetic":
         $("#queries_forum").hide();
         $("#queries_synthetic").show();
         $("#queries_synthetic").prop("selectedIndex", 0);
+        $("#queries_custom").hide();
         break;
+    case "custom":
+        $("#queries_forum").hide();
+        $("#queries_synthetic").hide();
+        $("#queries_custom").show();
+        $("#queries_custom").prop("selectedIndex", 0);
+        break;
+
     }
     });
                                   
@@ -168,13 +190,29 @@
     //if($("#queries_forum") > 0) {
       //$("#query").val(queries_forum[$("#queries_forum").val()]);
       //$("#query").text(queries_forum[$("#queries_forum").val()]);
+      document.getElementById('query').style.display = 'block';
+      document.getElementById('query_text').style.display = 'none';
       document.getElementById('query').innerHTML = queries_forum[$("#queries_forum").val()];
     });
     $("#queries_synthetic").change(function () {
     //else if($("#queries_synthetic") > 0) {                                           
       //$("#query").val(queries_synthetic[$("#queries_synthetic").val()]);
       //$("#query").text(queries_synthetic[$("#queries_synthetic").val()]);
+      document.getElementById('query').style.display = 'block';
+      document.getElementById('query_text').style.display = 'none';
       document.getElementById('query').innerHTML = queries_synthetic[$("#queries_synthetic").val()];
+    });
+    $("#dataset").change(function () {
+    //else if($("#queries_synthetic") > 0) {                                           
+      //$("#query").val(queries_synthetic[$("#queries_synthetic").val()]);
+      //$("#query").text(queries_synthetic[$("#queries_synthetic").val()]);
+      if($("#dataset").val() == "custom" && $("#query").val() == "") {
+        //document.getElementById('query').innerHTML = queries_synthetic[$("#queries_synthetic").val()];
+        document.getElementById('query').style.display = 'none';
+        document.getElementById('query_text').style.display = 'block';
+        document.getElementById('query_text').style.width = '100%';
+        document.getElementById('query_text').innerHTML = "";
+      }
     });
     </script>
 
