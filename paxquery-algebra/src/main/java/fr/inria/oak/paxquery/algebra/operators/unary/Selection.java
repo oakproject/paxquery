@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package fr.inria.oak.paxquery.algebra.operators.unary;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
-import fr.inria.oak.paxquery.common.datamodel.metadata.NestedMetadataUtils;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.BasePredicate;
 

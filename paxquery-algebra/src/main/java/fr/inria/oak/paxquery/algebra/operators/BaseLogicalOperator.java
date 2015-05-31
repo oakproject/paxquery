@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,8 +90,8 @@ public abstract class BaseLogicalOperator {
 				dir.mkdirs();
 			}
 			
-			String fileNameDot =  new String(folder+File.separator+givenFileName + "-LogPlan.dot");
-			String fileNamePNG = new String(folder + File.separator + givenFileName + "-LogPlan.png");
+			String fileNameDot =  new String(folder+File.separator+givenFileName+"-logplan.dot");
+			String fileNamePNG = new String(folder+File.separator+givenFileName+"-logplan.png");
 			
 			//System.out.println("fileNameDot: "+fileNameDot);
 			FileWriter file = new FileWriter(fileNameDot);
@@ -99,7 +99,7 @@ public abstract class BaseLogicalOperator {
 			file.write("}\n");
 			file.close();
 			Runtime r = Runtime.getRuntime();
-			String com = new String("/usr/local/bin/dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
+			String com = new String("dot -Tpng " + fileNameDot + " -o " + fileNamePNG);
 			Process p = r.exec(com);
 			p.waitFor();
 			//System.out.println("Logical plan drawn.");
@@ -111,17 +111,21 @@ public abstract class BaseLogicalOperator {
 
 
 	public NestedMetadata getNRSMD() {
-		if(this.nestedMetadata == null)
+		if(this.nestedMetadata == null) {
 			buildNRSMD();
-				
+		}
+
 		return this.nestedMetadata;
 	}
 	
 	public abstract void buildNRSMD();
 		
 	public void resetNRSMD() {
-		for(BaseLogicalOperator child : children)
-			child.resetNRSMD();
+	  if (children != null) {
+	    for(BaseLogicalOperator child : children) {
+	      child.resetNRSMD();
+	    }
+	  }
 		nestedMetadata = null;
 	}
 

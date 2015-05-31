@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public final class ConstructionTreePatternNode implements Serializable {
 	private String value;				// Either XML node tag, XML attribute tag, XML content (if literal) or attribute content (if literal)
 	private boolean optional;			// Is it an optional node?
 	private boolean variablePathRemapped;// Has the varmap been remapped?
+	private String outerVariable = null;	//if != -1 then this varpath is nested and this subtractFromVarpath stores the column of the outer variable; positions of inner columns should be calculated by subtracting subtractFromVarpath  
 	
 	public ConstructionTreePatternNode(ConstructionTreePattern ctp, ContentType contentType, String value, boolean optional) {
 		this(ctp, contentType, null, value, optional);
@@ -173,5 +174,13 @@ public final class ConstructionTreePatternNode implements Serializable {
 			child.setCTPFromHere(anotherCTP);
 		}		
 		this.ctp = anotherCTP;
+	}
+	
+	public void setOuterVariable(String name) {
+		this.outerVariable = name;
+	}
+	
+	public String getOuterVariable() {
+		return this.outerVariable;
 	}
 }

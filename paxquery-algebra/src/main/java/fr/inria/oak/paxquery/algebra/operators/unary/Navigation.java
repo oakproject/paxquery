@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,9 @@ public class Navigation extends BaseUnaryOperator {
 	
 	@Override
 	public void buildNRSMD() {
-		for(BaseLogicalOperator op : children)
+		for(BaseLogicalOperator op : children) {
 			op.buildNRSMD();
+		}
 		this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.getChild().getNRSMD(),
 				NestedMetadataUtils.getNRSMD(this.navigationTreePattern.getRoot(), new HashMap<Integer, HashMap<String, ArrayList<Integer>>>()));
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import org.apache.flink.core.fs.FSDataInputStream;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 
+import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.algebra.optimizer.Optimizer;
 import fr.inria.oak.paxquery.algebra.test.parser.LogicalPlanParser;
 import fr.inria.oak.paxquery.translation.Logical2Pact;
 
@@ -37,7 +39,7 @@ import fr.inria.oak.paxquery.translation.Logical2Pact;
  */
 public class QueryProcessor implements Program, ProgramDescription {
 	
-	private static final Log logger = LogFactory.getLog(QueryProcessor.class);
+	private static final Log LOG = LogFactory.getLog(QueryProcessor.class);
 
 
 	@Override
@@ -59,8 +61,15 @@ public class QueryProcessor implements Program, ProgramDescription {
 			final FileSystem fs = pathToPlanFile.getFileSystem();
 			FSDataInputStream fsdis = fs.open(pathToPlanFile);
 
-			BaseLogicalOperator logPlan = LogicalPlanParser.parseFile(fsdis);
-					
+			// 1. Parsing the logical plan and generating the initial plan
+			final BaseLogicalOperator root = LogicalPlanParser.parseFile(fsdis);
+			LogicalPlan logPlan = new LogicalPlan();
+			logPlan.setRoot(root);
+
+			// 2. Logical optimizations over the plan
+			Optimizer.INSTANCE.optimize(logPlan);
+
+			// 3. Translating plan to PACT
 			plan = Logical2Pact.planTranslate(logPlan);
 			plan.setDefaultParallelism(noSubtasks);
 		} catch (Exception e) {

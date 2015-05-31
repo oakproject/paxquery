@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate;
  */
 public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 
-	private final int aggregationColumn;
+	private int aggregationColumn;
 
 	private final AggregationType aggregationType;
 	
@@ -42,11 +42,9 @@ public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 			int documentIDColumn, int[] nodeIDColumns, int aggregationColumn, AggregationType aggregationType,
 			boolean excludeNestedField) throws PAXQueryExecutionException {
 		super(left,right,pred, documentIDColumn, nodeIDColumns);
-
+    this.ownName = "LeftOuterNestedJoinWithAggregation";
 		this.aggregationColumn = aggregationColumn;
-		
 		this.aggregationType = aggregationType;
-		
 		this.excludeNestedField = excludeNestedField;
 	}
 
@@ -70,11 +68,15 @@ public class LeftOuterNestedJoinWithAggregation extends LeftOuterNestedJoin {
 	public int getAggregationColumn() {
 		return this.aggregationColumn;
 	}
-	
+
+  public void setAggregationColumn(int aggregationColumn) {
+    this.aggregationColumn = aggregationColumn;
+  }
+
 	public AggregationType getAggregationType() {
 		return this.aggregationType;
 	}
-	
+
 	public boolean isExcludeNestedField() {
 		return this.excludeNestedField;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ public class NestedMetadataUtils {
 			colNames[i] = n1.colNames[i];
 		}
 		types[n1.colNo] = MetadataTypes.TUPLE_TYPE;
-		colNames[n1.colNo] = n2.colNames[0];
+		colNames[n1.colNo] = MetadataTypes.TUPLE_TYPE.toString();
 		for (int i = 0; i < n1.nestedChildren.length; i++) {
 			nestedChildren[i] = n1.nestedChildren[i];
 		}

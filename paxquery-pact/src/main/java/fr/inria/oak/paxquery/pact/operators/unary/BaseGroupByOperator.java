@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,14 @@ public abstract class BaseGroupByOperator extends BaseReduceOperator {
 		
 		//Initialize the list to be nested records...
 		RecordList resultsToKeep = new RecordList();
-		
+
 		//Store the contents for the new record
 		NestedMetadata nestedNRSMD = null;
-		if(!excludeNestedField)
-			nestedNRSMD = inputRecordsSignature.getNestedChild(inputRecordsSignature.getColNo()-1);
+		if(!excludeNestedField) {
+			nestedNRSMD = inputRecordsSignature.getNestedChild(
+			        aggregationColumn != -1 ? inputRecordsSignature.getColNo()-2 :
+			          inputRecordsSignature.getColNo()-1);
+		}
 
 		Record record;
 		do {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Sets;
+
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
 
 /**
  * This class models the construction tree patterns.
@@ -255,6 +258,7 @@ public class ConstructionTreePattern implements Serializable {
 			//		newCtp, top.getContentType(), top.getVarPath(), top.getValue(), top.isOptional());
 			ConstructionTreePatternNode topCopy = new ConstructionTreePatternNode(
 					newCtp, top.getContentType(), duplicatedVarPath, top.getValue(), top.isOptional());
+			topCopy.setOuterVariable(top.getOuterVariable());
 			newCtp.nodes.add(topCopy);
 			
 			if(top == root) {
@@ -319,5 +323,36 @@ public class ConstructionTreePattern implements Serializable {
 			sb.append(" ) ");				
 		}		
 	}
+
+  public Set<Integer> getTopLevelIndices() {
+    return getRecTopLevelIndices(root);
+  }
+
+  private static Set<Integer> getRecTopLevelIndices(ConstructionTreePatternNode node) {
+    Set<Integer> usedPos = Sets.newTreeSet();
+    if (node.getContentType() == ContentType.VARIABLE_PATH) {
+      usedPos.add(node.getVarPath().get(0));
+    } else {
+      for (ConstructionTreePatternNode child : node.getChildren()) {
+        usedPos.addAll(getRecTopLevelIndices(child));
+      }
+    }
+    return usedPos;
+  }
+
+  public void updateTopLevelIndices(Map<Integer,Integer> updatedColumns) {
+    updateTopLevelIndices(root, updatedColumns);
+  }
+
+  private void updateTopLevelIndices(ConstructionTreePatternNode node,
+          Map<Integer,Integer> updatedColumns) {
+    if (node.getContentType() == ContentType.VARIABLE_PATH) {
+      node.getVarPath().set(0, updatedColumns.get(node.getVarPath().get(0)));
+    } else {
+      for (ConstructionTreePatternNode child : node.getChildren()) {
+        updateTopLevelIndices(child, updatedColumns);
+      }
+    }
+  }
 
 }

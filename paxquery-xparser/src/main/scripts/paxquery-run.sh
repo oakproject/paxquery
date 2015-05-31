@@ -33,8 +33,7 @@ fi
 
 #Variables
 QUERY_FILE=$1
-OUTPUT_DIR=$(cd $(dirname $1); pwd)
-OUTPUT_FILE=$(basename $2)
+OUTPUT_DIR=$2
 PARALELLISM=$3
 
 PAXQUERY_INSTALLATION_BIN=$PAXQUERY_INSTALLATION_PATH"/bin"
@@ -51,7 +50,7 @@ echo ""
 #Actions
 rm $2 &> /dev/null	#hide rm output from the user
 if [ $drawtrees -eq 0 ]; then
-	"$FLINK_PATH"/bin/flink run -v $XPARSER_JAR file://"$QUERY_FILE" file://"$OUTPUT_DIR"/"$OUTPUT_FILE" $3
+	"$FLINK_PATH"/bin/flink run -v $XPARSER_JAR file://"$QUERY_FILE" "$OUTPUT_DIR" $3
 else
-	"$FLINK_PATH"/bin/flink run -v $XPARSER_JAR file://"$QUERY_FILE" file://"$OUTPUT_DIR"/"$OUTPUT_FILE" $3 drawtrees $WEB_PATH
+	"$FLINK_PATH"/bin/flink run -v $XPARSER_JAR file://"$QUERY_FILE" "$OUTPUT_DIR" $3 drawtrees $WEB_PATH
 fi

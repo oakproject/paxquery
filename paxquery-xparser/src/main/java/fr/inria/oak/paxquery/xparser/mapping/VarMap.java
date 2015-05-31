@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
@@ -5,6 +20,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
+
+import com.google.common.collect.Sets;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
@@ -77,9 +95,23 @@ public class VarMap {
 	 * @param var the new variable
 	 * @return the temporary position
 	 */
+	/*public int addNewVariable(Variable var) {
+		if(var == null || var.name == null)
+			return -1;
+		
+		variables.put(var.name, var);
+		temporaryPositionsByName.put(var.name, nextTemporaryPosition);
+		namesByTemporaryPosition.put(nextTemporaryPosition, var.name);
+		
+		nextTemporaryPosition++;
+		return nextTemporaryPosition-1;
+	}*/
 	public int addNewVariable(Variable var) {
 		if(var == null || var.name == null)
 			return -1;
+	
+		if(variables.get(var.name) != null)
+			return temporaryPositionsByName.get(var.name);
 		
 		variables.put(var.name, var);
 		temporaryPositionsByName.put(var.name, nextTemporaryPosition);
@@ -353,8 +385,15 @@ public class VarMap {
 				list.add(couple);
 			} catch(Exception e) {}
 		}
-		list.sort(new Comparator<Object[]>() { public int compare(Object[] a, Object[] b) {return ((Integer)a[1]).compareTo((Integer)b[1]);}});
-		Iterator<Object[]> iterator2 = list.iterator();
+		TreeSet<Object[]> sortedList =
+		        Sets.newTreeSet(
+		                new Comparator<Object[]>() {
+		                  public int compare(Object[] a, Object[] b) {
+		                    return ((Integer)a[1]).compareTo((Integer)b[1]);
+		                  }
+		                });
+		sortedList.addAll(list);
+		Iterator<Object[]> iterator2 = sortedList.iterator();
 		while(iterator2.hasNext()) {
 			Object[] couple = iterator2.next();
 			String name = (String)couple[0];

@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package fr.inria.oak.paxquery.algebra.logicalplan;
 
 import java.util.ArrayList;
@@ -5,10 +20,9 @@ import java.util.List;
 
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.BaseBinaryOperator;
-import fr.inria.oak.paxquery.algebra.operators.border.*;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
 import fr.inria.oak.paxquery.algebra.operators.unary.BaseUnaryOperator;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
-import fr.inria.oak.paxquery.common.xml.navigation.Variable;
 
 /**
  * Describes a logical plan composed of algebraic operators.
@@ -149,7 +163,22 @@ public class LogicalPlan {
 				((BaseBinaryOperator) operator).replaceChild(oldChild,  newChild);
 		}
 	}
-	
+
+	public static void connect(BaseLogicalOperator parent, BaseLogicalOperator child) {
+    parent.getChildren().clear();
+    parent.getChildren().add(child);
+    child.setParent(parent);
+	}
+
+	public static void connect(BaseLogicalOperator parent, BaseLogicalOperator leftChild,
+	        BaseLogicalOperator rightChild) {
+	  parent.getChildren().clear();
+	  parent.getChildren().add(leftChild);
+    leftChild.setParent(parent);
+    parent.getChildren().add(rightChild);
+    rightChild.setParent(parent);
+	}
+
 	/**
 	 * Goes through the tree of algebraic operators in pre-order and prints it out.
 	 * @param root the root of the tree, always an XMLConstruct operator

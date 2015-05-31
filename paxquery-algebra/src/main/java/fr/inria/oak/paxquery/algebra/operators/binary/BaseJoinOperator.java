@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public abstract class BaseJoinOperator extends BaseBinaryOperator {
 	
 	@Override
 	public void buildNRSMD() {
-		if(this.children != null && this.children.size() >= 2)
+		if(this.children != null && this.children.size() == 2)
 			this.nestedMetadata = NestedMetadataUtils.appendNRSMD(this.children.get(0).getNRSMD(), this.children.get(1).getNRSMD());
 		else
 			throw new PAXQueryExecutionException("Cannot build metadata for join operator.");

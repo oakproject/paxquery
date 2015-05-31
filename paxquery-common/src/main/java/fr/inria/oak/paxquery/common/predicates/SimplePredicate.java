@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,8 +252,6 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 			rightColumns[0][0] = this.column2;
 			return rightColumns;
 		}
-
-		logger.error("This predicate does not compare with another columns, but with a constant value!");
 		return null;
 	}
 	
@@ -284,20 +282,28 @@ public class SimplePredicate extends BasePredicate implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String var1name = this.variable1.name.startsWith("$") && this.variable1.name.length() > 1 ? this.variable1.name.substring(1) : this.variable1.name;
-		String var2name = null;
-		if(this.operation1 != null)
+		String var1name = "";
+		if (variable1 != null) {
+		  var1name = this.variable1.name.startsWith("$") && this.variable1.name.length() > 1 ?
+		          this.variable1.name.substring(1) : this.variable1.name;
+		}
+		if(this.operation1 != null) {
 			sb.append(var1name).append("(").append(this.column1).append(") ").append(this.operation1.toString());
-		else
+		} else {
 			sb.append(var1name).append("(").append(this.column1).append(") ");
+		}
 		sb.append(this.predCode.toString()+" ");
-		if(this.stringConstant != null)
+		if(this.stringConstant != null) {
 			sb.append(this.stringConstant);
-		else if(this.doubleConstant != -1)
+		} else if(this.doubleConstant != -1) {
 			sb.append(this.doubleConstant);
-		else {
-			var2name = this.variable2.name != null && this.variable2.name.startsWith("$") && this.variable2.name.length() > 1 ? this.variable2.name.substring(1) : this.variable2.name;
-			if(this.operation2 != null)
+		} else {
+		  String var2name = "";
+	    if (variable2 != null) {
+	      var2name = this.variable2.name != null && this.variable2.name.startsWith("$") && this.variable2.name.length() > 1 ?
+	              this.variable2.name.substring(1) : this.variable2.name;
+	    }
+	    if(this.operation2 != null)
 				sb.append(" ").append(var2name).append("(").append(this.column2).append(") ").append(this.operation2.toString());
 			else
 				sb.append(" ").append(var2name).append("(").append(this.column2).append(")");

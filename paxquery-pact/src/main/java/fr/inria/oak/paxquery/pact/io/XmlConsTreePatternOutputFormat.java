@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.flink.api.java.record.io.FileOutputFormat;
 import org.apache.flink.api.java.record.operators.FileDataSink;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.types.Record;
 import org.apache.flink.types.StringValue;
 
@@ -60,13 +61,15 @@ public class XmlConsTreePatternOutputFormat extends FileOutputFormat {
 	@Override
 	public void configure(Configuration parameters) {
 		super.configure(parameters);
-				
+
+    this.setWriteMode(WriteMode.OVERWRITE);
+
 		// read your own parameters
 		String recordsSignatureEncoded = parameters.getString(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), null);
 		byte[] recordsSignatureBytes = DatatypeConverter.parseBase64Binary(recordsSignatureEncoded);
 		final NestedMetadata signature = (NestedMetadata) SerializationUtils.deserialize(recordsSignatureBytes);
 		this.signature = signature;
-		
+
 		String ctpEncoded = parameters.getString(PACTOperatorsConfiguration.CTP_BINARY.toString(), null);
 		byte[] ctpBytes = DatatypeConverter.parseBase64Binary(ctpEncoded);
 		final ConstructionTreePattern ctp = (ConstructionTreePattern) SerializationUtils.deserialize(ctpBytes);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
  */
 public class GroupByWithAggregation extends GroupBy {
 
-	private final int aggregationColumn;
+	private int aggregationColumn;
 
 	private final AggregationType aggregationType;
 	
@@ -41,11 +41,9 @@ public class GroupByWithAggregation extends GroupBy {
 			int aggregationColumn, AggregationType aggregationType, 
 			boolean excludeNestedField) throws PAXQueryExecutionException {
 		super(child, reduceByColumns, groupByColumns, nestColumns);
-		
+    this.ownName = "GroupByWithAggregation";
 		this.aggregationColumn = aggregationColumn;
-		
 		this.aggregationType = aggregationType;
-		
 		this.excludeNestedField = excludeNestedField;
 	}
 	
@@ -69,7 +67,11 @@ public class GroupByWithAggregation extends GroupBy {
 	public int getAggregationColumn() {
 		return this.aggregationColumn;
 	}
-	
+
+  public void setAggregationColumn(int aggregationColumn) {
+	  this.aggregationColumn = aggregationColumn;
+  }
+
 	public AggregationType getAggregationType() {
 		return this.aggregationType;
 	}

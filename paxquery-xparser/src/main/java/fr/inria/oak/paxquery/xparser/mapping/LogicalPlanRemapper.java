@@ -1,15 +1,29 @@
+/*******************************************************************************
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package fr.inria.oak.paxquery.xparser.mapping;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
 import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoin;
-import fr.inria.oak.paxquery.algebra.operators.border.*;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLTreeConstruct;
 import fr.inria.oak.paxquery.algebra.operators.unary.Aggregation;
 import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
 import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
@@ -95,7 +109,7 @@ public class LogicalPlanRemapper {
 		//then calculate the positions of the variables in those XMLScans relative to construct
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(variableHolders);
 		//then substitute
-		substituteVariablesInCTP(construct.getConstructionTreePattern().getRoot(), equivalences);
+		substituteVariablesInCTP(construct.getConstructionTreePattern().getRoot(), equivalences, varMap);
 		
 		if(print == true && equivalences != null) {
 			System.out.println("VarMap for " + construct.getClass().getSimpleName() +" " + varMap.printNamesFinals(equivalences));
@@ -105,20 +119,25 @@ public class LogicalPlanRemapper {
 		return sublengths.get(0);
 	}
 	
-	private static void substituteVariablesInCTP(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
+	private static void substituteVariablesInCTP(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences, VarMap varMap) {
 		//substitute
-		substituteVariablesInCTPNode(node, equivalences);
+		substituteVariablesInCTPNode(node, equivalences, varMap);
 		//go to children
 		for(ConstructionTreePatternNode child : node.getChildren())
-			substituteVariablesInCTP(child, equivalences);
+			substituteVariablesInCTP(child, equivalences, varMap);
 	}
 	
-	private static void substituteVariablesInCTPNode(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences) {
+	private static void substituteVariablesInCTPNode(ConstructionTreePatternNode node, VariablePositionEquivalences equivalences, VarMap varMap) {
 		if(node.getContentType() == ContentType.VARIABLE_PATH && node.isVariablePathRemaped() == false) {
 			//alreadyVisitedVarpaths.add(node);
 			System.out.println("CTPN: "+node+" hash: "+node.hashCode());
 			List<Integer> varPath = node.getVarPath();
-			varPath.set(0, equivalences.getEquivalence(varPath.get(0)));
+			if(node.getOuterVariable() != null) {
+				int valueToSubtract = equivalences.getEquivalence(varMap.getTemporaryPositionByName(node.getOuterVariable()));
+				varPath.set(0, equivalences.getEquivalence(varPath.get(0)) - valueToSubtract);
+			}
+			else
+				varPath.set(0, equivalences.getEquivalence(varPath.get(0)));
 			for(int i = 1; i < varPath.size(); i++) {
 				if(varPath.get(i) == -1)
 					varPath.set(i, equivalences.getEquivalence(varPath.get(i)));
@@ -135,8 +154,11 @@ public class LogicalPlanRemapper {
 		//then calculate the positions of the variables in those XMLScans relative to dupElim
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(variableHolders);
 		//now substitute
-		for(int i = 0; i < dupElim.columns.length; i++)
-			dupElim.columns[i] = equivalences.getEquivalence(dupElim.columns[i]);
+		int[] newColumns = new int[dupElim.getColumns().length];
+		for(int i = 0; i < dupElim.getColumns().length; i++) {
+		  newColumns[i] = equivalences.getEquivalence(dupElim.getColumns()[i]);
+		}
+		dupElim.setColumns(newColumns);
 		dupElim.buildOwnDetails();
 		
 		return sublengths.get(0);
@@ -272,8 +294,10 @@ public class LogicalPlanRemapper {
 		VariablePositionEquivalences equivalences = varMap.calculateFinalPositions(variableHolders);
 		//now substitute
 		int[] aggregationPath = aggregation.getAggregationPath();
-		for(int i = 0; i < aggregationPath.length; i++)
+		for(int i = 0; i < aggregationPath.length; i++) 
 			aggregationPath[i] = equivalences.getEquivalence(aggregationPath[i]);
+		if(aggregationPath.length > 1 && aggregationPath[1] != 0)
+			aggregationPath[1] = aggregationPath[1] - aggregationPath[0];
 		aggregation.setAggregationPath(aggregationPath);		
 		
 		if(print) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 by Inria and Paris-Sud University
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.apache.flink.types.IntValue;
 import org.apache.flink.types.Record;
 import org.apache.flink.types.StringValue;
 
+import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
 import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
 import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
 import fr.inria.oak.paxquery.algebra.operators.binary.Join;
@@ -91,6 +92,7 @@ import fr.inria.oak.paxquery.pact.operators.unary.PostLOJoinOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.ProjectionOperator;
 import fr.inria.oak.paxquery.pact.operators.unary.SelectionOperator;
 
+
 /**
  * Translation of a logical expression into a PACT plan.
  * 
@@ -100,9 +102,8 @@ public class Logical2Pact {
 	private static final Log logger = LogFactory.getLog(Logical2Pact.class);
 	
 	
-	public static final Plan planTranslate(BaseLogicalOperator initialOp) {
-//		LogicalOperator log = LogicalRewriting.push(initialOp);
-		BaseLogicalOperator log = initialOp;
+	public static final Plan planTranslate(LogicalPlan logPlan) {
+		BaseLogicalOperator log = logPlan.getRoot();
 
 		logger.debug("After pushing: " + log.getName());
 				
@@ -321,14 +322,14 @@ public class Logical2Pact {
 		ReduceOperator.Builder duplicateEliminationBuilder = ReduceOperator.builder(DuplicateEliminationOperator.class)
 			.input(childPlan)
 			.name("DupElim");
-		for(int column: dupElim.columns)
+		for(int column: dupElim.getColumns())
 			KeyFactoryOperations.addKey(duplicateEliminationBuilder, MetadataTypesMapping.getKeyClass(dupElim.getChild().getNRSMD().getType(column)), column);
 		ReduceOperator duplicateElimination = duplicateEliminationBuilder.build();
 		
 		// projection configuration
 		final String encodedNRSMD = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(dupElim.getNRSMD()));
 		duplicateElimination.setParameter(PACTOperatorsConfiguration.NRSMD1_BINARY.toString(), encodedNRSMD);
-		final String encodedDuplicateEliminationColumns = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(dupElim.columns));
+		final String encodedDuplicateEliminationColumns = DatatypeConverter.printBase64Binary(SerializationUtils.serialize(dupElim.getColumns()));
 		duplicateElimination.setParameter(PACTOperatorsConfiguration.DUP_ELIM_COLUMNS_BINARY.toString(), encodedDuplicateEliminationColumns);
 		
 		return new Operator[]{duplicateElimination};

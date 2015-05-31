@@ -1,8 +1,37 @@
+/*******************************************************************************
+ * Copyright (C) 2013, 2014, 2015 by Inria and Paris-Sud University
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package fr.inria.oak.paxquery.xparser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
+
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import fr.inria.oak.paxquery.algebra.logicalplan.LogicalPlan;
-import fr.inria.oak.paxquery.algebra.operators.*;
-import fr.inria.oak.paxquery.algebra.operators.border.*;
+import fr.inria.oak.paxquery.algebra.operators.BaseLogicalOperator;
+import fr.inria.oak.paxquery.algebra.operators.binary.CartesianProduct;
+import fr.inria.oak.paxquery.algebra.operators.binary.LeftOuterNestedJoin;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLScan;
+import fr.inria.oak.paxquery.algebra.operators.border.XMLTreeConstruct;
+import fr.inria.oak.paxquery.algebra.operators.unary.Aggregation;
+import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
+import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
+import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.aggregation.AggregationType;
 import fr.inria.oak.paxquery.common.exception.PAXQueryExecutionException;
 import fr.inria.oak.paxquery.common.predicates.ArithmeticOperation;
@@ -12,13 +41,9 @@ import fr.inria.oak.paxquery.common.predicates.BasePredicate.PredicateType;
 import fr.inria.oak.paxquery.common.predicates.ConjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.DisjunctivePredicate;
 import fr.inria.oak.paxquery.common.predicates.SimplePredicate;
-import fr.inria.oak.paxquery.common.xml.construction.*;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePattern;
+import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.construction.ConstructionTreePatternNode.ContentType;
-import fr.inria.oak.paxquery.algebra.operators.binary.*;
-import fr.inria.oak.paxquery.algebra.operators.unary.Aggregation;
-import fr.inria.oak.paxquery.algebra.operators.unary.DuplicateElimination;
-import fr.inria.oak.paxquery.algebra.operators.unary.GroupBy;
-import fr.inria.oak.paxquery.algebra.operators.unary.Selection;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePattern;
 import fr.inria.oak.paxquery.common.xml.navigation.NavigationTreePatternNode;
 import fr.inria.oak.paxquery.common.xml.navigation.Variable;
@@ -29,13 +54,6 @@ import fr.inria.oak.paxquery.xparser.mapping.VarMap;
 import fr.inria.oak.paxquery.xparser.operatorinfo.BaseNestingOperatorInfo;
 import fr.inria.oak.paxquery.xparser.operatorinfo.GroupByInfo;
 import fr.inria.oak.paxquery.xparser.operatorinfo.LeftOuterNestedJoinInfo;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
-
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 
 public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
@@ -241,12 +259,12 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			//in case the dupelim already exists
 			if(var.getTreePattern() != null && dupelimNavigationTreePatterns.get(var.getTreePattern().getName()) != null) {
 				DuplicateElimination affectedDupElim = dupelimNavigationTreePatterns.get(var.getTreePattern().getName());
-				int[] oldColumns = affectedDupElim.columns;
+				int[] oldColumns = affectedDupElim.getColumns();
 				int[] newColumns = new int[oldColumns.length+1];
 				for(int i = 0; i < oldColumns.length; i++)
 					newColumns[i] = oldColumns[i];
 				newColumns[newColumns.length-1] = varMap.getTemporaryPositionByName(lastVarLeftSide);
-				affectedDupElim.columns = newColumns;
+				affectedDupElim.setColumns(newColumns);
 			}
 			else {
 				DuplicateElimination dupel = null;
@@ -1464,10 +1482,10 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			visit(ctx.eleConst());
 
 			//update all varpaths in the nested ctp with the position of the outer variable
-			if(subqueryLevel > -1) {
-				Variable outerVarObject = varMap.getVariable(outerVarSubquery);
-				outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
-			}
+			//if(subqueryLevel > -1) {
+			//	Variable outerVarObject = varMap.getVariable(outerVarSubquery);
+			//	outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+			//}
 		}
 		//if not, we have an aggrExpr or a VAR
 		else if(ctx.aggrExpr() != null || ctx.VAR() != null) {
@@ -1600,26 +1618,51 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						}
 						
 					}		
-					
+					//create the variable that contains the query
+					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					varMap.addNewVariable(outerVarObject);
+
 					ArrayList<Integer> list = new ArrayList<Integer>();
 					list.add(varMap.getTemporaryPositionByName(varName));
+					//outerVarObject.nestedPaths.add(varMap.getTemporaryPositionByName(varName));
 					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
-					if(nested == true)
+					if(nested == true) {
 						list.add(-1);
+					//	outerVarObject.nestedPaths.add(varMap.getTemporaryPositionByName(varName));
+					}
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 
-					//crate a CTPNode with a varpath for the innervariable of the outervariable
+					//create a CTPNode with a varpath for the innervariable of the outervariable
 					//ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
 					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
+					ctpnode.setOuterVariable(outerVarObject.name);
+					
+					//create a CTPNode with the varpath of the outervariable itself
+					int[] varpathouter = new int[1];
+					varpathouter[0] = varMap.getTemporaryPositionByName(outerVarObject.name);
+					ConstructionTreePatternNode ctpnodeouter = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpathouter, false);
+					
+					
 					//instantiate the inner construction tree pattern
-					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
-					ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);
+					//subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
+					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnodeouter);
+					ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);					
+					ctpnodeouter.setConstructionTreePattern(subqueryConstructionTreePattern);
+					subqueryConstructionTreePattern.addChild(ctpnodeouter, ctpnode);
+					
 					//add the variable that contains the subquery
-					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
 					//connect the new variable to the new CTP
-					outerVarObject.setNestedCTP(ctpnode);
-					varMap.addNewVariable(outerVarObject);
-					outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+					//outerVarObject.setNestedCTP(ctpnode);
+					outerVarObject.setNestedCTP(ctpnodeouter);
+					//varMap.addNewVariable(outerVarObject);
+					
+					//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+
+					
+					
+					
+					
+					
 					//get the predicate
 					BasePredicate predicate = predicateStack.pop();
 					if(predicate == null)
@@ -1682,24 +1725,53 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					//instantiate CP between the outer and the inner scans
 					constructChild = new CartesianProduct(constructChild, rightChild);
 					
+					
+					//add the variable that contains the subquery
+					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					varMap.addNewVariable(outerVarObject);
+
 					ArrayList<Integer> list = new ArrayList<Integer>();
 					list.add(varMap.getTemporaryPositionByName(varName));
 					boolean nested = (var.dataType != Variable.VariableDataType.Aggregation) && (var.node.getNestingDepth() > 0);
 					if(nested == true)
 						list.add(-1);
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
-					
+
 					//crate a CTPNode with a varpath for the innervariable of the outervariable
 					ConstructionTreePatternNode ctpnode = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpath, false);
-					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
-					ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);
+					ctpnode.setOuterVariable(outerVarObject.name);
+					//subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
+					//ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);
+
+					//////////
+					//create a CTPNode with the varpath of the outervariable itself
+					int[] varpathouter = new int[1];
+					varpathouter[0] = varMap.getTemporaryPositionByName(outerVarObject.name);
+					ConstructionTreePatternNode ctpnodeouter = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, varpathouter, false);
+
+					//instantiate the inner construction tree pattern
+					//subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnode);
+					subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnodeouter);
+					//ctpnode.setConstructionTreePattern(subqueryConstructionTreePattern);					
+					ctpnodeouter.setConstructionTreePattern(subqueryConstructionTreePattern);
+					subqueryConstructionTreePattern.addChild(ctpnodeouter, ctpnode);
 					
 					//add the variable that contains the subquery
-					Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
 					//connect the new variable to the new CTP
-					outerVarObject.setNestedCTP(ctpnode);
-					varMap.addNewVariable(outerVarObject);
-					outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+					//outerVarObject.setNestedCTP(ctpnode);
+					outerVarObject.setNestedCTP(ctpnodeouter);
+					//varMap.addNewVariable(outerVarObject);
+
+					///////////
+
+					
+					
+					//add the variable that contains the subquery
+					//Variable outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					//connect the new variable to the new CTP
+					//outerVarObject.setNestedCTP(ctpnode);
+					//varMap.addNewVariable(outerVarObject);
+					//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 					//instantiate a temporary empty GroupBy operator
 					constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
 					//instantiate a XQueryGroupByInfo for later update of the GroupBy operator
@@ -1717,7 +1789,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * visitEleConst
 	 * TODO: for the case eleConst : LT_S eaName att* CLOSE_OPENING_TAG we just plug the first XMLScan object to the XMLConstruct object. ANY BETTER SOLUTION?
 	 */
-	public Void visitEleConst(XQueryParser.EleConstContext ctx) {
+	/*public Void visitEleConst(XQueryParser.EleConstContext ctx) {
 		String tag = ctx.eaName(0).getText();
 		ConstructionTreePatternNode node = new ConstructionTreePatternNode(ContentType.ELEMENT, tag, false);
 		if(subqueryLevel == -1) {	//not in a sub-query
@@ -1774,7 +1846,82 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 		}
 		
 		return null;
+	}*/
+	public Void visitEleConst(XQueryParser.EleConstContext ctx) {
+		String tag = ctx.eaName(0).getText();
+		ConstructionTreePatternNode node = new ConstructionTreePatternNode(ContentType.ELEMENT, tag, false);
+		if(subqueryLevel == -1) {	//not in a sub-query
+			if(constructionTreePattern == null)
+				constructionTreePattern = new ConstructionTreePattern(node);
+			else {
+				constructionTreePattern.addChild(lastConstructionTreePatternNode, node);
+				node.setConstructionTreePattern(constructionTreePattern);
+			}
+			lastConstructionTreePatternNode = node;
+		}
+		else {	//inside a sub-query
+			if(subqueryConstructionTreePattern == null) {
+				Variable outerVarObject = varMap.getVariable(outerVarSubquery);
+				//if(varMap.getVariable(outerVarSubquery) == null) {
+				if(outerVarObject == null) {
+					outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
+					varMap.addNewVariable(outerVarObject);
+				}
+				
+				int[] outervar_varpath = { varMap.getTemporaryPositionByName(outerVarSubquery) };
+				ConstructionTreePatternNode ctpnodeouter = new ConstructionTreePatternNode(null, ContentType.VARIABLE_PATH, outervar_varpath, false);
+				subqueryConstructionTreePattern = new ConstructionTreePattern(ctpnodeouter);
+				subqueryConstructionTreePattern.addChild(ctpnodeouter, node);
+				ctpnodeouter.setConstructionTreePattern(subqueryConstructionTreePattern);
+				node.setConstructionTreePattern(subqueryConstructionTreePattern);
+				outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
+				
+				
+			}
+			else {
+				subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, node);
+				node.setConstructionTreePattern(subqueryConstructionTreePattern);
+			}
+			lastSubqueryConstructionTreePatternNode = node;
+		}
+		
+		//manually visit all attributes
+		for(int i = 0; i < ctx.att().size(); i++)
+			visit(ctx.att(i));
+		//if "eleConst : LT_S eaName att* CLOSE_OPENING_TAG" then we're done
+
+		if(subqueryLevel == -1) {	//not inside a sub-query
+			//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
+			if(ctx.GT_S().size() > 0) {
+				for(int i = 0; i < ctx.children.size(); i++) {
+					lastConstructionTreePatternNode = node;
+					//we find an eleConst rule
+					if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
+							ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
+						visit(ctx.getChild(i));
+					}
+				}
+				lastConstructionTreePatternNode = node.getParent();					
+			}
+		}
+		else {	//inside a sub-query
+			//eleConst : LT_S eaName att* (GT_S (eleConst | LEFTCURL eleConstInner RIGHTCURL )* OPEN_CLOSING_TAG (eaName) GT_S ) ;
+			if(ctx.GT_S().size() > 0) {
+				for(int i = 0; i < ctx.children.size(); i++) {
+					lastSubqueryConstructionTreePatternNode = node;
+					//we find an eleConst rule
+					if(ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstContext.class ||
+							ctx.getChild(i).getPayload().getClass() == XQueryParser.EleConstInnerContext.class) {
+						visit(ctx.getChild(i));
+					}
+				}
+				lastSubqueryConstructionTreePatternNode = node.getParent();					
+			}
+		}
+		
+		return null;
 	}
+
 
 	/**
 	 * att
@@ -1957,6 +2104,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					ctpnode.setOuterVariable(outerVarSubquery);					
 					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 					lastSubqueryConstructionTreePatternNode = lastSubqueryConstructionTreePatternNode.getParent();
 				}
@@ -2033,9 +2181,9 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					if(nested == true)
 						list.add(-1);
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
-					
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					ctpnode.setOuterVariable(outerVarSubquery);
 					subqueryConstructionTreePattern.addChild(lastSubqueryConstructionTreePatternNode, ctpnode);
 					lastSubqueryConstructionTreePatternNode = lastSubqueryConstructionTreePatternNode.getParent();
 				}
@@ -2048,7 +2196,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 	 * aggrExpr
 	 * TODO: currently we don't consider the aggregated expresion but the VAR within: obviously we need to address this differently
 	 */
-	public Void visitAggrExpr(XQueryParser.AggrExprContext ctx) {
+	/*public Void visitAggrExpr(XQueryParser.AggrExprContext ctx) {
 		String aggrType = ctx.AGGR_FUNCT().getText();
 		String varName = ctx.VAR().getText();
 		Variable var = varMap.getVariable(varName);
@@ -2059,6 +2207,50 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 			varpath = new int[2];
 			varpath[0] = varMap.getTemporaryPositionByName(varName);
 			varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+			if(subqueryLevel == -1) {
+				//outside a subquery, we build upon constructChild
+				if(constructChild == null) {
+					int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+					constructChild = scans.get(patternTreeIndex);
+					treePatternVisited.set(patternTreeIndex, true);
+				}
+				Variable aggrVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Aggregation);
+				varMap.addNewVariable(aggrVar);
+				constructChild = new Aggregation(constructChild, varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar, var);
+				
+			}
+			else {
+				//inside a subquery, we don't build upon constructChild
+				int patternTreeIndex = XQueryUtils.findVarInPatternTree(scans, patternNodeMap, varName);
+				Variable aggrVar = new Variable(lastVarLeftSide, Variable.VariableDataType.Aggregation);
+				varMap.addNewVariable(aggrVar);
+				Aggregation aggrOperator = new Aggregation(scans.get(patternTreeIndex), varpath, XQueryUtils.StringToAggregationType(aggrType), aggrVar, var);
+				scans.get(patternTreeIndex).setParent(aggrOperator);
+				treePatternVisited.set(patternTreeIndex, true);
+			}
+		}
+		else
+			throw new PAXQueryExecutionException("The variable " + varName + " is not nested, therefore it can not be aggregated.");
+		
+		return null;
+	}*/
+	public Void visitAggrExpr(XQueryParser.AggrExprContext ctx) {
+		String aggrType = ctx.AGGR_FUNCT().getText();
+		String varName = ctx.VAR().getText();
+		Variable var = varMap.getVariable(varName);
+		int[] varpath = null;
+		
+		if((var.node != null && var.node.getNestingDepth() > 0) || var.dataType == Variable.VariableDataType.Subquery) {
+			//we have a nested let
+			varpath = new int[2];
+			varpath[0] = varMap.getTemporaryPositionByName(varName);
+			//varpath[1] = -1;	//will be translated into a 0, which is the position of the nested tuples within this tuple. This is done to avoid confusions with the real 0-positioned variable, or to prevent crashes if no 0 position is found in varMap
+			//if(var.nestedPaths.size() > 0)
+			if(var.dataType == Variable.VariableDataType.Subquery && var.nestedCTPRoot.getContentType() == ContentType.VARIABLE_PATH && var.nestedCTPRoot.getVarPath().size() > 1)
+				varpath[1] = var.nestedCTPRoot.getVarPath().get(1);
+			else
+				varpath[1] = -1;
+			
 			if(subqueryLevel == -1) {
 				//outside a subquery, we build upon constructChild
 				if(constructChild == null) {
@@ -2262,6 +2454,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					ctpnode.setOuterVariable(outerVarSubquery);
 					
 					if(var.node != null && var.node.isAttribute() == true && isAggrExpr == false)	{ //create the artificial attribute node in the output
 						ConstructionTreePatternNode artificialAttributeNode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE, var.node.getTag(), false);
@@ -2328,7 +2521,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 						outerVarObject = new Variable(outerVarSubquery, Variable.VariableDataType.Subquery);
 						outerVarObject.setNestedCTP(subqueryConstructionTreePattern.getRoot());
 						varMap.addNewVariable(outerVarObject);
-						outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
+						//outerVarObject.updateNestedCTPWithVarPosition(varMap.getTemporaryPositionByName(outerVarObject.name));
 						
 						//instantiate a temporary empty GroupBy operator
 						constructChild = new GroupBy(constructChild, new int[0], new int[0], new int[0]);
@@ -2346,6 +2539,7 @@ public class XQueryVisitorImplementation extends XQueryBaseVisitor<Void> {
 					int[] varpath = XQueryUtils.IntegerListToIntArray(list);
 					//create a CTPNode with a varpath for the innervariable of the outervariable
 					ctpnode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.VARIABLE_PATH, varpath, false);
+					ctpnode.setOuterVariable(outerVarSubquery);
 					
 					if(var.node != null && var.node.isAttribute() == true && isAggrExpr == false)	{ //create the artificial attribute node in the output
 						ConstructionTreePatternNode artificialAttributeNode = new ConstructionTreePatternNode(subqueryConstructionTreePattern, ContentType.ATTRIBUTE, var.node.getTag(), false);
