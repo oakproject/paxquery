@@ -49,7 +49,7 @@ You may also want to install the Dot diagram (contained in [Graphviz](http://www
 
 Queries are written into text files. Graphs indicating the different intermediate logical and PACT execution plans are optionally drawn with the dot program.
 
-1 - Open {{$PAXQUERY_INSTALLATION_PATH/scripts/paxquery-run.sh}}. Set the following section according to your installation:
+1 - Open ```$PAXQUERY_INSTALLATION_PATH/scripts/paxquery-run.sh```. Set the following section according to your installation:
 
 ```
 ##########
