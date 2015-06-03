@@ -1,12 +1,5 @@
 # PAXQuery
 
-The PAXQuery engine seamlessly parallelizes the execution of XQuery queries. By applying on-the-fly translation and optimization procedures, PAXQuery runs user queries over massive collections of XML documents in a distributed fashion. PAXQuery runs on top of <a href="http://flink.apache.org/">Apache Flink</a>, previously known as <a href="http://stratosphere.eu/" target="_blank">Stratosphere</a>, a distributed execution platform that relies on the <a title="The PACT model" href="http://dl.acm.org/citation.cfm?id=1807148" target="_blank">PACT model</a>.
-
-After the user inputs the XQuery query, the engine builds an equivalent tree of algebraic operators that works on nested tuples. The set of operators includes navigation, group by, aggregation, selection, projection, and many others.
-
-Once the tree is built and optimized, the engine compiles it into a PACT plan consisting of <em>implicit parallel</em> operators such as Map, Reduce, Match, CoGroup, or Cross. The result is given to the Stratosphere platform, which is responsible for the PACT plan optimization and its parallel execution e.g. over HDFS or the local filesystem.
-
-
 PAXQuery is an XQuery processor built on top of the [Apache Flink](http://flink.apache.org/) platform, previously known as <a href="http://stratosphere.eu/" target="_blank">Stratosphere</a>. It automatically parallelizes queries over large collections of XML documents by translating XQuery into the PACT model used by Apache Flink.
 
 After the user inputs the XQuery query, the engine builds an equivalent tree of algebraic operators that works on nested tuples. The set of operators includes navigation, group by, aggregation, selection, projection, and many others.
