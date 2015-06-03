@@ -1,8 +1,21 @@
 # PAXQuery
 
-PAXQuery is an XQuery processor built on top of the [Apache Flink](http://flink.apache.org/) platform. It automatically parallelizes queries over large collections of XML documents by translating XQuery into the PACT model used by Apache Flink.
+The PAXQuery engine seamlessly parallelizes the execution of XQuery queries. By applying on-the-fly translation and optimization procedures, PAXQuery runs user queries over massive collections of XML documents in a distributed fashion. PAXQuery runs on top of <a href="http://flink.apache.org/">Apache Flink</a>, previously known as <a href="http://stratosphere.eu/" target="_blank">Stratosphere</a>, a distributed execution platform that relies on the <a title="The PACT model" href="http://dl.acm.org/citation.cfm?id=1807148" target="_blank">PACT model</a>.
 
-Currently PAXQuery is in a pre-alpha state. We support a subset of XQuery that can be found in the following ANTLR 4.2 files: [XQuery.g4](http://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XQuery.g4), [XPath.g4](https://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XPath.g4), and [XLexer.g4](https://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XLexer.g4). Although our algebra supports group-by and multiple levels of nesting, the translation from XQuery to it has not been completed yet.
+After the user inputs the XQuery query, the engine builds an equivalent tree of algebraic operators that works on nested tuples. The set of operators includes navigation, group by, aggregation, selection, projection, and many others.
+
+Once the tree is built and optimized, the engine compiles it into a PACT plan consisting of <em>implicit parallel</em> operators such as Map, Reduce, Match, CoGroup, or Cross. The result is given to the Stratosphere platform, which is responsible for the PACT plan optimization and its parallel execution e.g. over HDFS or the local filesystem.
+
+
+PAXQuery is an XQuery processor built on top of the [Apache Flink](http://flink.apache.org/) platform, previously known as <a href="http://stratosphere.eu/" target="_blank">Stratosphere</a>. It automatically parallelizes queries over large collections of XML documents by translating XQuery into the PACT model used by Apache Flink.
+
+After the user inputs the XQuery query, the engine builds an equivalent tree of algebraic operators that works on nested tuples. The set of operators includes navigation, group by, aggregation, selection, projection, and many others.
+
+Once the tree is built and optimized, the engine compiles it into a PACT plan consisting of <em>implicit parallel</em> operators such as Map, Reduce, Match, CoGroup, or Cross. The result is given to the Apache Flink platform, which is responsible for the PACT plan optimization and its parallel execution e.g. over HDFS or the local filesystem.
+
+##Current status
+
+Currently PAXQuery is in a pre-alpha state. We support a subset of XQuery that can be found in the following ANTLR 4.2 files: [XQuery.g4](http://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XQuery.g4), [XPath.g4](https://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XPath.g4), and [XLexer.g4](https://github.com/stratosphere/paxquery/blob/master/paxquery-xparser/src/main/java/fr/inria/oak/paxquery/xparser/XLexer.g4). Although our algebra supports group-by and multiple levels of nesting, the translation from XQuery to it has not been completed yet. If you would like to get involved, send us a message!
 
 ##More information
 http://cloak.saclay.inria.fr/research/paxquery
